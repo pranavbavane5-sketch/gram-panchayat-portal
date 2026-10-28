@@ -25,3 +25,12 @@ scratch/
 *.sql
 *.dump
 
+# Firebase Service Account Keys & Secrets (CRITICAL: DO NOT COMMIT)
+*serviceAccount*.json
+*service-account*.json
+*firebase-adminsdk*.json
+*firebase*.json
+*.credentials.json
+serviceAccountKey.json
+
+

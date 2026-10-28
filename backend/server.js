@@ -72,12 +72,23 @@ app.use(express.json({ limit: "2mb" }));
 // 1. HEALTH CHECK ENDPOINT
 // ==========================================================
 app.get("/api/health", async (req, res) => {
-  const dbStatus = await testConnection();
+  const provider = process.env.DB_PROVIDER || "mysql";
+  let dbStatus;
+
+  if (provider === "firestore") {
+    const { checkFirestoreConnection } = await import("./firestoreDb.js");
+    dbStatus = await checkFirestoreConnection();
+  } else {
+    dbStatus = await testConnection();
+    dbStatus.provider = "mysql";
+  }
+
   const isOk = dbStatus.connected;
 
   res.status(isOk ? 200 : 503).json({
     status: isOk ? "ok" : "degraded",
     server: "running",
+    provider,
     uptime: Math.floor(process.uptime()),
     database: dbStatus,
     timestamp: new Date().toISOString()

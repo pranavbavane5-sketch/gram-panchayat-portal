@@ -43,15 +43,20 @@ export function authenticateToken(req, res, next) {
   if (!token) {
     return res.status(401).json({
       error: "Unauthorized",
+      code: "NO_TOKEN",
       message: "Access token is required. Please log in to proceed."
     });
   }
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(403).json({
-        error: "Forbidden",
-        message: "Invalid or expired session token. Please log in again."
+      const isExpired = err.name === "TokenExpiredError";
+      return res.status(401).json({
+        error: "Unauthorized",
+        code: isExpired ? "TOKEN_EXPIRED" : "INVALID_TOKEN",
+        message: isExpired
+          ? "Your session has expired. Please log in again."
+          : "Invalid or expired session token. Please log in again."
       });
     }
     req.user = decoded;

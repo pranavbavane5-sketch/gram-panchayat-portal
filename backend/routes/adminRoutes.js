@@ -22,8 +22,8 @@ router.get("/profile", async (req, res) => {
   try {
     const adminId = req.user.id;
     const users = await query(
-      "SELECT id, login_id, role, role_title, full_name, phone, email, created_at FROM users WHERE id = ?",
-      [adminId]
+      "SELECT id, login_id, role, role_title, full_name, phone, email, created_at FROM users WHERE id = ? OR login_id = ? LIMIT 1",
+      [adminId, req.user.loginId || adminId]
     );
     if (users.length === 0) {
       return res.status(404).json({ error: "Not found", message: "Admin profile not found." });
@@ -51,7 +51,10 @@ router.put("/profile", async (req, res) => {
     const adminId = req.user.id;
     const { fullName, roleTitle, phone, email } = req.body;
 
-    const users = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [adminId]);
+    const users = await query(
+      "SELECT * FROM users WHERE id = ? OR login_id = ? LIMIT 1",
+      [adminId, req.user.loginId || adminId]
+    );
     if (users.length === 0) {
       return res.status(404).json({ error: "Not found", message: "Admin user not found." });
     }
@@ -69,10 +72,10 @@ router.put("/profile", async (req, res) => {
     // Persist changes to MySQL (strictly preserving login_id and role privileges)
     await query(
       "UPDATE users SET full_name = ?, role_title = ?, phone = ?, email = ? WHERE id = ?",
-      [newFullName, newRoleTitle, newPhone, newEmail, adminId]
+      [newFullName, newRoleTitle, newPhone, newEmail, adminRecord.id]
     );
 
-    const [updatedUser] = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [adminId]);
+    const [updatedUser] = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [adminRecord.id]);
     const { generateToken } = await import("../auth.js");
     const token = generateToken(updatedUser);
 

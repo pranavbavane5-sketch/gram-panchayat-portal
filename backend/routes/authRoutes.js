@@ -120,8 +120,8 @@ router.get("/me", authenticateToken, async (req, res) => {
 router.get("/profile", authenticateToken, async (req, res) => {
   try {
     const users = await query(
-      "SELECT id, login_id, role, role_title, full_name, phone, email, is_active, citizen_id, created_at FROM users WHERE id = ?",
-      [req.user.id]
+      "SELECT id, login_id, role, role_title, full_name, phone, email, is_active, citizen_id, created_at FROM users WHERE id = ? OR login_id = ? LIMIT 1",
+      [req.user.id, req.user.loginId || req.user.id]
     );
     if (users.length === 0) {
       return res.status(404).json({ error: "Not found", message: "User not found." });
@@ -152,7 +152,7 @@ router.put("/profile", authenticateToken, async (req, res) => {
     const userId = req.user.id;
     const { fullName, roleTitle, phone, email } = req.body;
 
-    const users = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [userId]);
+    const users = await query("SELECT * FROM users WHERE id = ? OR login_id = ? LIMIT 1", [userId, req.user.loginId || userId]);
     if (users.length === 0) {
       return res.status(404).json({ error: "Not found", message: "User not found." });
     }
@@ -173,7 +173,7 @@ router.put("/profile", authenticateToken, async (req, res) => {
     // Persist changes to MySQL securely - NEVER modify login_id or role (system permission)
     await query(
       "UPDATE users SET full_name = ?, role_title = ?, phone = ?, email = ? WHERE id = ?",
-      [newFullName, newRoleTitle, newPhone, newEmail, userId]
+      [newFullName, newRoleTitle, newPhone, newEmail, userRecord.id]
     );
 
     // If citizen account, keep citizens table in sync
@@ -185,7 +185,7 @@ router.put("/profile", authenticateToken, async (req, res) => {
     }
 
     // Fetch refreshed user record
-    const [updatedUser] = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [userId]);
+    const [updatedUser] = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [userRecord.id]);
 
     // Issue refreshed token with updated claims
     const token = generateToken(updatedUser);

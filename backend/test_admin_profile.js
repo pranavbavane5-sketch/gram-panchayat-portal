@@ -125,6 +125,26 @@ async function runTests() {
   });
   assert(invalidRes.status === 400, "Empty display name rejected with HTTP 400");
 
+  // Step 9: Token Verification & HTTP 401 Status Enforcement
+  const noTokenRes = await fetch(`${API_BASE}/auth/profile`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fullName: "Unauthorized Test" })
+  });
+  const noTokenData = await noTokenRes.json();
+  assert(noTokenRes.status === 401, "Missing token returns HTTP 401 Unauthorized", `Code: ${noTokenData.code}`);
+
+  const badTokenRes = await fetch(`${API_BASE}/auth/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer invalid_or_expired_jwt_token_sample"
+    },
+    body: JSON.stringify({ fullName: "Unauthorized Test" })
+  });
+  const badTokenData = await badTokenRes.json();
+  assert(badTokenRes.status === 401, "Invalid/expired token returns HTTP 401 Unauthorized", `Code: ${badTokenData.code}`);
+
   console.log("\n============================================================");
   console.log(`RESULTS: ${passed} passed, ${failed} failed`);
   console.log("============================================================\n");

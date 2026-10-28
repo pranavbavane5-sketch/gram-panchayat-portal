@@ -1134,12 +1134,11 @@ function initReportForm() {
     }
 
     try {
-      if (appState.isBackendConnected && appState.isDatabaseConnected) {
-        await api.createCommunityReport(newComplaint);
-        showToast("Issue submitted successfully! Ticket #" + newComplaint.id.slice(-4), "success");
-      } else {
-        showToast("Issue submitted successfully.", "success");
+      if (!appState.isDatabaseConnected) {
+        throw new Error("MySQL database is not connected. Live complaints and civic requests cannot be saved while database is offline.");
       }
+      await api.createCommunityReport(newComplaint);
+      showToast("Issue submitted successfully! Ticket #" + newComplaint.id.slice(-4), "success");
 
       appState.complaints.unshift(newComplaint);
       form.reset();
@@ -1281,6 +1280,14 @@ function initAuth() {
     });
   }
 
+  // Handle session expiration and invalid token event from API
+  window.addEventListener("auth:unauthorized", (e) => {
+    updateAuthUI();
+    showToast(e.detail?.message || "Your session has expired. Please log in again.", "warning");
+    if (typeof selectLoginRole === "function") selectLoginRole("admin");
+    if (typeof switchPage === "function") switchPage("login");
+  });
+
   // Refresh profile from server on startup if token exists
   const token = api.getAuthToken();
   if (token) {
@@ -1292,8 +1299,11 @@ function initAuth() {
           populateAdminProfileForm();
         }
       }
-    }).catch(() => {
-      // Offline fallback: keep existing session
+    }).catch((err) => {
+      if (err && err.status === 401) {
+        api.clearAuthSession();
+        updateAuthUI();
+      }
     });
   }
 

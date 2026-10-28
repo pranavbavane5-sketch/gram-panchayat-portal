@@ -73,6 +73,16 @@ async function request(endpoint, options = {}) {
     const data = await res.json().catch(() => null);
 
     if (!res.ok) {
+      if (res.status === 401 && endpoint !== "/auth/login") {
+        clearAuthSession();
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("auth:unauthorized", {
+            detail: {
+              message: (data && data.message) || "Session expired or invalid. Please log in again."
+            }
+          }));
+        }
+      }
       const errorMsg = (data && data.message) || (data && data.error) || `HTTP ${res.status}: ${res.statusText}`;
       const err = new Error(errorMsg);
       err.status = res.status;

@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // JalMitra / Gram Panchayat Portal Security Rules
+    // All read/write operations must proceed through the authenticated Node.js Express backend
+    // using the Firebase Admin SDK. Direct client SDK reads and writes are blocked.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

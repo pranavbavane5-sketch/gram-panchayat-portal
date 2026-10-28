@@ -30,6 +30,7 @@ scratch/
 *service-account*.json
 *firebase-adminsdk*.json
 *firebase*.json
+!firebase.json
 *.credentials.json
 serviceAccountKey.json
 

@@ -1,16 +1,20 @@
 /**
- * JalMitra Backend - MySQL Database Connection Pool
- * Uses mysql2/promise and dotenv.
+ * JalMitra Backend - Dual Engine Database Connection (MySQL & Cloud Firestore)
+ * Uses mysql2/promise for local development / cloud MySQL and Firestore for Vercel.
  */
 
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import { executeFirestoreQuery } from "./firestoreQueryAdapter.js";
+import { checkFirestoreConnection } from "./firestoreDb.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 dotenv.config(); // fallback
+
+const isFirestore = () => process.env.DB_PROVIDER === "firestore";
 
 // SSL & Connection Configuration for Cloud & Local MySQL
 const isRemoteHost = (host) => {
@@ -49,31 +53,41 @@ if (process.env.DATABASE_URL || process.env.MYSQL_URL) {
   };
 }
 
-// Create a connection pool
-let pool = null;
+// Create MySQL connection pool (only if not running pure Firestore)
+let mysqlPool = null;
 
-try {
-  pool = mysql.createPool(dbConfig);
-} catch (err) {
-  console.error("❌ Failed to create MySQL pool:", err.message);
+if (!isFirestore()) {
+  try {
+    mysqlPool = mysql.createPool(dbConfig);
+  } catch (err) {
+    console.error("❌ Failed to create MySQL pool:", err.message);
+  }
 }
 
 /**
- * Execute a SQL query with parameters
+ * Execute a query with parameters across active database provider
  */
 export async function query(sql, params = []) {
-  if (!pool) {
-    throw new Error("Database pool is not initialized. Please verify your MySQL configuration.");
+  if (isFirestore()) {
+    return await executeFirestoreQuery(sql, params);
   }
-  const [results] = await pool.execute(sql, params);
+
+  if (!mysqlPool) {
+    throw new Error("MySQL database pool is not initialized. Please verify your database configuration.");
+  }
+  const [results] = await mysqlPool.execute(sql, params);
   return results;
 }
 
 /**
- * Test MySQL connection
+ * Test database connection
  */
 export async function testConnection() {
-  if (!pool) {
+  if (isFirestore()) {
+    return await checkFirestoreConnection();
+  }
+
+  if (!mysqlPool) {
     return {
       connected: false,
       message: "MySQL pool not initialized. Check DB credentials in backend/.env"
@@ -81,7 +95,7 @@ export async function testConnection() {
   }
 
   try {
-    const connection = await pool.getConnection();
+    const connection = await mysqlPool.getConnection();
     await connection.ping();
     connection.release();
     return {
@@ -104,6 +118,10 @@ export async function testConnection() {
  * Check if the database tables are empty, and seed sample data only if empty.
  */
 export async function seedIfDatabaseEmpty() {
+  if (isFirestore()) {
+    return { seeded: false, reason: "Firestore active, skipping MySQL seeding" };
+  }
+
   const connStatus = await testConnection();
   if (!connStatus.connected) {
     console.warn("⚠️ MySQL not connected yet; skipping auto-seed.");
@@ -111,12 +129,12 @@ export async function seedIfDatabaseEmpty() {
   }
 
   try {
-    const [rows] = await pool.query("SELECT COUNT(*) AS count FROM water_sources");
+    const [rows] = await mysqlPool.query("SELECT COUNT(*) AS count FROM water_sources");
     if (rows[0].count === 0) {
       console.log("🌱 Database is empty. Seeding initial Sundarpur village data into MySQL...");
 
       // 1. Village settings
-      await pool.query(`
+      await mysqlPool.query(`
         INSERT INTO village_settings (id, village_name, district, overall_status, notice_text, last_updated, officer_name, helpline)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE village_name=VALUES(village_name)
@@ -141,7 +159,7 @@ export async function seedIfDatabaseEmpty() {
       ];
 
       for (const s of sources) {
-        await pool.query(`
+        await mysqlPool.query(`
           INSERT INTO water_sources (id, name, type, type_label, location, total_capacity, current_level_percent, last_inspected, purity_status)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON DUPLICATE KEY UPDATE current_level_percent=VALUES(current_level_percent)
@@ -161,7 +179,7 @@ export async function seedIfDatabaseEmpty() {
       ];
 
       for (const sch of schedules) {
-        await pool.query(`
+        await mysqlPool.query(`
           INSERT INTO distribution_schedules (id, area, date, date_label, time_slot, duration, supply_type, status, lineman)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON DUPLICATE KEY UPDATE status=VALUES(status)
@@ -176,7 +194,7 @@ export async function seedIfDatabaseEmpty() {
       ];
 
       for (const r of reports) {
-        await pool.query(`
+        await mysqlPool.query(`
           INSERT INTO community_reports (id, name, phone, area, problem_type, urgency, description, status)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           ON DUPLICATE KEY UPDATE status=VALUES(status)
@@ -194,14 +212,40 @@ export async function seedIfDatabaseEmpty() {
 }
 
 /**
- * Reset MySQL database to default sample data
+ * Reset database to default sample data
  */
 export async function resetDatabaseToSample() {
-  await pool.query("DELETE FROM community_reports");
-  await pool.query("DELETE FROM distribution_schedules");
-  await pool.query("DELETE FROM water_sources");
-  await pool.query("DELETE FROM village_settings");
+  if (isFirestore()) {
+    return { reset: false, message: "Reset not available in Firestore production mode" };
+  }
+  await mysqlPool.query("DELETE FROM community_reports");
+  await mysqlPool.query("DELETE FROM distribution_schedules");
+  await mysqlPool.query("DELETE FROM water_sources");
+  await mysqlPool.query("DELETE FROM village_settings");
   return await seedIfDatabaseEmpty();
 }
 
-export default pool;
+/**
+ * Universal pool wrapper compatible with both MySQL and Cloud Firestore
+ */
+const universalPool = {
+  async query(sql, params) {
+    const res = await query(sql, params);
+    return [res, []];
+  },
+  async execute(sql, params) {
+    const res = await query(sql, params);
+    return [res, []];
+  },
+  async getConnection() {
+    if (isFirestore()) {
+      return {
+        ping: async () => true,
+        release: () => {}
+      };
+    }
+    return await mysqlPool.getConnection();
+  }
+};
+
+export default universalPool;

@@ -69,8 +69,21 @@ app.use(cors({
 app.use(express.json({ limit: "2mb" }));
 
 // ==========================================================
-// 1. HEALTH CHECK ENDPOINT
+// 1. PING & HEALTH CHECK ENDPOINTS
 // ==========================================================
+app.get("/api/ping", (req, res) => {
+  res.json({
+    status: "ok",
+    provider: (process.env.DB_PROVIDER || "mysql").trim().toLowerCase(),
+    hasProjectId: Boolean(process.env.FIREBASE_PROJECT_ID),
+    hasClientEmail: Boolean(process.env.FIREBASE_CLIENT_EMAIL),
+    hasPrivateKey: Boolean(process.env.FIREBASE_PRIVATE_KEY),
+    nodeEnv: process.env.NODE_ENV || "development",
+    isVercel: Boolean(process.env.VERCEL),
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get("/api/health", async (req, res) => {
   const provider = (process.env.DB_PROVIDER || "").trim().toLowerCase() === "firestore" ? "firestore" : "mysql";
   let dbStatus;

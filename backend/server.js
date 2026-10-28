@@ -15,6 +15,7 @@ import waterTankRoutes from "./routes/waterTankRoutes.js";
 import panchayatRoutes from "./routes/panchayatRoutes.js";
 import { runMigrations } from "./migrate.js";
 import { authenticateToken, requireRole } from "./auth.js";
+import { serviceRepo } from "./repositories/serviceRepo.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, ".env") });
@@ -451,34 +452,26 @@ app.put("/api/village-settings", authenticateToken, requireRole(["admin"]), asyn
 // GET /api/services - Returns enabled services for public home page
 app.get("/api/services", async (req, res) => {
   try {
-    const rows = await query(`
-      SELECT 
-        id, service_key, title_en, title_mr, category, icon,
-        badge_text_en, badge_text_mr, badge_type,
-        desc_en, desc_mr, eligibility_en, eligibility_mr,
-        required_docs_en, required_docs_mr, contact_info_en, contact_info_mr,
-        button_label_en, button_label_mr, nav_target, nav_extra_attrs,
-        display_order, is_enabled
-      FROM gp_services 
-      WHERE is_enabled = 1 
-      ORDER BY display_order ASC, id ASC
-    `);
-    const services = rows.map(s => ({
-      ...s,
-      service_code: s.service_key,
-      name_en: s.title_en,
-      name_mr: s.title_mr,
-      desc_en: s.desc_en,
-      desc_mr: s.desc_mr,
-      service_badge_text: s.badge_text_en,
-      badge_text: s.badge_text_en,
-      action_target: s.nav_target,
-      is_active: true,
-      eligibility_instructions: s.eligibility_en,
-      required_documents: s.required_docs_en,
-      contact_department: s.contact_info_en
-    }));
-    res.json({ success: true, count: services.length, services });
+    const services = await serviceRepo.getAll(true);
+    res.json({
+      success: true,
+      count: services.length,
+      services: services.map(s => ({
+        ...s,
+        service_code: s.service_key,
+        name_en: s.title_en,
+        name_mr: s.title_mr,
+        desc_en: s.desc_en,
+        desc_mr: s.desc_mr,
+        service_badge_text: s.badge_text_en,
+        badge_text: s.badge_text_en,
+        action_target: s.nav_target,
+        is_active: true,
+        eligibility_instructions: s.eligibility_en,
+        required_documents: s.required_docs_en,
+        contact_department: s.contact_info_en
+      }))
+    });
   } catch (err) {
     console.error("GET /api/services error:", err);
     res.status(500).json({ error: "Database error", message: "Unable to load services at this time." });

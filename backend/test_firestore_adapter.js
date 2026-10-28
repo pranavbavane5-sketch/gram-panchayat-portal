@@ -24,14 +24,21 @@ async function runTests() {
   console.log("🧪 TESTING FIRESTORE ADAPTER & DUAL DRIVER (PHASE 1)");
   console.log("============================================================\n");
 
-  // 1. Unconfigured State Safety Check
+  // 1. Connection & Configuration State Safety Check
   const statusBefore = await checkFirestoreConnection();
-  assert(!statusBefore.connected, "Unconfigured Firestore reports connected: false");
-  assert(statusBefore.status === "NOT_CONFIGURED", "Unconfigured status is 'NOT_CONFIGURED'", statusBefore.status);
-  assert(typeof statusBefore.message === "string", "Helpful diagnostic message returned", statusBefore.message);
-
-  const dbInstance = getFirestoreDb();
-  assert(dbInstance === null, "getFirestoreDb() returns null safely without crashing when unconfigured");
+  if (process.env.FIREBASE_PROJECT_ID) {
+    assert(statusBefore.connected, "Configured Firestore reports connected: true");
+    assert(statusBefore.status === "CONNECTED", "Configured status is 'CONNECTED'", statusBefore.status);
+    assert(typeof statusBefore.message === "string", "Helpful diagnostic message returned", statusBefore.message);
+    const dbInstance = getFirestoreDb();
+    assert(dbInstance !== null, "getFirestoreDb() returns Firestore instance safely when configured");
+  } else {
+    assert(!statusBefore.connected, "Unconfigured Firestore reports connected: false");
+    assert(statusBefore.status === "NOT_CONFIGURED", "Unconfigured status is 'NOT_CONFIGURED'", statusBefore.status);
+    assert(typeof statusBefore.message === "string", "Helpful diagnostic message returned", statusBefore.message);
+    const dbInstance = getFirestoreDb();
+    assert(dbInstance === null, "getFirestoreDb() returns null safely without crashing when unconfigured");
+  }
 
   // 2. Collection Names Mapping Verification (All 20 collections mapped)
   const collectionKeys = Object.keys(COLLECTIONS);

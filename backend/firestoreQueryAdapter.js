@@ -117,6 +117,11 @@ export async function executeFirestoreQuery(sql, params = []) {
 
   // 5. GP_SERVICES
   if (/FROM gp_services/i.test(trimmed) && /^SELECT/i.test(trimmed)) {
+    if (/MAX\(display_order\)/i.test(trimmed)) {
+      const all = await serviceRepo.getAll(false);
+      const maxOrder = all.reduce((max, s) => Math.max(max, Number(s.display_order) || 0), 0);
+      return [{ max_order: maxOrder, max: maxOrder }];
+    }
     const enabledOnly = /is_enabled\s*=\s*1/i.test(trimmed);
     if (/WHERE id\s*=\s*\?/i.test(trimmed)) {
       const s = await serviceRepo.getById(params[0]);

@@ -3221,10 +3221,15 @@ export async function loadAdminServicesTable() {
 
     // Stable sort strictly by display_order in ascending order
     services.sort((a, b) => {
-      const orderA = Number(a.display_order) || 0;
-      const orderB = Number(b.display_order) || 0;
+      const orderA = Number.isFinite(Number(a.display_order)) ? Number(a.display_order) : 999999;
+      const orderB = Number.isFinite(Number(b.display_order)) ? Number(b.display_order) : 999999;
       if (orderA !== orderB) return orderA - orderB;
-      return (Number(a.id) || 0) - (Number(b.id) || 0);
+      const numA = Number(a.id);
+      const numB = Number(b.id);
+      if (Number.isFinite(numA) && Number.isFinite(numB)) {
+        return numA - numB;
+      }
+      return String(a.id || "").localeCompare(String(b.id || ""));
     });
 
     if (services.length === 0) {
@@ -3240,15 +3245,16 @@ export async function loadAdminServicesTable() {
       const badgeType = s.badge_type || "counter";
       const badgeText = s.service_badge_text || "Standard";
       const isActive = !!s.is_active;
+      const safeId = escapeHtml(String(s.id));
 
       return `
         <tr>
           <td style="text-align:center; white-space:nowrap;">
             <div class="service-order-cell">
-              <span class="service-order-pill">#${s.display_order || 1}</span>
+              <span class="service-order-pill">#${s.display_order || (idx + 1)}</span>
               <div class="service-order-actions">
-                <button type="button" class="btn-order-btn" onclick="window.moveAdminService(${s.id}, 'up')" ${idx === 0 ? 'disabled' : ''} title="Move Up (Display earlier)" aria-label="Move Up">▲</button>
-                <button type="button" class="btn-order-btn" onclick="window.moveAdminService(${s.id}, 'down')" ${idx === services.length - 1 ? 'disabled' : ''} title="Move Down (Display later)" aria-label="Move Down">▼</button>
+                <button type="button" class="btn-order-btn" onclick="window.moveAdminService('${safeId}', 'up')" ${idx === 0 ? 'disabled' : ''} title="Move Up (Display earlier)" aria-label="Move Up">▲</button>
+                <button type="button" class="btn-order-btn" onclick="window.moveAdminService('${safeId}', 'down')" ${idx === services.length - 1 ? 'disabled' : ''} title="Move Down (Display later)" aria-label="Move Down">▼</button>
               </div>
             </div>
           </td>
@@ -3264,7 +3270,7 @@ export async function loadAdminServicesTable() {
           <td>
             <button type="button" class="btn btn-sm ${isActive ? 'btn-outline-success' : 'btn-outline-secondary'}" 
                     style="font-size:0.75rem; padding: 3px 8px;"
-                    onclick="window.toggleAdminService(${s.id}, ${isActive})">
+                    onclick="window.toggleAdminService('${safeId}', ${isActive})">
               ${isActive ? '✓ Active' : '✕ Disabled'}
             </button>
           </td>
@@ -3273,7 +3279,7 @@ export async function loadAdminServicesTable() {
               <button type="button" class="btn btn-sm btn-outline-primary" style="padding:4px 8px; font-size:0.78rem;" onclick="window.editAdminService('${sJson}')" title="Edit Service">
                 Edit
               </button>
-              <button type="button" class="btn btn-sm btn-outline-danger" style="padding:4px 8px; font-size:0.78rem;" onclick="window.deleteAdminService(${s.id}, '${escapeHtml(s.name_en || '')}')" title="Delete Service">
+              <button type="button" class="btn btn-sm btn-outline-danger" style="padding:4px 8px; font-size:0.78rem;" onclick="window.deleteAdminService('${safeId}', '${escapeHtml(s.name_en || '')}')" title="Delete Service">
                 Delete
               </button>
             </div>
@@ -3382,10 +3388,15 @@ export async function renderHomeServices() {
 
     // Strict ascending sort by display_order
     services.sort((a, b) => {
-      const orderA = Number(a.display_order) || 0;
-      const orderB = Number(b.display_order) || 0;
+      const orderA = Number.isFinite(Number(a.display_order)) ? Number(a.display_order) : 999999;
+      const orderB = Number.isFinite(Number(b.display_order)) ? Number(b.display_order) : 999999;
       if (orderA !== orderB) return orderA - orderB;
-      return (Number(a.id) || 0) - (Number(b.id) || 0);
+      const numA = Number(a.id);
+      const numB = Number(b.id);
+      if (Number.isFinite(numA) && Number.isFinite(numB)) {
+        return numA - numB;
+      }
+      return String(a.id || "").localeCompare(String(b.id || ""));
     });
 
     const isMr = getLanguage() === "mr";

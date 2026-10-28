@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import { query } from "../db.js";
 import { authenticateToken, requireRole } from "../auth.js";
 import { buildExcelWorkbook } from "../excelExport.js";
+import { serviceRepo } from "../repositories/serviceRepo.js";
 
 const router = Router();
 
@@ -1040,24 +1041,12 @@ function formatServiceRow(s) {
 router.get("/services", async (req, res) => {
   try {
     const { category, status } = req.query;
-    let sql = "SELECT * FROM gp_services WHERE 1=1";
-    const params = [];
-
-    if (category) {
-      sql += " AND category = ?";
-      params.push(category);
-    }
-    if (status === "active" || status === "1") {
-      sql += " AND is_enabled = 1";
-    } else if (status === "inactive" || status === "0") {
-      sql += " AND is_enabled = 0";
-    }
-
-    sql += " ORDER BY display_order ASC, id ASC";
-    const rows = await query(sql, params);
-    const services = rows.map(formatServiceRow);
-
-    res.json({ success: true, count: services.length, services });
+    const services = await serviceRepo.getAll(false, category, status);
+    res.json({
+      success: true,
+      count: services.length,
+      services: services.map(formatServiceRow)
+    });
   } catch (err) {
     console.error("GET /admin/services error:", err);
     res.status(500).json({ error: "Server error", message: "Unable to load services." });
@@ -1070,24 +1059,7 @@ router.post("/services", async (req, res) => {
     const title_en = req.body.title_en || req.body.name_en || req.body.title;
     const title_mr = req.body.title_mr || req.body.name_mr || title_en;
     const category = req.body.category || "Civic Utilities";
-    const icon = req.body.icon || "🏛️";
-    const badge_text_en = req.body.badge_text_en || req.body.service_badge_text || req.body.badge || "Office Counter";
-    const badge_text_mr = req.body.badge_text_mr || badge_text_en;
-    const badge_type = req.body.badge_type || "counter";
-    const desc_en = req.body.desc_en || req.body.description || req.body.desc || "Gram Panchayat Service";
-    const desc_mr = req.body.desc_mr || desc_en;
-    const eligibility_en = req.body.eligibility_en || req.body.eligibility_instructions || "";
-    const eligibility_mr = req.body.eligibility_mr || eligibility_en;
-    const required_docs_en = req.body.required_docs_en || req.body.required_documents || "";
-    const required_docs_mr = req.body.required_docs_mr || required_docs_en;
-    const contact_info_en = req.body.contact_info_en || req.body.contact_department || "";
-    const contact_info_mr = req.body.contact_info_mr || contact_info_en;
-    const button_label_en = req.body.button_label_en || "Access Service";
-    const button_label_mr = req.body.button_label_mr || "सेवा मिळवा";
-    const nav_target = req.body.nav_target || req.body.action_target || "counter_info";
-    const is_enabled = req.body.is_enabled !== undefined ? (req.body.is_enabled ? 1 : 0) : (req.body.is_active !== undefined ? (req.body.is_active ? 1 : 0) : 1);
-    const service_key = req.body.service_key || req.body.service_code || req.body.code;
-    const nav_extra_attrs = req.body.nav_extra_attrs;
+    const desc_en = req.body.desc_en || req.body.description || req.body.desc;
 
     if (!title_en || !String(title_en).trim()) {
       return res.status(400).json({ error: "Validation error", message: "Service title (English) is required." });
@@ -1102,60 +1074,21 @@ router.post("/services", async (req, res) => {
       return res.status(400).json({ error: "Validation error", message: "Service description (English) is required." });
     }
 
-    const key = (service_key && String(service_key).trim())
-      ? String(service_key).trim().toLowerCase().replace(/[^a-z0-9_]/g, "_")
-      : `srv_${Date.now()}`;
-
-    // Compute display_order: if not explicitly provided, assign the next available order number (placed at end)
-    let order = (req.body.display_order !== undefined && req.body.display_order !== null && req.body.display_order !== "" && !isNaN(Number(req.body.display_order)))
-      ? Number(req.body.display_order)
-      : null;
-
-    if (order === null || order < 1) {
-      const [maxRow] = await query("SELECT COALESCE(MAX(display_order), 0) AS max_order FROM gp_services");
-      order = (Number(maxRow?.max_order) || 0) + 1;
-    }
-
-    const enabled = is_enabled ? 1 : 0;
-    const extraAttrs = typeof nav_extra_attrs === "object" ? JSON.stringify(nav_extra_attrs) : (nav_extra_attrs || "{}");
-
-    const result = await query(`
-      INSERT INTO gp_services (
-        service_key, title_en, title_mr, category, icon,
-        badge_text_en, badge_text_mr, badge_type,
-        desc_en, desc_mr, eligibility_en, eligibility_mr,
-        required_docs_en, required_docs_mr, contact_info_en, contact_info_mr,
-        button_label_en, button_label_mr, nav_target, nav_extra_attrs,
-        display_order, is_enabled
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [
-      key, String(title_en).trim(), String(title_mr).trim(), String(category).trim(), icon || "🏛️",
-      badge_text_en, badge_text_mr, badge_type,
-      String(desc_en).trim(), desc_mr ? String(desc_mr).trim() : String(desc_en).trim(),
-      eligibility_en || "", eligibility_mr || "",
-      required_docs_en || "", required_docs_mr || "",
-      contact_info_en || "", contact_info_mr || "",
-      button_label_en || "Access Service", button_label_mr || "सेवा मिळवा",
-      nav_target || "counter_info", extraAttrs,
-      order, enabled
-    ]);
-
-    const newId = result.insertId;
-    const [created] = await query("SELECT * FROM gp_services WHERE id = ?", [newId]);
+    const created = await serviceRepo.create(req.body);
 
     await recordAuditLog(
       "SERVICE_CREATE",
       "SERVICE",
-      String(newId),
+      String(created.id),
       req.user,
-      `Created Gram Panchayat service '${String(title_en).trim()}' (Key: ${key})`,
+      `Created Gram Panchayat service '${created.title_en}' (Key: ${created.service_key})`,
       req.ip
     );
 
     res.status(201).json({
       success: true,
       message: "Gram Panchayat service added successfully.",
-      id: newId,
+      id: created.id,
       service: formatServiceRow(created)
     });
   } catch (err) {
@@ -1171,7 +1104,7 @@ router.post("/services", async (req, res) => {
 router.get("/services/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const [service] = await query("SELECT * FROM gp_services WHERE id = ?", [id]);
+    const service = await serviceRepo.getById(id);
     if (!service) {
       return res.status(404).json({ error: "Not Found", message: `Service #${id} not found.` });
     }
@@ -1186,77 +1119,12 @@ router.get("/services/:id", async (req, res) => {
 router.put("/services/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const [existing] = await query("SELECT * FROM gp_services WHERE id = ?", [id]);
+    const existing = await serviceRepo.getById(id);
     if (!existing) {
       return res.status(404).json({ error: "Not Found", message: `Service #${id} not found.` });
     }
 
-    const title_en = req.body.title_en !== undefined ? req.body.title_en : (req.body.name_en !== undefined ? req.body.name_en : null);
-    const title_mr = req.body.title_mr !== undefined ? req.body.title_mr : (req.body.name_mr !== undefined ? req.body.name_mr : null);
-    const category = req.body.category !== undefined ? req.body.category : null;
-    const icon = req.body.icon !== undefined ? req.body.icon : null;
-    const badge_text_en = req.body.badge_text_en !== undefined ? req.body.badge_text_en : (req.body.service_badge_text !== undefined ? req.body.service_badge_text : null);
-    const badge_text_mr = req.body.badge_text_mr !== undefined ? req.body.badge_text_mr : null;
-    const badge_type = req.body.badge_type !== undefined ? req.body.badge_type : null;
-    const desc_en = req.body.desc_en !== undefined ? req.body.desc_en : (req.body.description !== undefined ? req.body.description : null);
-    const desc_mr = req.body.desc_mr !== undefined ? req.body.desc_mr : null;
-    const eligibility_en = req.body.eligibility_en !== undefined ? req.body.eligibility_en : (req.body.eligibility_instructions !== undefined ? req.body.eligibility_instructions : null);
-    const eligibility_mr = req.body.eligibility_mr !== undefined ? req.body.eligibility_mr : null;
-    const required_docs_en = req.body.required_docs_en !== undefined ? req.body.required_docs_en : (req.body.required_documents !== undefined ? req.body.required_documents : null);
-    const required_docs_mr = req.body.required_docs_mr !== undefined ? req.body.required_docs_mr : null;
-    const contact_info_en = req.body.contact_info_en !== undefined ? req.body.contact_info_en : (req.body.contact_department !== undefined ? req.body.contact_department : null);
-    const contact_info_mr = req.body.contact_info_mr !== undefined ? req.body.contact_info_mr : null;
-    const button_label_en = req.body.button_label_en !== undefined ? req.body.button_label_en : null;
-    const button_label_mr = req.body.button_label_mr !== undefined ? req.body.button_label_mr : null;
-    const nav_target = req.body.nav_target !== undefined ? req.body.nav_target : (req.body.action_target !== undefined ? req.body.action_target : null);
-    const nav_extra_attrs = req.body.nav_extra_attrs;
-    const display_order = (req.body.display_order !== undefined && req.body.display_order !== null && req.body.display_order !== "" && !isNaN(Number(req.body.display_order)))
-      ? Number(req.body.display_order)
-      : null;
-    const is_enabled = req.body.is_enabled !== undefined 
-      ? (req.body.is_enabled ? 1 : 0) 
-      : (req.body.is_active !== undefined ? (req.body.is_active ? 1 : 0) : null);
-
-    const extraAttrs = nav_extra_attrs !== undefined
-      ? (typeof nav_extra_attrs === "object" ? JSON.stringify(nav_extra_attrs) : nav_extra_attrs)
-      : existing.nav_extra_attrs;
-
-    await query(`
-      UPDATE gp_services SET
-        title_en = COALESCE(?, title_en),
-        title_mr = COALESCE(?, title_mr),
-        category = COALESCE(?, category),
-        icon = COALESCE(?, icon),
-        badge_text_en = COALESCE(?, badge_text_en),
-        badge_text_mr = COALESCE(?, badge_text_mr),
-        badge_type = COALESCE(?, badge_type),
-        desc_en = COALESCE(?, desc_en),
-        desc_mr = COALESCE(?, desc_mr),
-        eligibility_en = COALESCE(?, eligibility_en),
-        eligibility_mr = COALESCE(?, eligibility_mr),
-        required_docs_en = COALESCE(?, required_docs_en),
-        required_docs_mr = COALESCE(?, required_docs_mr),
-        contact_info_en = COALESCE(?, contact_info_en),
-        contact_info_mr = COALESCE(?, contact_info_mr),
-        button_label_en = COALESCE(?, button_label_en),
-        button_label_mr = COALESCE(?, button_label_mr),
-        nav_target = COALESCE(?, nav_target),
-        nav_extra_attrs = ?,
-        display_order = COALESCE(?, display_order),
-        is_enabled = COALESCE(?, is_enabled)
-      WHERE id = ?
-    `, [
-      title_en, title_mr, category, icon,
-      badge_text_en, badge_text_mr, badge_type,
-      desc_en, desc_mr, eligibility_en, eligibility_mr,
-      required_docs_en, required_docs_mr, contact_info_en, contact_info_mr,
-      button_label_en, button_label_mr, nav_target, extraAttrs,
-      display_order !== null ? Number(display_order) : null,
-      is_enabled !== null ? is_enabled : null,
-      id
-    ]);
-
-    const [updated] = await query("SELECT * FROM gp_services WHERE id = ?", [id]);
+    const updated = await serviceRepo.update(id, req.body);
 
     await recordAuditLog(
       "SERVICE_UPDATE",
@@ -1282,12 +1150,12 @@ router.put("/services/:id", async (req, res) => {
 router.delete("/services/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const [existing] = await query("SELECT * FROM gp_services WHERE id = ?", [id]);
+    const existing = await serviceRepo.getById(id);
     if (!existing) {
       return res.status(404).json({ error: "Not Found", message: `Service #${id} not found.` });
     }
 
-    await query("DELETE FROM gp_services WHERE id = ?", [id]);
+    await serviceRepo.delete(id);
 
     await recordAuditLog(
       "SERVICE_DELETE",
@@ -1318,56 +1186,26 @@ router.put("/services/:id/move", async (req, res) => {
       return res.status(400).json({ error: "Validation error", message: "Direction must be 'up' or 'down'." });
     }
 
-    const rows = await query("SELECT id, title_en, display_order FROM gp_services ORDER BY display_order ASC, id ASC");
-    const currentIndex = rows.findIndex(r => String(r.id) === String(id));
-    if (currentIndex === -1) {
+    const moved = await serviceRepo.moveOrder(id, direction);
+    if (!moved) {
       return res.status(404).json({ error: "Not Found", message: `Service #${id} not found.` });
     }
-
-    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
-    if (targetIndex < 0 || targetIndex >= rows.length) {
-      return res.json({
-        success: true,
-        message: `Service is already at the ${direction === 'up' ? 'top' : 'bottom'}.`,
-        service: formatServiceRow(rows[currentIndex])
-      });
-    }
-
-    const currentItem = rows[currentIndex];
-    const swapItem = rows[targetIndex];
-
-    let currentNewOrder = Number(swapItem.display_order);
-    let swapNewOrder = Number(currentItem.display_order);
-
-    // If both items had identical display_order, adjust so current strictly moves ahead/behind
-    if (currentNewOrder === swapNewOrder) {
-      if (direction === "up") {
-        currentNewOrder = Math.max(1, swapNewOrder - 1);
-      } else {
-        currentNewOrder = swapNewOrder + 1;
-      }
-    }
-
-    await query("UPDATE gp_services SET display_order = ? WHERE id = ?", [currentNewOrder, currentItem.id]);
-    await query("UPDATE gp_services SET display_order = ? WHERE id = ?", [swapNewOrder, swapItem.id]);
 
     await recordAuditLog(
       "SERVICE_REORDER",
       "SERVICE",
       String(id),
       req.user,
-      `Moved service #${id} (${currentItem.title_en}) ${direction}. Order changed to #${currentNewOrder}.`,
+      `Moved service #${id} (${moved.title_en}) ${direction}. Order changed to #${moved.display_order}.`,
       req.ip
     );
 
-    const [updated] = await query("SELECT * FROM gp_services WHERE id = ?", [id]);
-
     res.json({
       success: true,
-      message: `Service '${currentItem.title_en}' moved ${direction} successfully.`,
-      id: currentItem.id,
-      display_order: currentNewOrder,
-      service: formatServiceRow(updated)
+      message: `Service '${moved.title_en}' moved ${direction} successfully.`,
+      id: moved.id,
+      display_order: moved.display_order,
+      service: formatServiceRow(moved)
     });
   } catch (err) {
     console.error("PUT /admin/services/:id/move error:", err);
@@ -1383,11 +1221,7 @@ router.put("/services/reorder", async (req, res) => {
       return res.status(400).json({ error: "Validation error", message: "Items array is required." });
     }
 
-    for (const item of items) {
-      if (item.id && item.display_order !== undefined) {
-        await query("UPDATE gp_services SET display_order = ? WHERE id = ?", [Number(item.display_order), item.id]);
-      }
-    }
+    const normalized = await serviceRepo.reorder(items);
 
     await recordAuditLog(
       "SERVICE_REORDER_BATCH",
@@ -1398,7 +1232,11 @@ router.put("/services/reorder", async (req, res) => {
       req.ip
     );
 
-    res.json({ success: true, message: "Services display order persisted successfully." });
+    res.json({
+      success: true,
+      message: "Services display order persisted successfully.",
+      services: normalized.map(formatServiceRow)
+    });
   } catch (err) {
     console.error("PUT /admin/services/reorder error:", err);
     res.status(500).json({ error: "Server error", message: "Unable to update services order." });

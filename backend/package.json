@@ -1,0 +1,21 @@
+{
+  "name": "jalmitra-backend",
+  "version": "1.0.0",
+  "description": "Express and MySQL REST API backend for JalMitra Water Management System",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test_suite.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.5.0",
+    "mysql2": "^3.9.8"
+  }
+}

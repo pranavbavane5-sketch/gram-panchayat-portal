@@ -1,0 +1,19 @@
+# Node & Build artifacts
+node_modules/
+backend/node_modules/
+dist/
+.DS_Store
+
+# Environment variables & DB credentials (DO NOT COMMIT)
+.env
+.env.*
+*.env
+backend/.env
+backend/.env.*
+env.js
+*.local
+
+# Editor directories
+.vscode/
+.idea/
+scratch/

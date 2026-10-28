@@ -163,6 +163,96 @@ app.get("/api/migration/audit", async (req, res) => {
   }
 });
 
+// POST /api/migration/import - Controlled one-time database migration ingest
+app.post("/api/migration/import", async (req, res) => {
+  const secret = req.headers["x-migration-secret"];
+  const expectedSecret = process.env.MIGRATION_SECRET || process.env.JWT_SECRET;
+
+  if (!expectedSecret || secret !== expectedSecret) {
+    return res.status(401).json({ error: "Unauthorized", message: "Invalid or missing migration secret." });
+  }
+
+  const provider = (process.env.DB_PROVIDER || "").trim().toLowerCase();
+  if (provider !== "firestore") {
+    return res.status(400).json({ error: "Invalid provider", message: "Migration ingest is only permitted when DB_PROVIDER=firestore." });
+  }
+
+  const { tables } = req.body;
+  if (!tables || typeof tables !== "object") {
+    return res.status(400).json({ error: "Validation error", message: "Missing tables payload." });
+  }
+
+  try {
+    const { getFirestoreDb, COLLECTIONS } = await import("./firestoreDb.js");
+    const db = getFirestoreDb();
+    if (!db) {
+      return res.status(503).json({ error: "Database error", message: "Firestore is not initialized." });
+    }
+
+    const rawProj = process.env.FIREBASE_PROJECT_ID || "";
+    const cleanProj = rawProj.replace(/["']/g, "").trim();
+
+    // Verify target project is drought-management-syste-4838f
+    if (cleanProj !== "drought-management-syste-4838f") {
+      return res.status(400).json({
+        error: "Target Project Mismatch",
+        message: `Expected 'drought-management-syste-4838f' but detected '${cleanProj}'. Aborting.`
+      });
+    }
+
+    const allowedCollections = new Set(Object.values(COLLECTIONS));
+    const results = {};
+    let totalMigrated = 0;
+
+    for (const [collName, rows] of Object.entries(tables)) {
+      if (!allowedCollections.has(collName)) {
+        return res.status(400).json({
+          error: "Unapproved Collection",
+          message: `Collection '${collName}' is not in the approved 20 collections list. Aborting.`
+        });
+      }
+
+      if (!Array.isArray(rows) || rows.length === 0) {
+        results[collName] = 0;
+        continue;
+      }
+
+      // Write in chunks of 250
+      const CHUNK_SIZE = 250;
+      let collWritten = 0;
+
+      for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
+        const chunk = rows.slice(i, i + CHUNK_SIZE);
+        const batch = db.batch();
+
+        for (const row of chunk) {
+          const docId = String(row.id);
+          if (!docId) throw new Error(`Row in ${collName} is missing primary key 'id'`);
+          const docRef = db.collection(collName).doc(docId);
+          batch.set(docRef, row);
+        }
+
+        await batch.commit();
+        collWritten += chunk.length;
+      }
+
+      results[collName] = collWritten;
+      totalMigrated += collWritten;
+    }
+
+    res.json({
+      success: true,
+      targetProjectId: cleanProj,
+      totalMigrated,
+      migratedCounts: results,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error("Migration import error:", err);
+    res.status(500).json({ error: "Migration failed", message: err.message });
+  }
+});
+
 // ==========================================================
 // 2. VILLAGE SETTINGS ENDPOINTS
 // ==========================================================

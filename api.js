@@ -3,9 +3,14 @@
  * Connects the frontend to the Express + MySQL backend.
  */
 
+// Determine API Base URL:
+// 1. Explicit window.__API_URL__ (runtime override, e.g. for testing)
+// 2. Vite environment variable import.meta.env.VITE_API_BASE_URL (build-time override)
+// 3. In production mode: defaults to "/api" (same-domain relative path for Vercel Serverless & reverse proxies)
+// 4. In development mode: defaults to "http://localhost:5000/api"
 export const API_BASE_URL = (typeof window !== "undefined" && window.__API_URL__) 
   || (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_BASE_URL)
-  || "http://localhost:5000/api";
+  || (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.PROD ? "/api" : "http://localhost:5000/api");
 
 // Auth token storage key
 export const AUTH_TOKEN_KEY = "jalmitra_auth_token";
@@ -77,8 +82,13 @@ async function request(endpoint, options = {}) {
 
     return data;
   } catch (err) {
-    if (err.name === "TypeError" && (err.message.includes("fetch") || err.message.includes("network"))) {
-      const offlineErr = new Error(`Cannot connect to Express server at ${API_BASE_URL}. Ensure 'npm start' is running in backend.`);
+    if (err.name === "TypeError" && (err.message.includes("fetch") || err.message.includes("network") || err.message.includes("Failed"))) {
+      const isLocal = API_BASE_URL.includes("localhost") || API_BASE_URL.includes("127.0.0.1");
+      const offlineErr = new Error(
+        isLocal
+          ? `Cannot connect to Express server at ${API_BASE_URL}. Ensure 'npm start' is running in backend.`
+          : `Cannot connect to Gram Panchayat API at ${API_BASE_URL}. Please check server deployment status.`
+      );
       offlineErr.isOffline = true;
       throw offlineErr;
     }

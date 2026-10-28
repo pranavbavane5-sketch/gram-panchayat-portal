@@ -12,16 +12,42 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 dotenv.config(); // fallback
 
-const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  port: parseInt(process.env.DB_PORT || "3306", 10),
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "jalmitra_db",
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+// SSL & Connection Configuration for Cloud & Local MySQL
+const isRemoteHost = (host) => {
+  if (!host) return false;
+  return host !== "localhost" && host !== "127.0.0.1" && host !== "::1";
 };
+
+const requiresSsl = process.env.DB_SSL === "true" || process.env.DB_SSL === "1" ||
+  (process.env.NODE_ENV === "production" && isRemoteHost(process.env.DB_HOST));
+
+const sslConfig = requiresSsl ? { rejectUnauthorized: false } : undefined;
+
+const connectionLimit = parseInt(process.env.DB_CONNECTION_LIMIT || (process.env.VERCEL ? "3" : "10"), 10);
+
+let dbConfig;
+if (process.env.DATABASE_URL || process.env.MYSQL_URL) {
+  const uri = process.env.DATABASE_URL || process.env.MYSQL_URL;
+  dbConfig = {
+    uri,
+    waitForConnections: true,
+    connectionLimit,
+    queueLimit: 0,
+    ...(sslConfig ? { ssl: sslConfig } : {})
+  };
+} else {
+  dbConfig = {
+    host: process.env.DB_HOST || "localhost",
+    port: parseInt(process.env.DB_PORT || "3306", 10),
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "",
+    database: process.env.DB_NAME || "jalmitra_db",
+    waitForConnections: true,
+    connectionLimit,
+    queueLimit: 0,
+    ...(sslConfig ? { ssl: sslConfig } : {})
+  };
+}
 
 // Create a connection pool
 let pool = null;
@@ -60,9 +86,10 @@ export async function testConnection() {
     connection.release();
     return {
       connected: true,
-      database: dbConfig.database,
-      host: dbConfig.host,
-      port: dbConfig.port
+      database: dbConfig.database || process.env.DB_NAME || "jalmitra_db",
+      host: dbConfig.host || (process.env.DB_HOST || "cloud_mysql"),
+      port: dbConfig.port || parseInt(process.env.DB_PORT || "3306", 10),
+      ssl: Boolean(sslConfig)
     };
   } catch (err) {
     return {

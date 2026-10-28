@@ -346,7 +346,13 @@ async function initDatabaseAndLoadData() {
     appState.isBackendConnected = false;
     appState.isDatabaseConnected = false;
     updateDatabaseUIState({ status: "BACKEND_DISCONNECTED" });
-    showToast("Backend server not detected on port 5000. Running in preview mode.", "info");
+    const isLocal = API_BASE_URL.includes("localhost") || API_BASE_URL.includes("127.0.0.1");
+    showToast(
+      isLocal 
+        ? `Backend server not detected at ${API_BASE_URL}. Running in preview mode.`
+        : "Backend API is currently unreachable. Running in preview mode.",
+      "info"
+    );
   }
 
   // Render all views with loaded data

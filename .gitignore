@@ -12,6 +12,9 @@ backend/.env
 backend/.env.*
 env.js
 *.local
+!.env.example
+!backend/.env.example
+!*.example
 
 # Editor directories
 .vscode/

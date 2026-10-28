@@ -33,10 +33,40 @@ app.use((req, res, next) => {
   next();
 });
 
+// CORS Configuration - Allows Vercel frontend, preview domains, local dev, and explicit env origins
+const allowedOrigins = [
+  "https://gram-panchayat-portal-sandy.vercel.app",
+  process.env.FRONTEND_URL,
+  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",").map(o => o.trim()) : [])
+].filter(Boolean);
+
 app.use(cors({
-  origin: true, // Reflect request origin or configure specific domains in production
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow non-browser requests (curl, mobile apps, Postman, internal health checks)
+    if (!origin) return callback(null, true);
+
+    // In local development or localhost callers, allow
+    if (process.env.NODE_ENV !== "production" || origin.includes("localhost") || origin.includes("127.0.0.1")) {
+      return callback(null, true);
+    }
+
+    // Allow deployed Vercel domain and any branch/preview deployments (*.vercel.app)
+    const isVercelDomain = origin.endsWith(".vercel.app");
+    const isAllowedOrigin = allowedOrigins.includes(origin);
+
+    if (isAllowedOrigin || isVercelDomain || process.env.ALLOW_ALL_ORIGINS === "true") {
+      return callback(null, true);
+    }
+
+    console.warn(`Blocked CORS request from unauthorized origin: ${origin}`);
+    return callback(new Error(`CORS policy does not allow access from origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
+
+app.options("*", cors());
 app.use(express.json({ limit: "2mb" }));
 
 // ==========================================================
@@ -665,16 +695,20 @@ app.use("/api/*", (req, res) => {
   res.status(404).json({ error: "Not Found", message: `Cannot ${req.method} ${req.originalUrl}` });
 });
 
-// Start Express Server
-app.listen(PORT, async () => {
-  console.log(`🚀 JalMitra Backend Server listening on http://localhost:${PORT}`);
-  console.log(`👉 Health check: http://localhost:${PORT}/api/health`);
+// Start Express Server (only when not running inside a serverless runtime like Vercel)
+if (!process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    console.log(`🚀 JalMitra Backend Server listening on http://localhost:${PORT}`);
+    console.log(`👉 Health check: http://localhost:${PORT}/api/health`);
 
-  // Attempt auto-seed and migrations if MySQL is ready
-  try {
-    await seedIfDatabaseEmpty();
-    await runMigrations();
-  } catch (e) {
-    console.warn("Auto-seed/migration deferred:", e.message);
-  }
-});
+    // Attempt auto-seed and migrations if MySQL is ready
+    try {
+      await seedIfDatabaseEmpty();
+      await runMigrations();
+    } catch (e) {
+      console.warn("Auto-seed/migration deferred:", e.message);
+    }
+  });
+}
+
+export default app;

@@ -20,3 +20,8 @@ env.js
 .vscode/
 .idea/
 scratch/
+
+# Database dumps & exports
+*.sql
+*.dump
+

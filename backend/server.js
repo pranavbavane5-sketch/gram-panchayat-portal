@@ -86,26 +86,42 @@ app.get("/api/ping", (req, res) => {
 
 app.get("/api/health", async (req, res) => {
   const provider = (process.env.DB_PROVIDER || "").trim().toLowerCase() === "firestore" ? "firestore" : "mysql";
-  let dbStatus;
+  try {
+    let dbStatus;
 
-  if (provider === "firestore") {
-    const { checkFirestoreConnection } = await import("./firestoreDb.js");
-    dbStatus = await checkFirestoreConnection();
-  } else {
-    dbStatus = await testConnection();
-    dbStatus.provider = "mysql";
+    if (provider === "firestore") {
+      const { checkFirestoreConnection } = await import("./firestoreDb.js");
+      dbStatus = await checkFirestoreConnection();
+    } else {
+      dbStatus = await testConnection();
+      dbStatus.provider = "mysql";
+    }
+
+    const isOk = dbStatus && dbStatus.connected;
+
+    res.status(isOk ? 200 : 503).json({
+      status: isOk ? "ok" : "degraded",
+      server: "running",
+      provider,
+      uptime: Math.floor(process.uptime()),
+      database: dbStatus,
+      timestamp: new Date().toISOString()
+    });
+  } catch (healthErr) {
+    console.error("Health check exception:", healthErr.message);
+    res.status(503).json({
+      status: "degraded",
+      server: "running",
+      provider,
+      database: {
+        connected: false,
+        error: healthErr.code || "HEALTH_CHECK_ERROR",
+        message: healthErr.message,
+        provider
+      },
+      timestamp: new Date().toISOString()
+    });
   }
-
-  const isOk = dbStatus.connected;
-
-  res.status(isOk ? 200 : 503).json({
-    status: isOk ? "ok" : "degraded",
-    server: "running",
-    provider,
-    uptime: Math.floor(process.uptime()),
-    database: dbStatus,
-    timestamp: new Date().toISOString()
-  });
 });
 
 // ==========================================================

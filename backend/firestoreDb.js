@@ -10,6 +10,7 @@
  */
 
 import admin from "firebase-admin";
+import { cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import dotenv from "dotenv";
 import path from "path";
@@ -30,66 +31,82 @@ let initStatus = {
   error: null
 };
 
+function makeCert(config) {
+  if (typeof cert === "function") return cert(config);
+  if (typeof admin.cert === "function") return admin.cert(config);
+  if (admin.credential && typeof admin.credential.cert === "function") return admin.credential.cert(config);
+  throw new Error("Unable to locate cert helper in firebase-admin SDK");
+}
+
 /**
  * Safely parse and format Firebase Service Account Credentials
  */
 function resolveCredentials() {
-  // Option 1: Discrete Environment Variables (Recommended for Vercel & Production)
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  try {
+    // Option 1: Discrete Environment Variables (Recommended for Vercel & Production)
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
-  if (projectId && clientEmail && privateKey) {
-    // Sanitize escaped newlines (Vercel env vars often escape \n to \\n)
-    if (privateKey.includes("\\n")) {
-      privateKey = privateKey.replace(/\\n/g, "\n");
-    }
-    return {
-      type: "discrete",
-      projectId,
-      credential: admin.credential.cert({
-        projectId,
-        clientEmail,
-        privateKey
-      })
-    };
-  }
-
-  // Option 2: Full JSON string in FIREBASE_SERVICE_ACCOUNT
-  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (serviceAccountJson && typeof serviceAccountJson === "string") {
-    try {
-      const parsed = JSON.parse(serviceAccountJson);
-      if (parsed.private_key && parsed.private_key.includes("\\n")) {
-        parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+    if (projectId && clientEmail && privateKey) {
+      // Strip surrounding quotes if present from env string
+      privateKey = String(privateKey).trim();
+      if ((privateKey.startsWith('"') && privateKey.endsWith('"')) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
+        privateKey = privateKey.slice(1, -1);
+      }
+      // Sanitize escaped newlines (Vercel env vars often escape \n to \\n)
+      if (privateKey.includes("\\n")) {
+        privateKey = privateKey.replace(/\\n/g, "\n");
       }
       return {
-        type: "json_string",
-        projectId: parsed.project_id,
-        credential: admin.credential.cert(parsed)
+        type: "discrete",
+        projectId,
+        credential: makeCert({
+          projectId,
+          clientEmail,
+          privateKey
+        })
       };
-    } catch (parseErr) {
-      console.warn("⚠️ Failed to parse FIREBASE_SERVICE_ACCOUNT JSON string:", parseErr.message);
     }
-  }
 
-  // Option 3: Local file via GOOGLE_APPLICATION_CREDENTIALS (development only)
-  const credPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-  if (credPath) {
-    const resolvedPath = path.isAbsolute(credPath) ? credPath : path.resolve(process.cwd(), credPath);
-    if (fs.existsSync(resolvedPath)) {
+    // Option 2: Full JSON string in FIREBASE_SERVICE_ACCOUNT
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (serviceAccountJson && typeof serviceAccountJson === "string") {
       try {
-        const fileContent = fs.readFileSync(resolvedPath, "utf8");
-        const parsed = JSON.parse(fileContent);
+        const parsed = JSON.parse(serviceAccountJson);
+        if (parsed.private_key && parsed.private_key.includes("\\n")) {
+          parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+        }
         return {
-          type: "file",
+          type: "json_string",
           projectId: parsed.project_id,
-          credential: admin.credential.cert(parsed)
+          credential: makeCert(parsed)
         };
-      } catch (fileErr) {
-        console.warn("⚠️ Failed to load credentials from file:", fileErr.message);
+      } catch (parseErr) {
+        console.warn("⚠️ Failed to parse FIREBASE_SERVICE_ACCOUNT JSON string:", parseErr.message);
       }
     }
+
+    // Option 3: Local file via GOOGLE_APPLICATION_CREDENTIALS (development only)
+    const credPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (credPath) {
+      const resolvedPath = path.isAbsolute(credPath) ? credPath : path.resolve(process.cwd(), credPath);
+      if (fs.existsSync(resolvedPath)) {
+        try {
+          const fileContent = fs.readFileSync(resolvedPath, "utf8");
+          const parsed = JSON.parse(fileContent);
+          return {
+            type: "file",
+            projectId: parsed.project_id,
+            credential: makeCert(parsed)
+          };
+        } catch (fileErr) {
+          console.warn("⚠️ Failed to load credentials from file:", fileErr.message);
+        }
+      }
+    }
+  } catch (err) {
+    console.error("❌ resolveCredentials error:", err.message);
   }
 
   return null;

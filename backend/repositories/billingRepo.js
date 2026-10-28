@@ -35,12 +35,16 @@ function normalizePayment(p) {
 
 function normalizeTax(t) {
   if (!t) return null;
+  const chargeType = t.charge_type || t.chargeType || t.tax_name || t.taxName || t.title || "General Water Tax";
+  const desc = t.description || t.tax_category || t.taxCategory || t.category || "Panchayat Cess";
   return {
     id: t.id,
     citizen_id: t.citizen_id || t.citizenId,
     property_id: t.property_id || t.propertyId || null,
-    tax_name: t.tax_name || t.taxName,
-    tax_category: t.tax_category || t.taxCategory || "General",
+    charge_type: chargeType,
+    description: desc,
+    tax_name: chargeType,
+    tax_category: desc,
     amount: Number(t.amount || 0),
     due_date: t.due_date ? (typeof t.due_date === "string" ? t.due_date.split("T")[0] : t.due_date.toISOString().split("T")[0]) : "",
     status: t.status || "Unpaid"

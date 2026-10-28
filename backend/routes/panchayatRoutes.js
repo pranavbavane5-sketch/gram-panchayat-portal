@@ -464,8 +464,10 @@ router.get("/admin/applications/:id", authenticateToken, requireRole(["admin"]),
     `, [app.id]);
 
     res.json({
+      success: true,
       application: app,
-      history
+      history,
+      ...app
     });
   } catch (err) {
     console.error("GET /api/admin/applications/:id error:", err);
@@ -700,22 +702,38 @@ router.post("/admin/tasks", authenticateToken, requireRole(["admin"]), async (re
   }
 });
 
+// GET /api/admin/tasks/:id (Admin Protected - Get single task)
+router.get("/admin/tasks/:id", authenticateToken, requireRole(["admin"]), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rows = await query("SELECT * FROM gram_panchayat_tasks WHERE id = ? LIMIT 1", [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Not found", message: "Task not found." });
+    }
+    res.json({ success: true, task: rows[0], ...rows[0] });
+  } catch (err) {
+    console.error("GET /api/admin/tasks/:id error:", err);
+    res.status(500).json({ error: "Database error", message: err.message });
+  }
+});
+
 // PUT /api/admin/tasks/:id/status (Admin Protected)
 router.put("/admin/tasks/:id/status", authenticateToken, requireRole(["admin"]), async (req, res) => {
   try {
     const { id } = req.params;
     const { status, completion_notes } = req.body;
-    if (!status || !["Pending", "In Progress", "Completed", "Delayed"].includes(status)) {
-      return res.status(400).json({ error: "Validation error", message: "Valid status required." });
+    const normalizedStatus = status === "Open" ? "Pending" : status;
+    if (!normalizedStatus || !["Pending", "In Progress", "Completed", "Delayed"].includes(normalizedStatus)) {
+      return res.status(400).json({ error: "Validation error", message: "Valid status required ('Pending', 'In Progress', 'Completed', 'Delayed')." });
     }
 
     await query(`
       UPDATE gram_panchayat_tasks 
       SET status = ?, completion_notes = ? 
       WHERE id = ?
-    `, [status, completion_notes || null, id]);
+    `, [normalizedStatus, completion_notes || null, id]);
 
-    res.json({ success: true, message: "Task status updated." });
+    res.json({ success: true, message: "Task status updated.", id, status: normalizedStatus });
   } catch (err) {
     console.error("PUT /api/admin/tasks/:id/status error:", err);
     res.status(500).json({ error: "Database error", message: err.message });

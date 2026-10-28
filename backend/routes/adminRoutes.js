@@ -9,6 +9,8 @@ import { query } from "../db.js";
 import { authenticateToken, requireRole } from "../auth.js";
 import { buildExcelWorkbook } from "../excelExport.js";
 import { serviceRepo } from "../repositories/serviceRepo.js";
+import { citizenRepo } from "../repositories/citizenRepo.js";
+import { propertyRepo } from "../repositories/propertyRepo.js";
 
 const router = Router();
 
@@ -193,21 +195,9 @@ router.get("/dashboard-stats", async (req, res) => {
 router.get("/citizens", async (req, res) => {
   try {
     const search = (req.query.search || "").trim();
-    let sql = `
-      SELECT c.*, u.login_id, u.is_active as user_active
-      FROM citizens c
-      LEFT JOIN users u ON c.user_id = u.id
-    `;
-    const params = [];
-
-    if (search) {
-      sql += " WHERE c.full_name LIKE ? OR c.phone LIKE ? OR c.property_no LIKE ? OR c.ward_area LIKE ? OR c.id LIKE ?";
-      const like = `%${search}%`;
-      params.push(like, like, like, like, like);
-    }
-
-    sql += " ORDER BY c.created_at DESC";
-    const rows = await query(sql, params);
+    const status = (req.query.status || "").trim();
+    const ward = (req.query.ward || "").trim();
+    const rows = await citizenRepo.getAll({ search, status, ward });
     res.json(rows);
   } catch (err) {
     console.error("GET /citizens error:", err);
@@ -234,7 +224,8 @@ router.post("/citizens", async (req, res) => {
     }
 
     const countRow = await query("SELECT COUNT(*) as count FROM citizens");
-    const nextSeq = countRow[0].count + 101;
+    const countVal = (countRow && countRow[0] && countRow[0].count !== undefined) ? Number(countRow[0].count) : 0;
+    const nextSeq = countVal + 101;
     const citizenId = (req.body.citizenId || req.body.id || `CIT-${nextSeq}`).trim();
     const userId = `usr-cit-${Date.now()}`;
     const passwordHash = await bcrypt.hash(initialPassword, 10);
@@ -269,14 +260,34 @@ router.post("/citizens", async (req, res) => {
       VALUES (?, ?, ?, 'citizen', ?, ?, ?, 1, ?)
     `, [userId, citizenId, passwordHash, fullName, phone, email, citizenId]);
 
+    const newCitizen = {
+      id: citizenId,
+      citizenId,
+      user_id: userId,
+      login_id: citizenId,
+      full_name: fullName,
+      phone,
+      email,
+      property_no: propertyNo,
+      ward_area: wardArea,
+      family_members: familyMembers,
+      meter_no: meterNo || `MET-${nextSeq}`,
+      connection_type: connectionType,
+      status: "Active",
+      property_id: propertyId
+    };
+
     res.status(201).json({
+      success: true,
       message: "Citizen created successfully.",
       citizenId,
+      id: citizenId,
       loginId: citizenId,
       fullName,
       propertyNo,
       wardArea,
-      initialPassword
+      initialPassword,
+      citizen: newCitizen
     });
   } catch (err) {
     console.error("POST /citizens error:", err);
@@ -439,13 +450,47 @@ router.post("/bills", async (req, res) => {
       return res.status(400).json({ error: "Validation error", message: "Citizen ID, billing period, amount, and due date are required." });
     }
 
+    // Check duplicate unpaid bill for citizen and period
+    try {
+      const existingBills = await query("SELECT id FROM water_bills WHERE citizen_id = ? AND billing_period = ? AND status != 'Paid'", [citizenId, billingPeriod.trim()]);
+      if (existingBills && existingBills.length > 0) {
+        return res.status(409).json({ error: "Conflict", message: `An unpaid water bill for period '${billingPeriod.trim()}' already exists for this resident.` });
+      }
+    } catch (chkErr) {
+      console.warn("Bill duplicate check note:", chkErr.message);
+    }
+
     const billId = `BILL-${Date.now().toString().slice(-6)}`;
+    const billAmount = parseFloat(amount);
     await query(`
       INSERT INTO water_bills (id, citizen_id, billing_period, amount, paid_amount, due_date, status)
       VALUES (?, ?, ?, ?, 0.00, ?, 'Unpaid')
-    `, [billId, citizenId, billingPeriod.trim(), parseFloat(amount), dueDate]);
+    `, [billId, citizenId, billingPeriod.trim(), billAmount, dueDate]);
 
-    res.status(201).json({ message: "Water bill created successfully.", billId, id: billId });
+    const billData = {
+      id: billId,
+      billId,
+      billNumber: billId,
+      citizenId,
+      citizen_id: citizenId,
+      billingPeriod: billingPeriod.trim(),
+      billing_period: billingPeriod.trim(),
+      amount: billAmount,
+      paidAmount: 0.00,
+      paid_amount: 0.00,
+      dueDate,
+      due_date: dueDate,
+      status: "Unpaid"
+    };
+
+    res.status(201).json({
+      success: true,
+      message: "Water bill created successfully.",
+      billId,
+      id: billId,
+      billNumber: billId,
+      bill: billData
+    });
   } catch (err) {
     console.error("POST /admin/bills error:", err);
     res.status(500).json({ error: "Server error", message: err.message });
@@ -476,7 +521,7 @@ router.post("/payments", async (req, res) => {
     let citizenId = req.body.citizenId || req.body.citizen_id;
     const amount = req.body.amount !== undefined ? req.body.amount : (req.body.amountPaid !== undefined ? req.body.amountPaid : req.body.paidAmount);
     const paymentMode = req.body.paymentMode || req.body.paymentMethod || "Cash";
-    const receiptNo = req.body.receiptNo || req.body.transactionRef || `REC-${Date.now().toString().slice(-5)}`;
+    const receiptNo = req.body.receiptNo || req.body.transactionRef || `REC-${new Date().getFullYear()}-${Date.now().toString().slice(-5)}`;
     const notes = req.body.notes;
 
     if (!citizenId && billId) {
@@ -486,6 +531,14 @@ router.post("/payments", async (req, res) => {
 
     if (!citizenId || amount === undefined || isNaN(parseFloat(amount))) {
       return res.status(400).json({ error: "Validation error", message: "Citizen ID and payment amount are required." });
+    }
+
+    // Check if bill is already paid
+    if (billId) {
+      const bills = await query("SELECT amount, paid_amount, status FROM water_bills WHERE id = ?", [billId]);
+      if (bills && bills.length > 0 && bills[0].status === "Paid") {
+        return res.status(400).json({ error: "Already Paid", message: "This water bill has already been fully paid." });
+      }
     }
 
     const payId = `PAY-${Date.now().toString().slice(-6)}`;
@@ -506,15 +559,51 @@ router.post("/payments", async (req, res) => {
 
     // If billId provided, update the bill
     if (billId) {
-      const [bill] = await query("SELECT amount, paid_amount FROM water_bills WHERE id = ?", [billId]);
-      if (bill) {
-        const newPaid = Number(bill.paid_amount) + payAmount;
+      const bills = await query("SELECT amount, paid_amount FROM water_bills WHERE id = ?", [billId]);
+      if (bills && bills.length > 0) {
+        const bill = bills[0];
+        const newPaid = Number(bill.paid_amount || 0) + payAmount;
         const newStatus = newPaid >= Number(bill.amount) ? "Paid" : "Partially Paid";
         await query("UPDATE water_bills SET paid_amount = ?, status = ? WHERE id = ?", [newPaid, newStatus, billId]);
       }
     }
 
-    res.status(201).json({ message: "Payment recorded successfully.", paymentId: payId, receiptNo: recNo });
+    const paymentData = {
+      id: payId,
+      paymentId: payId,
+      billId: billId || null,
+      citizenId,
+      citizen_id: citizenId,
+      amount: payAmount,
+      paymentMode: normalizedMode,
+      payment_mode: normalizedMode,
+      receiptNo: recNo,
+      receiptNumber: recNo,
+      receipt_no: recNo,
+      notes: notes || "Counter payment collected by Gram Panchayat",
+      paymentDate: new Date().toISOString(),
+      payment_date: new Date().toISOString()
+    };
+
+    res.status(201).json({
+      success: true,
+      message: "Payment recorded successfully.",
+      paymentId: payId,
+      receiptNo: recNo,
+      receiptNumber: recNo,
+      payment: paymentData,
+      receipt: {
+        receiptNo: recNo,
+        receiptNumber: recNo,
+        receipt_no: recNo,
+        paymentId: payId,
+        billId: billId || null,
+        citizenId,
+        amount: payAmount,
+        paymentMode: normalizedMode,
+        paidAt: new Date().toISOString()
+      }
+    });
   } catch (err) {
     console.error("POST /admin/payments error:", err);
     res.status(500).json({ error: "Server error", message: err.message });
@@ -544,19 +633,47 @@ router.get("/taxes", async (req, res) => {
 // POST /api/admin/taxes
 router.post("/taxes", async (req, res) => {
   try {
-    const { citizenId, chargeType, description, amount, dueDate } = req.body;
+    const citizenId = req.body.citizenId || req.body.citizen_id;
+    const chargeType = (req.body.chargeType || req.body.title || req.body.tax_name || req.body.category || "").trim();
+    const description = (req.body.description || req.body.category || req.body.title || "").trim();
+    const amount = req.body.amount;
+    const dueDate = req.body.dueDate || req.body.due_date;
 
-    if (!citizenId || !chargeType || !amount || !dueDate) {
-      return res.status(400).json({ error: "Validation error", message: "Citizen ID, charge type, amount, and due date are required." });
+    if (!citizenId || !chargeType || amount === undefined || isNaN(parseFloat(amount)) || !dueDate) {
+      return res.status(400).json({ error: "Validation error", message: "Citizen ID, charge type/title, amount, and due date are required." });
     }
 
     const taxId = `TAX-${Date.now().toString().slice(-6)}`;
+    const numAmount = parseFloat(amount);
+
     await query(`
       INSERT INTO taxes_charges (id, citizen_id, charge_type, description, amount, due_date, status)
       VALUES (?, ?, ?, ?, ?, ?, 'Unpaid')
-    `, [taxId, citizenId, chargeType.trim(), description || "", parseFloat(amount), dueDate]);
+    `, [taxId, citizenId, chargeType, description, numAmount, dueDate]);
 
-    res.status(201).json({ message: "Tax/charge record created.", taxId });
+    const taxData = {
+      id: taxId,
+      taxId,
+      citizenId,
+      citizen_id: citizenId,
+      chargeType,
+      charge_type: chargeType,
+      title: chargeType,
+      description,
+      category: description,
+      amount: numAmount,
+      dueDate,
+      due_date: dueDate,
+      status: "Unpaid"
+    };
+
+    res.status(201).json({
+      success: true,
+      message: "Tax/charge record created successfully.",
+      taxId,
+      id: taxId,
+      tax: taxData
+    });
   } catch (err) {
     console.error("POST /admin/taxes error:", err);
     res.status(500).json({ error: "Server error", message: err.message });
@@ -703,22 +820,7 @@ router.get("/complaints/export-excel", async (req, res) => {
 router.get("/properties", async (req, res) => {
   try {
     const search = (req.query.search || "").trim();
-    let sql = `
-      SELECT p.*, c.full_name as linked_citizen_name, c.phone as linked_citizen_phone,
-             (SELECT COUNT(*) FROM water_bills wb WHERE wb.property_id = p.id OR wb.citizen_id = p.owner_citizen_id) as total_bills,
-             (SELECT COALESCE(SUM(wb.amount - wb.paid_amount), 0) FROM water_bills wb WHERE (wb.property_id = p.id OR wb.citizen_id = p.owner_citizen_id) AND wb.status != 'Paid') as unpaid_water_dues,
-             (SELECT COALESCE(SUM(tc.amount), 0) FROM taxes_charges tc WHERE (tc.property_id = p.id OR tc.citizen_id = p.owner_citizen_id) AND tc.status = 'Unpaid') as unpaid_tax_dues
-      FROM properties p
-      LEFT JOIN citizens c ON p.owner_citizen_id = c.id
-    `;
-    const params = [];
-    if (search) {
-      sql += " WHERE p.property_number LIKE ? OR p.owner_name LIKE ? OR p.ward_area LIKE ? OR p.address LIKE ?";
-      const like = `%${search}%`;
-      params.push(like, like, like, like);
-    }
-    sql += " ORDER BY p.created_at DESC";
-    const rows = await query(sql, params);
+    const rows = await propertyRepo.getAllWithDues({ search });
     res.json(rows);
   } catch (err) {
     console.error("GET /admin/properties error:", err);

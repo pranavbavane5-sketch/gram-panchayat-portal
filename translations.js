@@ -601,7 +601,12 @@ export const translations = {
     
     srv_letters_title: "Application & Request Letter Generator",
     srv_letters_desc: "Draft standard Gram Panchayat application letters and official petitions in Marathi and English with instant print and PDF download.",
-    srv_letters_badge: "Letter Builder"
+    srv_letters_badge: "Letter Builder",
+
+    home_notices_title: "Official Public Notices & Announcements",
+    home_notices_subtitle: "Stay updated on Gram Sabha meetings, water advisories, tax rebates, and village welfare schemes",
+    home_btn_all_notices: "View All Notices →",
+    admin_services_heading: "Gram Panchayat Citizen Services Management"
   },
 
   mr: {
@@ -1201,7 +1206,12 @@ export const translations = {
     
     srv_letters_title: "ग्रामपंचायत अर्ज व विनंती पत्र जनरेटर",
     srv_letters_desc: "प्रमाणित मराठी व इंग्रजी स्वरूपात ग्रामपंचायतीसाठी विविध विषयांवर अधिकृत अर्ज व विनंती पत्रे तयार करा व प्रिंट/PDF घ्या.",
-    srv_letters_badge: "अर्ज जनरेटर"
+    srv_letters_badge: "अर्ज जनरेटर",
+
+    home_notices_title: "अधिकृत जाहीर सूचना व ग्रामपंचायत घोषणा",
+    home_notices_subtitle: "ग्रामसभा बैठका, पाणी पुरवठा सूचना, कर सवलत मुदत आणि शासकीय योजनांबाबत अद्ययावत माहिती मिळवा",
+    home_btn_all_notices: "सर्व सूचना पहा →",
+    admin_services_heading: "ग्रामपंचायत नागरिक सेवा व्यवस्थापन"
   }
 };
 
@@ -1419,7 +1429,9 @@ export function setLanguage(lang) {
     });
 
     // Dispatch custom window event
-    window.dispatchEvent(new CustomEvent("languageChanged", { detail: { lang: currentLang } }));
+    if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+      window.dispatchEvent(new CustomEvent("languageChanged", { detail: { lang: currentLang } }));
+    }
   }
 }
 

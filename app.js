@@ -545,6 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initApplicationTracking(showToast);
   initAdminPanchayatModule(showToast);
   loadPublicNoticesView();
+  renderHomeNotices();
   initAuth();
   initCitizenView();
   initAdminView();
@@ -552,6 +553,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   onLanguageChange(() => {
     renderAllViews();
+    renderHomeNotices();
   });
 
   // Load database
@@ -627,7 +629,10 @@ export function switchPage(pageId) {
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 
-  if (pageId === "home") renderHomeView();
+  if (pageId === "home") {
+    renderHomeView();
+    renderHomeNotices();
+  }
   if (pageId === "storage") renderStorageView();
   if (pageId === "schedule") renderScheduleView();
   if (pageId === "report") renderRecentReports();
@@ -658,6 +663,16 @@ function initNavigation() {
 
   const btnExitAdmin = document.getElementById("btnExitAdmin");
   if (btnExitAdmin) btnExitAdmin.addEventListener("click", () => switchPage("home"));
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest('[data-nav="report"][data-app-tab="notices"]');
+    if (btn) {
+      e.preventDefault();
+      switchPage("report");
+      const btnTab = document.querySelector('[data-app-tab="notices"]');
+      if (btnTab) btnTab.click();
+    }
+  });
 }
 
 // ==========================================================
@@ -1680,7 +1695,8 @@ function initCitizenView() {
 
       try {
         const res = await api.payMyBill(billId, null, method);
-        showToast(`Payment successful! Receipt #${res.payment.receiptNumber}`, "success");
+        const receiptNum = res.payment?.receiptNumber || res.receipt?.receiptNo || res.receiptNo || "Paid";
+        showToast(`Payment successful! Receipt #${receiptNum}`, "success");
         closePayBill();
         await loadCitizenBills();
         await loadCitizenPayments();
@@ -1921,7 +1937,7 @@ async function loadCitizenPayments() {
     if (!tbody) return;
 
     if (payments.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:20px;">${t("cit_no_payments", "No payment receipts found.")}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:20px;">${t("cit_no_payments", "No payment receipts found.")}</td></tr>`;
     } else {
       tbody.innerHTML = payments.map(p => {
         const recNo = p.receipt_no || p.receiptNumber || p.id;
@@ -1929,6 +1945,7 @@ async function loadCitizenPayments() {
         const pDate = p.payment_date || p.paymentDate;
         const pMode = p.payment_mode || p.paymentMethod || "UPI";
         const recorded = p.notes || p.recordedBy || (getLanguage() === "mr" ? "ग्रामपंचायत काउंटर" : "Gram Panchayat Counter");
+        const pJson = escapeHtml(JSON.stringify(p)).replace(/'/g, "&#39;");
 
         return `
           <tr>
@@ -1938,6 +1955,11 @@ async function loadCitizenPayments() {
             <td>${escapeHtml(pDate ? String(pDate).slice(0, 10) : (getLanguage() === "mr" ? "नुकतेच" : "Recent"))}</td>
             <td>${escapeHtml(pMode)}</td>
             <td>${escapeHtml(recorded)}</td>
+            <td>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.viewPaymentReceipt('${pJson}')">
+                ${getLanguage() === "mr" ? "पावती पहा" : "View Receipt"}
+              </button>
+            </td>
           </tr>
         `;
       }).join("");
@@ -2593,7 +2615,8 @@ function initAdminView() {
 
       try {
         const res = await api.createAdminBill({ citizenId, billingPeriod, amount, dueDate, unitsConsumed });
-        showToast(`Bill #${res.bill.billNumber} issued for ${billingPeriod}!`, "success");
+        const billNum = res.bill?.billNumber || res.billNumber || res.billId || res.id;
+        showToast(`Bill #${billNum} issued for ${billingPeriod}!`, "success");
         closeBill();
         await renderAdminBillsTable();
         await renderAdminStats();
@@ -2649,7 +2672,8 @@ function initAdminView() {
 
       try {
         const res = await api.recordAdminPayment({ billId, amount, paymentMethod, notes });
-        showToast(`Payment recorded! Receipt #${res.payment.receiptNumber}`, "success");
+        const receiptNum = res.payment?.receiptNumber || res.receipt?.receiptNo || res.receiptNo || res.paymentId;
+        showToast(`Payment recorded! Receipt #${receiptNum}`, "success");
         closePay();
         await renderAdminBillsTable();
         await renderAdminPaymentsTable();
@@ -2710,7 +2734,15 @@ function initAdminView() {
       }
 
       try {
-        await api.createAdminTax({ citizenId, title, category, amount, dueDate });
+        await api.createAdminTax({
+          citizenId,
+          chargeType: title,
+          title,
+          description: category,
+          category,
+          amount,
+          dueDate
+        });
         showToast(`Tax '${title}' applied to resident!`, "success");
         closeTax();
         await renderAdminTaxesTable();
@@ -3653,6 +3685,10 @@ async function populatePropertyCitizensSelect(selectId) {
   if (!select) return;
   try {
     const citizens = await api.getAdminCitizens();
+    if (!citizens || citizens.length === 0) {
+      select.innerHTML = '<option value="">-- No registered citizens found --</option>';
+      return;
+    }
     select.innerHTML = '<option value="">-- No linked citizen (Select or Leave Empty) --</option>' +
       citizens.map(c => {
         const citId = c.id || c.citizenId || c.login_id;
@@ -3670,6 +3706,10 @@ async function populateCitizenSelect(selectId) {
   if (!select) return;
   try {
     const citizens = await api.getAdminCitizens();
+    if (!citizens || citizens.length === 0) {
+      select.innerHTML = '<option value="" disabled selected>-- No registered citizens found (Register citizen first) --</option>';
+      return;
+    }
     select.innerHTML = '<option value="">-- Choose Resident --</option>' + 
       citizens.map(c => {
         const citId = c.id || c.citizenId || c.login_id;
@@ -3827,6 +3867,8 @@ async function renderAdminCitizensTable(search = "", status = "", ward = "") {
   const tbody = document.getElementById("adminCitizensTableBody");
   if (!tbody) return;
 
+  tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:#64748b;"><span class="spinner-inline spinner-dark"></span> Loading citizen records...</td></tr>`;
+
   try {
     const citizens = await api.getAdminCitizens(search, status, ward);
     if (!citizens || citizens.length === 0) {
@@ -3880,6 +3922,8 @@ async function renderAdminCitizensTable(search = "", status = "", ward = "") {
 async function renderAdminPropertiesTable(search = "", ward = "", type = "") {
   const tbody = document.getElementById("adminPropertiesTableBody");
   if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:#64748b;"><span class="spinner-inline spinner-dark"></span> Loading property records...</td></tr>`;
 
   try {
     const properties = await api.getAdminProperties(search);
@@ -4139,13 +4183,13 @@ async function renderAdminPaymentsTable() {
 
   const isMr = getLanguage() === "mr";
   if (!tbody.children.length || tbody.innerHTML.includes("Failed to load")) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#64748b;"><span class="spinner-inline spinner-dark"></span> ${isMr ? "पावती नोंदी लोड होत आहेत..." : "Loading payment records..."}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:#64748b;"><span class="spinner-inline spinner-dark"></span> ${isMr ? "पावती नोंदी लोड होत आहेत..." : "Loading payment records..."}</td></tr>`;
   }
 
   try {
     const payments = await api.getAdminPayments();
     if (!payments || payments.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:20px;">${t("adm_no_payments", "No payment receipts recorded.")}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8; padding:20px;">${t("adm_no_payments", "No payment receipts recorded.")}</td></tr>`;
       return;
     }
 
@@ -4158,6 +4202,7 @@ async function renderAdminPaymentsTable() {
       const pDate = p.payment_date || p.paymentDate;
       const pMode = p.payment_mode || p.paymentMethod || "UPI";
       const recorded = p.notes || p.recordedBy || t("adm_staff", "Admin Staff");
+      const pJson = escapeHtml(JSON.stringify(p)).replace(/'/g, "&#39;");
 
       return `
         <tr>
@@ -4171,12 +4216,17 @@ async function renderAdminPaymentsTable() {
           <td>${escapeHtml(pDate ? String(pDate).slice(0, 10) : (getLanguage() === "mr" ? "नुकतेच" : "Recent"))}</td>
           <td><span class="source-type-pill">${escapeHtml(pMode)}</span></td>
           <td>${escapeHtml(recorded)}</td>
+          <td>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.viewPaymentReceipt('${pJson}')">
+              ${isMr ? "पावती पहा" : "View Receipt"}
+            </button>
+          </td>
         </tr>
       `;
     }).join("");
   } catch (err) {
     console.error("renderAdminPaymentsTable error:", err);
-    tbody.innerHTML = `<tr><td colspan="7" style="color:#ef4444; text-align:center; padding:20px;">${isMr ? "पावती नोंदी लोड करण्यात त्रुटी आली." : "Failed to load payments."}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="color:#ef4444; text-align:center; padding:20px;">${isMr ? "पावती नोंदी लोड करण्यात त्रुटी आली." : "Failed to load payments."}</td></tr>`;
   }
 }
 
@@ -5338,5 +5388,127 @@ window.acknowledgeAlert = async function(alertId) {
     showToast("Failed to acknowledge alert: " + err.message, "error");
   }
 };
+
+// ==========================================================
+// OFFICIAL PAYMENT RECEIPT VIEW & PRINT
+// ==========================================================
+window.viewPaymentReceipt = function(paymentJson) {
+  try {
+    const p = typeof paymentJson === "string" ? JSON.parse(paymentJson) : paymentJson;
+    const modal = document.getElementById("paymentReceiptModal");
+    if (!modal || !p) return;
+
+    const recNo = p.receipt_no || p.receiptNumber || p.id || ("REC-" + Date.now().toString().slice(-5));
+    const dateStr = p.payment_date || p.paymentDate || p.paidAt || new Date().toISOString();
+    const formattedDate = new Date(dateStr).toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    });
+    const amt = Number(p.amount || 0);
+
+    const setT = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val || "-";
+    };
+
+    setT("rcptNo", recNo);
+    setT("rcptDate", formattedDate);
+    setT("rcptBillId", p.billing_period ? `${p.billing_period} (${p.bill_id || "General"})` : (p.bill_id || "Direct Panchayat Payment"));
+    setT("rcptMode", p.payment_mode || p.paymentMethod || "UPI / Counter");
+    setT("rcptCitizenName", p.full_name || p.fullName || (appState.user?.fullName) || "Village Resident");
+    setT("rcptCitizenId", p.citizen_id || p.citizenId || (appState.user?.citizenId) || "-");
+    setT("rcptPropertyNo", p.property_no || p.propertyNo || "-");
+    setT("rcptWard", p.ward_area || p.ward || "Gram Panchayat Ward");
+    setT("rcptDescription", p.notes || "Official Water Supply Tariff / Panchayat Cess Collection");
+    setT("rcptAmount", `₹${amt.toFixed(2)}`);
+    setT("rcptTotalPaid", `₹${amt.toFixed(2)}`);
+
+    modal.hidden = false;
+  } catch (err) {
+    console.error("viewPaymentReceipt error:", err);
+  }
+};
+
+// Wire close and print for paymentReceiptModal
+const closeRcptModal = () => {
+  const modal = document.getElementById("paymentReceiptModal");
+  if (modal) modal.hidden = true;
+};
+const btnCloseRcpt = document.getElementById("btnCloseReceiptModal");
+const btnCancelRcpt = document.getElementById("btnCancelReceiptModal");
+const btnPrintRcpt = document.getElementById("btnPrintReceiptBtn");
+if (btnCloseRcpt) btnCloseRcpt.addEventListener("click", closeRcptModal);
+if (btnCancelRcpt) btnCancelRcpt.addEventListener("click", closeRcptModal);
+if (btnPrintRcpt) {
+  btnPrintRcpt.addEventListener("click", () => {
+    window.print();
+  });
+}
+
+// ==========================================================
+// HOMEPAGE PUBLIC NOTICES RENDERER
+// ==========================================================
+async function renderHomeNotices() {
+  const grid = document.getElementById("homeNoticesGrid");
+  if (!grid) return;
+
+  const isMr = getLanguage() === "mr";
+  try {
+    const notices = await api.getPublicNotices();
+    if (!notices || notices.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 24px; text-align: center; background: var(--bg-card); border: 1px dashed var(--border-light); border-radius: var(--radius-md); color: var(--text-muted);">
+          <p>${isMr ? "सध्या कोणतीही नवीन अधिकृत सूचना प्रसिद्ध झालेली नाही." : "No official public notices published at this time."}</p>
+        </div>
+      `;
+      return;
+    }
+
+    const displayNotices = notices.slice(0, 4);
+    grid.innerHTML = displayNotices.map(n => {
+      const title = isMr && n.title_mr ? n.title_mr : n.title;
+      const content = isMr && n.content_mr ? n.content_mr : n.content;
+      const dateFmt = new Date(n.created_at || n.publish_date).toLocaleDateString("en-GB", {
+        day: "numeric", month: "short", year: "numeric"
+      });
+      const isPinned = n.is_pinned ? `<span class="badge-pill" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.75rem; margin-right:6px;">📌 ${isMr ? "महत्त्वाची" : "Pinned"}</span>` : "";
+
+      return `
+        <div class="notice-card" style="background:var(--bg-card); border:1px solid var(--border-light); border-left:4px solid ${n.is_pinned ? '#eab308' : '#0284c7'}; border-radius:var(--radius-md); padding:18px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div>
+                ${isPinned}
+                <span class="badge-pill" style="background:#e0f2fe; color:#0369a1; font-size:0.75rem; font-weight:800; text-transform:uppercase;">
+                  ${escapeHtml(n.category || "General")}
+                </span>
+              </div>
+              <span style="font-size:0.8rem; color:var(--text-muted);">${dateFmt}</span>
+            </div>
+            <h4 style="font-size:1.05rem; font-weight:800; color:var(--text-main); margin:6px 0 8px 0; line-height:1.4;">
+              ${escapeHtml(title)}
+            </h4>
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.5; margin:0 0 12px 0;">
+              ${escapeHtml(content && content.length > 140 ? content.slice(0, 140) + "..." : (content || ""))}
+            </p>
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline-primary btn-sm" style="width:100%;" data-nav="report" data-app-tab="notices">
+              ${isMr ? "सविस्तर वाचा &rarr;" : "Read Full Notice &rarr;"}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  } catch (err) {
+    console.warn("renderHomeNotices error:", err);
+    grid.innerHTML = `
+      <div style="grid-column:1 / -1; padding:16px; color:#ef4444; font-size:0.85rem;">
+        ${isMr ? "सूचना लोड करण्यात अडचण आली." : "Could not load public notices."}
+      </div>
+    `;
+  }
+}
+window.renderHomeNotices = renderHomeNotices;
 
 

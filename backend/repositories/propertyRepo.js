@@ -33,6 +33,92 @@ export const propertyRepo = {
     return rows.map(normalizeProperty);
   },
 
+  async getAllWithDues(filters = {}) {
+    if (isFirestore()) {
+      const db = getDb();
+      const [propSnap, citSnap, billSnap, taxSnap] = await Promise.all([
+        db.collection(COLLECTIONS.PROPERTIES).get(),
+        db.collection(COLLECTIONS.CITIZENS).get(),
+        db.collection(COLLECTIONS.WATER_BILLS).get(),
+        db.collection(COLLECTIONS.TAXES_CHARGES).get()
+      ]);
+
+      const citizens = docsToArray(citSnap);
+      const citMap = {};
+      citizens.forEach(c => {
+        if (c.id) citMap[c.id] = c;
+      });
+
+      const bills = docsToArray(billSnap);
+      const taxes = docsToArray(taxSnap);
+
+      let properties = docsToArray(propSnap).map(p => {
+        const norm = normalizeProperty(p);
+        const linkedCitizen = norm.owner_citizen_id ? citMap[norm.owner_citizen_id] : null;
+
+        // Calculate bills and water dues
+        const propBills = bills.filter(b => b.property_id === norm.id || (norm.owner_citizen_id && b.citizen_id === norm.owner_citizen_id));
+        const total_bills = propBills.length;
+        const unpaid_water_dues = propBills
+          .filter(b => b.status !== "Paid")
+          .reduce((sum, b) => sum + Math.max(0, Number(b.amount || 0) - Number(b.paid_amount || 0)), 0);
+
+        // Calculate unpaid taxes
+        const propTaxes = taxes.filter(t => t.property_id === norm.id || (norm.owner_citizen_id && t.citizen_id === norm.owner_citizen_id));
+        const unpaid_tax_dues = propTaxes
+          .filter(t => t.status === "Unpaid")
+          .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+        return {
+          ...norm,
+          linked_citizen_name: linkedCitizen ? linkedCitizen.full_name : norm.owner_name,
+          linked_citizen_phone: linkedCitizen ? linkedCitizen.phone : null,
+          total_bills,
+          unpaid_water_dues: parseFloat(unpaid_water_dues.toFixed(2)),
+          unpaid_tax_dues: parseFloat(unpaid_tax_dues.toFixed(2))
+        };
+      });
+
+      if (filters.search) {
+        const q = String(filters.search).toLowerCase().trim();
+        properties = properties.filter(p =>
+          (p.property_number && p.property_number.toLowerCase().includes(q)) ||
+          (p.owner_name && p.owner_name.toLowerCase().includes(q)) ||
+          (p.linked_citizen_name && p.linked_citizen_name.toLowerCase().includes(q)) ||
+          (p.ward_area && p.ward_area.toLowerCase().includes(q)) ||
+          (p.address && p.address.toLowerCase().includes(q))
+        );
+      }
+
+      return properties.sort((a, b) => String(a.property_number).localeCompare(String(b.property_number)));
+    }
+
+    let sql = `
+      SELECT p.*, c.full_name as linked_citizen_name, c.phone as linked_citizen_phone,
+             (SELECT COUNT(*) FROM water_bills wb WHERE wb.property_id = p.id OR wb.citizen_id = p.owner_citizen_id) as total_bills,
+             (SELECT COALESCE(SUM(wb.amount - wb.paid_amount), 0) FROM water_bills wb WHERE (wb.property_id = p.id OR wb.citizen_id = p.owner_citizen_id) AND wb.status != 'Paid') as unpaid_water_dues,
+             (SELECT COALESCE(SUM(tc.amount), 0) FROM taxes_charges tc WHERE (tc.property_id = p.id OR tc.citizen_id = p.owner_citizen_id) AND tc.status = 'Unpaid') as unpaid_tax_dues
+      FROM properties p
+      LEFT JOIN citizens c ON p.owner_citizen_id = c.id
+    `;
+    const params = [];
+
+    if (filters.search) {
+      sql += " WHERE p.property_number LIKE ? OR p.owner_name LIKE ? OR p.ward_area LIKE ? OR p.address LIKE ?";
+      const like = `%${filters.search.trim()}%`;
+      params.push(like, like, like, like);
+    }
+
+    sql += " ORDER BY p.created_at DESC";
+    const rows = await mysqlQuery(sql, params);
+    return rows.map(p => ({
+      ...p,
+      total_bills: Number(p.total_bills || 0),
+      unpaid_water_dues: parseFloat(p.unpaid_water_dues || 0),
+      unpaid_tax_dues: parseFloat(p.unpaid_tax_dues || 0)
+    }));
+  },
+
   async getById(id) {
     if (!id) return null;
     const cleanId = String(id).trim();

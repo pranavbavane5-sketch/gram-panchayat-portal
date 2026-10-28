@@ -335,6 +335,7 @@ export const api = {
     method: "PUT",
     body: JSON.stringify({ status })
   }),
+  getAdminTaskById: (id) => request(`/admin/tasks/${encodeURIComponent(id)}`),
   getPanchayatSummary: () => request("/admin/panchayat-summary"),
 
   // 10. Gram Panchayat Services Management

@@ -50,7 +50,7 @@ if (getLanguage() !== 'mr') {
 
 // 6. Test Key Translations in Marathi
 const testKeys = [
-  { key: 'brand_title', expected: 'जलमित्र' },
+  { key: 'brand_title', expected: 'ग्रामपंचायत' },
   { key: 'nav_home', expected: 'मुख्यपृष्ठ' },
   { key: 'nav_storage', expected: 'जलसाठा' },
   { key: 'nav_schedule', expected: 'वेळापत्रक' },

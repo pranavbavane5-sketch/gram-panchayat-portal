@@ -199,14 +199,34 @@ router.post("/my-payments", async (req, res) => {
       WHERE id = ?
     `, [billId]);
 
+    const paymentPayload = {
+      id: paymentId,
+      paymentId,
+      receiptNumber: receiptNo,
+      receiptNo,
+      billId,
+      citizenId,
+      amount: dueAmount,
+      paymentMode: mode,
+      payment_mode: mode,
+      paidAt: new Date().toISOString()
+    };
+
     res.status(201).json({
+      success: true,
       message: "Payment processed successfully.",
+      paymentId,
+      receiptNo,
+      receiptNumber: receiptNo,
+      payment: paymentPayload,
       receipt: {
         receiptNo,
+        receiptNumber: receiptNo,
         billId,
+        citizenId,
         amount: dueAmount,
         paymentMode: mode,
-        paidAt: new Date().toISOString()
+        paidAt: paymentPayload.paidAt
       }
     });
   } catch (err) {

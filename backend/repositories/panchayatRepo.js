@@ -7,14 +7,20 @@ import { isFirestore, getDb, docToData, docsToArray, cleanUndefined, mysqlQuery,
 
 function normalizeApplication(a) {
   if (!a) return null;
+  const applicantName = a.applicant_name || a.applicantName || a.citizen_name || a.citizenName || "";
+  const applicantPhone = a.applicant_phone || a.applicantPhone || a.citizen_phone || a.citizenPhone || "";
+  const wardArea = a.ward_area || a.wardArea || a.ward || null;
   return {
     ...a,
     id: a.id,
     reference_no: a.reference_no || a.referenceNo,
-    applicant_name: a.applicant_name || a.applicantName,
-    applicant_phone: a.applicant_phone || a.applicantPhone,
+    applicant_name: applicantName,
+    citizen_name: applicantName,
+    applicant_phone: applicantPhone,
+    citizen_phone: applicantPhone,
     applicant_email: a.applicant_email || a.applicantEmail || null,
-    ward_area: a.ward_area || a.wardArea || null,
+    ward_area: wardArea,
+    ward: wardArea,
     property_no: a.property_no || a.propertyNo || null,
     category: a.category,
     sub_type: a.sub_type || a.subType || null,
@@ -250,20 +256,29 @@ export const panchayatRepo = {
   async getNotices(activeOnly = true) {
     if (isFirestore()) {
       const db = getDb();
-      let snap;
+      const snap = await db.collection(COLLECTIONS.PUBLIC_NOTICES).get();
+      let notices = docsToArray(snap);
+
       if (activeOnly) {
-        snap = await db.collection(COLLECTIONS.PUBLIC_NOTICES).where("is_active", "==", 1).get();
-      } else {
-        snap = await db.collection(COLLECTIONS.PUBLIC_NOTICES).get();
+        const now = new Date();
+        notices = notices.filter(n => {
+          if (n.is_active === 0 || n.is_active === false) return false;
+          if (n.expiry_date) {
+            const exp = new Date(n.expiry_date);
+            if (!isNaN(exp.getTime()) && exp < now) return false;
+          }
+          return true;
+        });
       }
-      return docsToArray(snap).sort((a, b) => {
+
+      return notices.sort((a, b) => {
         if (b.is_pinned !== a.is_pinned) return (b.is_pinned || 0) - (a.is_pinned || 0);
-        return String(b.publish_date || "").localeCompare(String(a.publish_date || ""));
+        return String(b.publish_date || b.created_at || "").localeCompare(String(a.publish_date || a.created_at || ""));
       });
     }
 
     const sql = activeOnly
-      ? "SELECT * FROM public_notices WHERE is_active = 1 ORDER BY is_pinned DESC, publish_date DESC"
+      ? "SELECT * FROM public_notices WHERE expiry_date IS NULL OR expiry_date >= CURRENT_DATE ORDER BY is_pinned DESC, publish_date DESC"
       : "SELECT * FROM public_notices ORDER BY is_pinned DESC, publish_date DESC";
     return mysqlQuery(sql);
   },

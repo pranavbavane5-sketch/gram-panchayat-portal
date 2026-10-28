@@ -10,6 +10,8 @@ function normalizeCitizen(c) {
   return {
     id: c.id,
     user_id: c.user_id || c.userId || null,
+    login_id: c.login_id || c.loginId || c.id,
+    user_active: c.user_active !== undefined ? c.user_active : (c.status === "Active" ? 1 : 0),
     full_name: c.full_name || c.fullName,
     phone: c.phone,
     email: c.email || null,
@@ -25,14 +27,99 @@ function normalizeCitizen(c) {
 }
 
 export const citizenRepo = {
-  async getAll() {
+  async getAll(filters = {}) {
     if (isFirestore()) {
       const db = getDb();
       const snap = await db.collection(COLLECTIONS.CITIZENS).get();
-      return docsToArray(snap).map(normalizeCitizen).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+      let citizens = docsToArray(snap).map(normalizeCitizen);
+
+      // Attach user accounts for login_id and user_active
+      try {
+        const usersSnap = await db.collection(COLLECTIONS.USERS).get();
+        const userMap = {};
+        usersSnap.docs.forEach(doc => {
+          const u = doc.data();
+          if (u.id) userMap[u.id] = u;
+          if (u.citizen_id) userMap[u.citizen_id] = u;
+        });
+
+        citizens = citizens.map(c => {
+          const matchedUser = (c.user_id && userMap[c.user_id]) || userMap[c.id];
+          return {
+            ...c,
+            login_id: matchedUser?.login_id || c.login_id || c.id,
+            user_active: matchedUser?.is_active !== undefined ? matchedUser.is_active : (c.status === "Active" ? 1 : 0)
+          };
+        });
+      } catch (uErr) {
+        console.warn("citizenRepo: could not map users:", uErr.message);
+      }
+
+      // Filter by search
+      if (filters.search) {
+        const q = String(filters.search).toLowerCase().trim();
+        citizens = citizens.filter(c =>
+          (c.full_name && c.full_name.toLowerCase().includes(q)) ||
+          (c.phone && c.phone.toLowerCase().includes(q)) ||
+          (c.property_no && c.property_no.toLowerCase().includes(q)) ||
+          (c.ward_area && c.ward_area.toLowerCase().includes(q)) ||
+          (c.id && c.id.toLowerCase().includes(q)) ||
+          (c.login_id && c.login_id.toLowerCase().includes(q))
+        );
+      }
+
+      // Filter by status
+      if (filters.status) {
+        const s = String(filters.status).toLowerCase().trim();
+        citizens = citizens.filter(c => c.status && c.status.toLowerCase() === s);
+      }
+
+      // Filter by ward
+      if (filters.ward) {
+        const w = String(filters.ward).toLowerCase().trim();
+        citizens = citizens.filter(c => c.ward_area && c.ward_area.toLowerCase() === w);
+      }
+
+      // Sort by created_at DESC or ID
+      return citizens.sort((a, b) => {
+        if (b.created_at && a.created_at) {
+          return String(b.created_at).localeCompare(String(a.created_at));
+        }
+        return String(a.id).localeCompare(String(b.id));
+      });
     }
 
-    const rows = await mysqlQuery("SELECT * FROM citizens ORDER BY id ASC");
+    let sql = `
+      SELECT c.*, u.login_id, u.is_active as user_active
+      FROM citizens c
+      LEFT JOIN users u ON (c.user_id = u.id OR c.id = u.citizen_id)
+    `;
+    const params = [];
+    const wheres = [];
+
+    if (filters.search) {
+      const like = `%${filters.search.trim()}%`;
+      wheres.push("(c.full_name LIKE ? OR c.phone LIKE ? OR c.property_no LIKE ? OR c.ward_area LIKE ? OR c.id LIKE ?)");
+      params.push(like, like, like, like, like);
+    }
+
+    if (filters.status) {
+      wheres.push("c.status = ?");
+      params.push(filters.status.trim());
+    }
+
+    if (filters.ward) {
+      wheres.push("c.ward_area = ?");
+      params.push(filters.ward.trim());
+    }
+
+    if (wheres.length > 0) {
+      sql += " WHERE " + wheres.join(" AND ");
+    }
+
+    sql += " ORDER BY c.created_at DESC";
+
+    const rows = await mysqlQuery(sql, params);
     return rows.map(normalizeCitizen);
   },
 

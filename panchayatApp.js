@@ -804,7 +804,7 @@ function renderTrackingResult(app) {
 // 5. PUBLIC NOTICES VIEW
 // ==========================================================
 export async function loadPublicNoticesView() {
-  const container = document.getElementById("publicNoticesContainer");
+  const container = document.getElementById("publicNoticesGrid") || document.getElementById("publicNoticesContainer");
   if (!container) return;
 
   try {
@@ -1116,7 +1116,7 @@ export async function loadAdminApplications(filters = {}) {
           <td>${formatStatusBadge(app.status)}</td>
           <td>${escapeHtml(app.assigned_to || "-")}</td>
           <td>
-            <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.openAdminUpdateAppModal(${app.id})">
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.openAdminUpdateAppModal('${escapeHtml(String(app.id))}')">
               Review / Update
             </button>
           </td>
@@ -1171,7 +1171,7 @@ export async function loadAdminRtiRegister() {
           </td>
           <td>${formatStatusBadge(app.status)}</td>
           <td>
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="window.openAdminUpdateAppModal(${app.id})">
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="window.openAdminUpdateAppModal('${escapeHtml(String(app.id))}')">
               SLA Action
             </button>
           </td>
@@ -1222,9 +1222,14 @@ export async function loadAdminTasks() {
             </span>
           </td>
           <td>
-            <button type="button" class="btn btn-sm ${isDone ? 'btn-secondary' : 'btn-outline-primary'}" onclick="window.toggleAdminTaskStatus(${t.id}, '${isDone ? 'Open' : 'Completed'}')">
-              ${isDone ? 'Reopen' : 'Mark Done'}
-            </button>
+            <div style="display:inline-flex; gap:6px;">
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="window.viewAdminTask('${escapeHtml(JSON.stringify(t)).replace(/'/g, "&#39;")}')">
+                View
+              </button>
+              <button type="button" class="btn btn-sm ${isDone ? 'btn-secondary' : 'btn-outline-success'}" onclick="window.toggleAdminTaskStatus('${escapeHtml(String(t.id))}', '${isDone ? 'Pending' : 'Completed'}')">
+                ${isDone ? 'Reopen' : 'Mark Done'}
+              </button>
+            </div>
           </td>
         </tr>
       `;
@@ -1264,7 +1269,7 @@ export async function loadAdminNotices() {
           <td>${escapeHtml(n.priority || "Normal")}</td>
           <td>${dateFmt}</td>
           <td>
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="window.deleteAdminNotice(${n.id})">
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="window.deleteAdminNotice('${escapeHtml(String(n.id))}')">
               Delete
             </button>
           </td>
@@ -1318,27 +1323,28 @@ export async function loadAdminExecutiveKPIs() {
 // Window global bridges for inline onclicks in admin tables
 window.openAdminUpdateAppModal = async function(id) {
   try {
-    const app = await api.getAdminApplicationById(id);
+    const raw = await api.getAdminApplicationById(id);
+    const app = raw.application || raw;
     const modal = document.getElementById("adminUpdateAppModal");
-    if (!modal) return;
+    if (!modal || !app) return;
 
-    document.getElementById("adminUpdateAppId").value = app.id;
-    document.getElementById("updateAppRefNo").textContent = app.reference_no;
-    document.getElementById("updateAppSubject").textContent = app.subject;
-    document.getElementById("updateAppDesc").textContent = app.description;
-    document.getElementById("updateAppCitizen").textContent = app.citizen_name;
-    document.getElementById("updateAppPhone").textContent = app.citizen_phone || "-";
-    document.getElementById("updateAppWard").textContent = app.ward || "-";
+    document.getElementById("adminUpdateAppId").value = app.id || "";
+    document.getElementById("updateAppRefNo").textContent = app.reference_no || "-";
+    document.getElementById("updateAppSubject").textContent = app.subject || "-";
+    document.getElementById("updateAppDesc").textContent = app.description || "-";
+    document.getElementById("updateAppCitizen").textContent = app.citizen_name || app.applicant_name || "-";
+    document.getElementById("updateAppPhone").textContent = app.citizen_phone || app.applicant_phone || "-";
+    document.getElementById("updateAppWard").textContent = app.ward || app.ward_area || "-";
     document.getElementById("updateAppStatus").value = app.status || "Submitted";
     document.getElementById("updateAppOfficer").value = app.assigned_to || "";
-    document.getElementById("updateAppResponse").value = app.official_response || "";
+    document.getElementById("updateAppResponse").value = app.official_response || app.officer_remarks || "";
     document.getElementById("updateAppInternalNotes").value = app.internal_notes || "";
 
     const attWrap = document.getElementById("updateAppAttachmentWrap");
     const attLink = document.getElementById("updateAppAttachmentLink");
     if (app.attachment_path && attWrap && attLink) {
       attWrap.style.display = "block";
-      attLink.href = `/api${app.attachment_path}`;
+      attLink.href = app.attachment_path.startsWith("http") ? app.attachment_path : `/api${app.attachment_path.startsWith('/') ? '' : '/'}${app.attachment_path}`;
     } else if (attWrap) {
       attWrap.style.display = "none";
     }
@@ -1348,6 +1354,57 @@ window.openAdminUpdateAppModal = async function(id) {
     alert("Could not load application: " + err.message);
   }
 };
+
+window.viewAdminTask = function(taskJson) {
+  try {
+    const t = typeof taskJson === "string" ? JSON.parse(taskJson) : taskJson;
+    const modal = document.getElementById("adminTaskViewModal");
+    if (!modal || !t) return;
+
+    const setT = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val || "-";
+    };
+
+    setT("taskViewId", t.id || "-");
+    setT("taskViewTitle", t.title || "-");
+    setT("taskViewCategory", t.category || "General");
+    setT("taskViewPriority", t.priority || "Normal");
+    setT("taskViewWard", t.ward || "All Wards");
+    setT("taskViewAssigned", t.assigned_to || "Unassigned");
+    setT("taskViewDueDate", t.due_date ? String(t.due_date).split("T")[0] : "No deadline");
+    setT("taskViewCreatedBy", t.created_by || "Admin");
+    setT("taskViewDesc", t.description || "No additional description provided.");
+
+    const compWrap = document.getElementById("taskViewCompletionWrap");
+    if (t.completion_notes && compWrap) {
+      compWrap.style.display = "block";
+      setT("taskViewCompletionNotes", t.completion_notes);
+    } else if (compWrap) {
+      compWrap.style.display = "none";
+    }
+
+    const badge = document.getElementById("taskViewStatusBadge");
+    if (badge) {
+      badge.textContent = t.status || "Pending";
+      badge.className = "status-tag " + (t.status === "Completed" ? "status-completed" : (t.status === "In Progress" ? "status-in-progress" : "status-open"));
+    }
+
+    modal.hidden = false;
+  } catch (err) {
+    console.error("viewAdminTask error:", err);
+  }
+};
+
+// Wire close handlers for adminTaskViewModal
+const closeTaskModal = () => {
+  const modal = document.getElementById("adminTaskViewModal");
+  if (modal) modal.hidden = true;
+};
+const btnCloseTask = document.getElementById("btnCloseTaskViewModal");
+const btnCancelTask = document.getElementById("btnCancelTaskViewModal");
+if (btnCloseTask) btnCloseTask.addEventListener("click", closeTaskModal);
+if (btnCancelTask) btnCancelTask.addEventListener("click", closeTaskModal);
 
 window.toggleAdminTaskStatus = async function(id, newStatus) {
   try {

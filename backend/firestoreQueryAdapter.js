@@ -73,7 +73,7 @@ export async function executeFirestoreQuery(sql, params = []) {
 
   // 3. CITIZENS
   if (/FROM citizens/i.test(trimmed)) {
-    if (/COUNT\(\*\)/i.test(trimmed)) {
+    if (/^SELECT\s+COUNT\(\*\)/i.test(trimmed) || /COUNT\(\*\)\s+as\s+count\s+FROM\s+citizens/i.test(trimmed)) {
       const count = await citizenRepo.count();
       return [{ count }];
     }
@@ -81,38 +81,45 @@ export async function executeFirestoreQuery(sql, params = []) {
       const profile = await citizenRepo.getProfileWithProperty(params[0]);
       return profile ? [profile] : [];
     }
-    if (/WHERE id\s*=\s*\?/i.test(trimmed) || /WHERE id\s*=\s*\?\s*LIMIT/i.test(trimmed)) {
+    if (/WHERE\s+(?:c\.)?id\s*=\s*\?/i.test(trimmed) || /WHERE\s+(?:c\.)?id\s*=\s*\?\s*LIMIT/i.test(trimmed)) {
       const c = await citizenRepo.getById(params[0]);
       return c ? [c] : [];
     }
-    if (/WHERE phone\s*=\s*\?/i.test(trimmed)) {
+    if (/WHERE\s+(?:c\.)?phone\s*=\s*\?/i.test(trimmed)) {
       const c = await citizenRepo.getByPhone(params[0]);
       return c ? [c] : [];
     }
-    if (/^SELECT \* FROM citizens ORDER BY/i.test(trimmed) || /^SELECT \* FROM citizens$/i.test(trimmed)) {
-      return await citizenRepo.getAll();
+    // Any other citizen query (including listing, joins with users, search filters)
+    let search = "";
+    if (params.length > 0 && typeof params[0] === "string" && params[0].includes("%")) {
+      search = params[0].replace(/%/g, "");
     }
+    return await citizenRepo.getAll({ search });
   }
 
   // 4. PROPERTIES
   if (/FROM properties/i.test(trimmed) && /^SELECT/i.test(trimmed)) {
-    if (/COUNT\(\*\)/i.test(trimmed)) {
+    if (/^SELECT\s+COUNT\(\*\)\s+FROM\s+properties/i.test(trimmed)) {
       const count = await propertyRepo.count();
       return [{ count }];
     }
-    if (/WHERE property_number\s*=\s*\?/i.test(trimmed)) {
+    if (/WHERE\s+(?:p\.)?property_number\s*=\s*\?/i.test(trimmed)) {
       const p = await propertyRepo.getByPropertyNumber(params[0]);
       return p ? [p] : [];
     }
-    if (/WHERE id\s*=\s*\?/i.test(trimmed)) {
+    if (/WHERE\s+(?:p\.)?id\s*=\s*\?/i.test(trimmed)) {
       const p = await propertyRepo.getById(params[0]);
       return p ? [p] : [];
     }
-    if (/WHERE owner_citizen_id\s*=\s*\?/i.test(trimmed)) {
+    if (/WHERE\s+(?:p\.)?owner_citizen_id\s*=\s*\?/i.test(trimmed)) {
       const p = await propertyRepo.getByOwnerCitizenId(params[0]);
       return p ? [p] : [];
     }
-    return await propertyRepo.getAll();
+    let search = "";
+    if (params.length > 0 && typeof params[0] === "string" && params[0].includes("%")) {
+      search = params[0].replace(/%/g, "");
+    }
+    return await propertyRepo.getAllWithDues({ search });
   }
 
   // 5. GP_SERVICES
@@ -173,28 +180,67 @@ export async function executeFirestoreQuery(sql, params = []) {
 
   // 8. BILLING, PAYMENTS & TAXES
   if (/FROM water_bills/i.test(trimmed) && /^SELECT/i.test(trimmed)) {
-    if (/WHERE citizen_id\s*=\s*\?/i.test(trimmed)) {
+    if (/WHERE\s+(?:b\.)?citizen_id\s*=\s*\?/i.test(trimmed)) {
       return await billingRepo.getBillsByCitizenId(params[0]);
     }
-    if (/WHERE id\s*=\s*\?/i.test(trimmed)) {
+    if (/WHERE\s+(?:b\.)?id\s*=\s*\?/i.test(trimmed)) {
       const b = await billingRepo.getBillById(params[0]);
       return b ? [b] : [];
     }
-    return await billingRepo.getAllBills();
+    const bills = await billingRepo.getAllBills();
+    try {
+      const cits = await citizenRepo.getAll();
+      const citMap = {};
+      cits.forEach(c => { citMap[c.id] = c; });
+      return bills.map(b => ({
+        ...b,
+        full_name: citMap[b.citizen_id]?.full_name || "Resident",
+        property_no: citMap[b.citizen_id]?.property_no || "",
+        ward_area: citMap[b.citizen_id]?.ward_area || "",
+        phone: citMap[b.citizen_id]?.phone || ""
+      }));
+    } catch {
+      return bills;
+    }
   }
 
   if (/FROM payments/i.test(trimmed) && /^SELECT/i.test(trimmed)) {
-    if (/WHERE p\.citizen_id\s*=\s*\?/i.test(trimmed) || /WHERE citizen_id\s*=\s*\?/i.test(trimmed)) {
+    if (/WHERE\s+(?:p\.)?citizen_id\s*=\s*\?/i.test(trimmed)) {
       return await billingRepo.getPaymentsByCitizenId(params[0]);
     }
-    return await billingRepo.getAllPayments();
+    const payments = await billingRepo.getAllPayments();
+    try {
+      const cits = await citizenRepo.getAll();
+      const citMap = {};
+      cits.forEach(c => { citMap[c.id] = c; });
+      return payments.map(p => ({
+        ...p,
+        full_name: citMap[p.citizen_id]?.full_name || "Resident",
+        property_no: citMap[p.citizen_id]?.property_no || ""
+      }));
+    } catch {
+      return payments;
+    }
   }
 
   if (/FROM taxes_charges/i.test(trimmed) && /^SELECT/i.test(trimmed)) {
-    if (/WHERE citizen_id\s*=\s*\?/i.test(trimmed)) {
+    if (/WHERE\s+(?:t\.)?citizen_id\s*=\s*\?/i.test(trimmed)) {
       return await billingRepo.getTaxesByCitizenId(params[0]);
     }
-    return await billingRepo.getAllTaxes();
+    const taxes = await billingRepo.getAllTaxes();
+    try {
+      const cits = await citizenRepo.getAll();
+      const citMap = {};
+      cits.forEach(c => { citMap[c.id] = c; });
+      return taxes.map(t => ({
+        ...t,
+        full_name: citMap[t.citizen_id]?.full_name || "Resident",
+        property_no: citMap[t.citizen_id]?.property_no || "",
+        ward_area: citMap[t.citizen_id]?.ward_area || ""
+      }));
+    } catch {
+      return taxes;
+    }
   }
 
   // 9. COMMUNITY REPORTS / GRIEVANCES
@@ -234,11 +280,16 @@ export async function executeFirestoreQuery(sql, params = []) {
   }
 
   if (/FROM public_notices/i.test(trimmed) && /^SELECT/i.test(trimmed)) {
-    const active = /WHERE is_active\s*=\s*1/i.test(trimmed);
+    const active = !/SELECT \* FROM public_notices ORDER BY/i.test(trimmed);
     return await panchayatRepo.getNotices(active);
   }
 
   if (/FROM gram_panchayat_tasks/i.test(trimmed) && /^SELECT/i.test(trimmed)) {
+    if (/WHERE\s+id\s*=\s*\?/i.test(trimmed)) {
+      const tasks = await panchayatRepo.getTasks();
+      const t = tasks.find(x => String(x.id) === String(params[0]));
+      return t ? [t] : [];
+    }
     return await panchayatRepo.getTasks();
   }
 
@@ -282,13 +333,21 @@ export async function executeFirestoreQuery(sql, params = []) {
       }
     });
 
-    // Extract WHERE id = ?
+    // Extract WHERE condition parameter
     const whereParam = params[assignments.length];
     const coll = getCollectionRef(tableName);
 
     if (whereClause.toLowerCase().includes("id =") && whereParam) {
       await coll.doc(String(whereParam)).update(patch);
       return { affectedRows: 1 };
+    }
+
+    if (whereClause.toLowerCase().includes("citizen_id =") && whereParam) {
+      const qSnap = await coll.where("citizen_id", "==", String(whereParam)).get();
+      const batch = getFirestoreDb().batch();
+      qSnap.docs.forEach(d => batch.update(d.ref, patch));
+      await batch.commit();
+      return { affectedRows: qSnap.size };
     }
 
     return { affectedRows: 0 };

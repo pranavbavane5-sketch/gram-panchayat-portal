@@ -133,8 +133,9 @@ export function initFirestore() {
 
   try {
     // Check if an app is already initialized to prevent duplicate app errors in serverless
-    if (admin.apps.length > 0) {
-      firebaseAppInstance = admin.app();
+    const existingApps = typeof admin.getApps === "function" ? admin.getApps() : (admin.apps || []);
+    if (existingApps.length > 0) {
+      firebaseAppInstance = typeof admin.getApp === "function" ? admin.getApp() : admin.app();
     } else {
       firebaseAppInstance = admin.initializeApp({
         credential: creds.credential,

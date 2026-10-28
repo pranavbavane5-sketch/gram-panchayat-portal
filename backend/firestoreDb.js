@@ -10,6 +10,7 @@
  */
 
 import admin from "firebase-admin";
+import { getFirestore } from "firebase-admin/firestore";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
@@ -124,7 +125,7 @@ export function initFirestore() {
       });
     }
 
-    firestoreInstance = admin.firestore(firebaseAppInstance);
+    firestoreInstance = getFirestore(firebaseAppInstance);
     // Ignore undefined properties to avoid Firestore write exceptions
     firestoreInstance.settings({ ignoreUndefinedProperties: true });
 
@@ -180,9 +181,12 @@ export async function checkFirestoreConnection() {
   }
 
   try {
-    // Execute a read probe against village_settings/current
+    // Execute a read probe against village_settings/current with a 4000ms safety timeout
     const docRef = firestoreInstance.collection("village_settings").doc("current");
-    const snapshot = await docRef.get();
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Probe request timed out after 4000ms. Check if Cloud Firestore database has been created in Firebase Console.")), 4000);
+    });
+    const snapshot = await Promise.race([docRef.get(), timeoutPromise]);
 
     return {
       connected: true,

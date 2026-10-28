@@ -14,7 +14,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 dotenv.config(); // fallback
 
-const isFirestore = () => process.env.DB_PROVIDER === "firestore";
+const isFirestore = () => {
+  const p = (process.env.DB_PROVIDER || "").trim().toLowerCase();
+  return p === "firestore";
+};
 
 // SSL & Connection Configuration for Cloud & Local MySQL
 const isRemoteHost = (host) => {
@@ -95,7 +98,10 @@ export async function testConnection() {
   }
 
   try {
-    const connection = await mysqlPool.getConnection();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("MySQL connection attempt timed out after 3000ms")), 3000)
+    );
+    const connection = await Promise.race([mysqlPool.getConnection(), timeoutPromise]);
     await connection.ping();
     connection.release();
     return {

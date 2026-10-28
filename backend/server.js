@@ -72,7 +72,7 @@ app.use(express.json({ limit: "2mb" }));
 // 1. HEALTH CHECK ENDPOINT
 // ==========================================================
 app.get("/api/health", async (req, res) => {
-  const provider = process.env.DB_PROVIDER || "mysql";
+  const provider = (process.env.DB_PROVIDER || "").trim().toLowerCase() === "firestore" ? "firestore" : "mysql";
   let dbStatus;
 
   if (provider === "firestore") {

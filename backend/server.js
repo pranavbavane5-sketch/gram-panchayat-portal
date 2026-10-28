@@ -124,6 +124,45 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
+// Read-only destination audit endpoint for pre-migration verification
+app.get("/api/migration/audit", async (req, res) => {
+  const provider = (process.env.DB_PROVIDER || "").trim().toLowerCase();
+  try {
+    const { getFirestoreDb, COLLECTIONS } = await import("./firestoreDb.js");
+    const db = getFirestoreDb();
+    if (!db) {
+      return res.status(503).json({ error: "Firestore not initialized" });
+    }
+
+    const audit = {};
+    let totalDocs = 0;
+
+    for (const [key, collName] of Object.entries(COLLECTIONS)) {
+      const snap = await db.collection(collName).get();
+      audit[collName] = {
+        count: snap.size,
+        isEmpty: snap.size === 0,
+        sampleIds: snap.docs.slice(0, 3).map(d => d.id)
+      };
+      totalDocs += snap.size;
+    }
+
+    const rawProj = process.env.FIREBASE_PROJECT_ID || "";
+    const cleanProj = rawProj.replace(/["']/g, "").trim();
+
+    res.json({
+      status: "ok",
+      targetProjectId: cleanProj,
+      totalDestinationDocuments: totalDocs,
+      isCleanSlate: totalDocs === 0,
+      collections: audit,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Audit failed", message: err.message });
+  }
+});
+
 // ==========================================================
 // 2. VILLAGE SETTINGS ENDPOINTS
 // ==========================================================

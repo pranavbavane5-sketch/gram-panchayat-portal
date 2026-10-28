@@ -31,6 +31,24 @@ let initStatus = {
   error: null
 };
 
+function stripQuotes(str) {
+  if (!str || typeof str !== "string") return str;
+  let s = str.trim();
+  while ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+    s = s.slice(1, -1).trim();
+  }
+  return s;
+}
+
+function normalizePrivateKey(key) {
+  if (!key || typeof key !== "string") return key;
+  let k = stripQuotes(key);
+  if (k.includes("\\n")) {
+    k = k.replace(/\\n/g, "\n");
+  }
+  return k.replace(/\r\n/g, "\n").trim();
+}
+
 function makeCert(config) {
   if (typeof cert === "function") return cert(config);
   if (typeof admin.cert === "function") return admin.cert(config);
@@ -44,20 +62,15 @@ function makeCert(config) {
 function resolveCredentials() {
   try {
     // Option 1: Discrete Environment Variables (Recommended for Vercel & Production)
-    const projectId = process.env.FIREBASE_PROJECT_ID;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const rawProjectId = process.env.FIREBASE_PROJECT_ID;
+    const rawClientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const rawPrivateKey = process.env.FIREBASE_PRIVATE_KEY;
 
-    if (projectId && clientEmail && privateKey) {
-      // Strip surrounding quotes if present from env string
-      privateKey = String(privateKey).trim();
-      if ((privateKey.startsWith('"') && privateKey.endsWith('"')) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
-        privateKey = privateKey.slice(1, -1);
-      }
-      // Sanitize escaped newlines (Vercel env vars often escape \n to \\n)
-      if (privateKey.includes("\\n")) {
-        privateKey = privateKey.replace(/\\n/g, "\n");
-      }
+    if (rawProjectId && rawClientEmail && rawPrivateKey) {
+      const projectId = stripQuotes(rawProjectId);
+      const clientEmail = stripQuotes(rawClientEmail);
+      const privateKey = normalizePrivateKey(rawPrivateKey);
+
       return {
         type: "discrete",
         projectId,
@@ -74,8 +87,14 @@ function resolveCredentials() {
     if (serviceAccountJson && typeof serviceAccountJson === "string") {
       try {
         const parsed = JSON.parse(serviceAccountJson);
-        if (parsed.private_key && parsed.private_key.includes("\\n")) {
-          parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+        if (parsed.private_key) {
+          parsed.private_key = normalizePrivateKey(parsed.private_key);
+        }
+        if (parsed.project_id) {
+          parsed.project_id = stripQuotes(parsed.project_id);
+        }
+        if (parsed.client_email) {
+          parsed.client_email = stripQuotes(parsed.client_email);
         }
         return {
           type: "json_string",

@@ -112,6 +112,10 @@ export const api = {
   // 2. Authentication APIs
   login: (loginId, password) => request("/auth/login", { method: "POST", body: JSON.stringify({ loginId, password }) }),
   getMe: () => request("/auth/me"),
+  getProfile: () => request("/auth/profile"),
+  updateProfile: (profileData) => request("/auth/profile", { method: "PUT", body: JSON.stringify(profileData) }),
+  getAdminProfile: () => request("/admin/profile"),
+  updateAdminProfile: (profileData) => request("/admin/profile", { method: "PUT", body: JSON.stringify(profileData) }),
   changePassword: (oldPassword, newPassword) => request("/auth/change-password", { method: "PUT", body: JSON.stringify({ oldPassword, newPassword }) }),
   registerCitizen: (data) => request("/auth/register-citizen", { method: "POST", body: JSON.stringify(data) }),
 

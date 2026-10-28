@@ -1821,6 +1821,91 @@
             </div>
           </div>
 
+          <!-- ================= LOGGED-IN ADMIN PROFILE & BADGE SETTINGS ================= -->
+          <div class="admin-card-section" id="adminProfileSettingsSection" style="margin-bottom: 24px;">
+            <div class="section-header-flex">
+              <div>
+                <h2 class="admin-section-heading">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  <span>Logged-in Administrator Profile & Badge Settings</span>
+                </h2>
+                <p class="section-subtitle">Customize the administrator display name and badge role shown in the top-right header and audit registers. Changes are saved to MySQL and take effect immediately without changing system permissions or login credentials.</p>
+              </div>
+              <div class="admin-badge-preview-box" id="adminBadgePreviewBox" style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Header Badge Preview:</span>
+                <div class="user-nav-badge preview-badge" id="previewNavBadge" style="display:inline-flex; pointer-events:none;">
+                  <div class="user-badge-avatar" id="prevBadgeAvatar">A</div>
+                  <div class="user-badge-info">
+                    <span class="user-badge-name" id="prevBadgeName">Admin</span>
+                    <span class="user-badge-role" id="prevBadgeRole">Staff</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <form id="adminProfileForm" class="admin-settings-grid">
+              <div class="form-group">
+                <label for="adminProfileLoginId" class="form-label">
+                  <span>Login Username (Account ID)</span>
+                  <span class="text-muted" style="font-weight: normal; font-size: 0.78rem;">(Used to sign in — Fixed)</span>
+                </label>
+                <input type="text" id="adminProfileLoginId" class="form-control" readonly disabled style="background-color: var(--bg-muted, #f1f5f9); cursor: not-allowed; font-family: monospace; font-weight:600;">
+              </div>
+
+              <div class="form-group">
+                <label for="adminProfileSystemRole" class="form-label">
+                  <span>System Permission Level</span>
+                  <span class="text-muted" style="font-weight: normal; font-size: 0.78rem;">(Security Access)</span>
+                </label>
+                <input type="text" id="adminProfileSystemRole" class="form-control" readonly disabled value="ADMIN (Full System Privileges)" style="background-color: var(--bg-muted, #f1f5f9); cursor: not-allowed; color: #047857; font-weight: 600;">
+              </div>
+
+              <div class="form-group">
+                <label for="adminProfileFullName" class="form-label">
+                  <span>Display Name <span class="required-star">*</span></span>
+                  <span class="text-muted" style="font-weight: normal; font-size: 0.78rem;">(Shows on top-right badge and official audit logs)</span>
+                </label>
+                <input type="text" id="adminProfileFullName" class="form-control" placeholder="e.g. Shri. Ramesh Patil or Rajesh Sharma" required>
+              </div>
+
+              <div class="form-group">
+                <label for="adminProfileRoleTitle" class="form-label">
+                  <span>Display Role / Badge Title <span class="required-star">*</span></span>
+                  <span class="text-muted" style="font-weight: normal; font-size: 0.78rem;">(e.g. Gram Sevak, Administrator, Sarpanch, Secretary)</span>
+                </label>
+                <input type="text" id="adminProfileRoleTitle" class="form-control" placeholder="e.g. Gram Sevak or Administrator" list="roleTitleSuggestions" required>
+                <datalist id="roleTitleSuggestions">
+                  <option value="Gram Sevak"></option>
+                  <option value="Panchayat Administrator"></option>
+                  <option value="Sarpanch"></option>
+                  <option value="Up-Sarpanch"></option>
+                  <option value="Panchayat Secretary"></option>
+                  <option value="Village Development Officer"></option>
+                  <option value="Water Supply Officer"></option>
+                  <option value="Administrative Staff"></option>
+                </datalist>
+              </div>
+
+              <div class="form-group">
+                <label for="adminProfilePhone" class="form-label">Official Phone Number</label>
+                <input type="text" id="adminProfilePhone" class="form-control" placeholder="10-digit mobile number">
+              </div>
+
+              <div class="form-group">
+                <label for="adminProfileEmail" class="form-label">Official Email Address</label>
+                <input type="email" id="adminProfileEmail" class="form-control" placeholder="admin@jalmitra.gov.in">
+              </div>
+
+              <div class="col-full action-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <span class="text-muted" style="font-size: 0.85rem;" id="adminProfileLastSaved">Profile synchronizes with MySQL instantly upon saving.</span>
+                <button type="submit" class="btn btn-primary" id="btnSaveAdminProfile">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                  <span>Save Profile & Update Badge</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
           <!-- Official Gram Panchayat & Village Settings Card -->
           <div class="admin-card-section">
             <h2 class="admin-section-heading">

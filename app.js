@@ -1227,9 +1227,25 @@ function updateAuthUI() {
   if (user) {
     if (navUserBadge) navUserBadge.style.display = "flex";
     if (navLoginBtn) navLoginBtn.style.display = "none";
-    if (navUserName) navUserName.textContent = user.fullName || user.username;
-    if (navUserRole) navUserRole.textContent = user.role === "admin" ? t("role_admin_badge", "Staff") : t("role_citizen_badge", "Citizen");
-    if (navUserAvatar) navUserAvatar.textContent = (user.fullName || user.username || "U")[0].toUpperCase();
+
+    const displayName = user.fullName || user.full_name || user.username || user.loginId || "User";
+    const displayRole = user.roleTitle || user.role_title || (user.role === "admin" ? t("role_admin_badge", "Staff") : t("role_citizen_badge", "Citizen"));
+
+    if (navUserName) {
+      navUserName.textContent = displayName;
+      navUserName.title = displayName;
+    }
+    if (navUserRole) {
+      navUserRole.textContent = displayRole;
+      navUserRole.title = displayRole;
+    }
+    if (navUserAvatar) {
+      navUserAvatar.textContent = (displayName || "U")[0].toUpperCase();
+    }
+    if (navUserBadge) {
+      navUserBadge.title = `${displayName} (${displayRole}) • Click to configure admin profile`;
+    }
+
     if (navCitizen) navCitizen.style.display = user.role === "admin" ? "none" : "inline-flex";
     if (navAdmin) navAdmin.style.display = user.role === "admin" ? "inline-flex" : "none";
   } else {
@@ -1242,6 +1258,44 @@ function updateAuthUI() {
 
 function initAuth() {
   updateAuthUI();
+
+  // Clicking on top-right profile badge navigates to Admin Profile Settings when logged in as admin
+  const navUserBadge = document.getElementById("navUserBadge");
+  if (navUserBadge) {
+    navUserBadge.style.cursor = "pointer";
+    navUserBadge.addEventListener("click", (e) => {
+      if (e.target.closest("#navLogoutBtn")) return; // Don't trigger if clicking logout button
+      const user = api.getCurrentUser();
+      if (user && user.role === "admin") {
+        switchPage("admin");
+        const dashTab = document.querySelector(".portal-subnav-tab[data-admin-tab='dashboard']");
+        if (dashTab) dashTab.click();
+        const profileSec = document.getElementById("adminProfileSettingsSection");
+        if (profileSec) {
+          profileSec.scrollIntoView({ behavior: "smooth", block: "center" });
+          profileSec.classList.remove("highlight-section");
+          void profileSec.offsetWidth;
+          profileSec.classList.add("highlight-section");
+        }
+      }
+    });
+  }
+
+  // Refresh profile from server on startup if token exists
+  const token = api.getAuthToken();
+  if (token) {
+    api.getMe().then(data => {
+      if (data && data.user) {
+        api.setAuthSession(token, data.user);
+        updateAuthUI();
+        if (typeof populateAdminProfileForm === "function") {
+          populateAdminProfileForm();
+        }
+      }
+    }).catch(() => {
+      // Offline fallback: keep existing session
+    });
+  }
 
   // Role toggle tabs on Login View
   const tabCitizen = document.getElementById("tabRoleCitizen");
@@ -2104,6 +2158,77 @@ function initAdminView() {
     btnRefresh.addEventListener("click", () => {
       renderAdminView();
       showToast("Records refreshed successfully.", "success");
+    });
+  }
+
+  // Save Admin Profile & Header Badge Settings Form
+  const profileForm = document.getElementById("adminProfileForm");
+  const inputFullName = document.getElementById("adminProfileFullName");
+  const inputRoleTitle = document.getElementById("adminProfileRoleTitle");
+  const inputPhone = document.getElementById("adminProfilePhone");
+  const inputEmail = document.getElementById("adminProfileEmail");
+  const btnSaveProfile = document.getElementById("btnSaveAdminProfile");
+  const statusSaved = document.getElementById("adminProfileLastSaved");
+  const prevName = document.getElementById("prevBadgeName");
+  const prevRole = document.getElementById("prevBadgeRole");
+  const prevAvatar = document.getElementById("prevBadgeAvatar");
+
+  const updateBadgePreview = () => {
+    const dName = inputFullName?.value?.trim() || "Admin";
+    const dRole = inputRoleTitle?.value?.trim() || "Staff";
+    if (prevName) prevName.textContent = dName;
+    if (prevRole) prevRole.textContent = dRole;
+    if (prevAvatar) prevAvatar.textContent = (dName || "A")[0].toUpperCase();
+  };
+
+  if (inputFullName) inputFullName.addEventListener("input", updateBadgePreview);
+  if (inputRoleTitle) inputRoleTitle.addEventListener("input", updateBadgePreview);
+
+  if (profileForm) {
+    profileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fullName = inputFullName?.value?.trim();
+      const roleTitle = inputRoleTitle?.value?.trim();
+      const phone = inputPhone?.value?.trim();
+      const email = inputEmail?.value?.trim();
+
+      if (!fullName) {
+        showToast("Display name cannot be empty.", "error");
+        return;
+      }
+      if (!roleTitle) {
+        showToast("Display role / badge title cannot be empty.", "error");
+        return;
+      }
+
+      if (btnSaveProfile) {
+        btnSaveProfile.disabled = true;
+        btnSaveProfile.innerHTML = `<span class="spinner-inline"></span> Saving to MySQL...`;
+      }
+
+      try {
+        const res = await api.updateProfile({ fullName, roleTitle, phone, email });
+        if (res.token && res.user) {
+          api.setAuthSession(res.token, res.user);
+        }
+        updateAuthUI();
+        updateBadgePreview();
+
+        if (statusSaved) {
+          statusSaved.textContent = `Saved to MySQL at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+          statusSaved.style.color = "#047857";
+        }
+
+        showToast(`Profile updated! Badge now displays "${fullName}" (${roleTitle}).`, "success");
+      } catch (err) {
+        console.error("Failed to save admin profile:", err);
+        showToast("Error updating profile: " + err.message, "error");
+      } finally {
+        if (btnSaveProfile) {
+          btnSaveProfile.disabled = false;
+          btnSaveProfile.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> <span>Save Profile & Update Badge</span>`;
+        }
+      }
     });
   }
 
@@ -3559,10 +3684,42 @@ async function populateUnpaidBillsSelect(selectId) {
   }
 }
 
+// Populates the Logged-in Administrator Profile & Badge Settings Form
+export function populateAdminProfileForm() {
+  const user = api.getCurrentUser();
+  if (!user) return;
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) el.value = val;
+  };
+
+  const loginId = user.loginId || user.login_id || user.username || "admin";
+  const fullName = user.fullName || user.full_name || "";
+  const roleTitle = user.roleTitle || user.role_title || (user.role === "admin" ? "Administrator" : "Staff");
+  const phone = user.phone || "";
+  const email = user.email || "";
+
+  setVal("adminProfileLoginId", loginId);
+  setVal("adminProfileFullName", fullName);
+  setVal("adminProfileRoleTitle", roleTitle);
+  setVal("adminProfilePhone", phone);
+  setVal("adminProfileEmail", email);
+
+  const prevAvatar = document.getElementById("prevBadgeAvatar");
+  const prevName = document.getElementById("prevBadgeName");
+  const prevRole = document.getElementById("prevBadgeRole");
+
+  if (prevName) prevName.textContent = fullName || "Admin";
+  if (prevRole) prevRole.textContent = roleTitle || "Staff";
+  if (prevAvatar) prevAvatar.textContent = (fullName || "A")[0].toUpperCase();
+}
+window.populateAdminProfileForm = populateAdminProfileForm;
+
 // ==========================================================
 // 14. ADMIN RENDERING SUB-ROUTINES
 // ==========================================================
 async function renderAdminView() {
+  populateAdminProfileForm();
   const vi = appState.villageInfo || {};
   const setVal = (id, val) => {
     const el = document.getElementById(id);

@@ -16,6 +16,86 @@ router.use(authenticateToken);
 router.use(requireRole(["admin"]));
 
 // ==========================================================
+// ADMIN PROFILE & DISPLAY SETTINGS
+// ==========================================================
+router.get("/profile", async (req, res) => {
+  try {
+    const adminId = req.user.id;
+    const users = await query(
+      "SELECT id, login_id, role, role_title, full_name, phone, email, created_at FROM users WHERE id = ?",
+      [adminId]
+    );
+    if (users.length === 0) {
+      return res.status(404).json({ error: "Not found", message: "Admin profile not found." });
+    }
+    const user = users[0];
+    res.json({
+      profile: {
+        id: user.id,
+        loginId: user.login_id,
+        role: user.role,
+        roleTitle: user.role_title || "Administrator",
+        fullName: user.full_name,
+        phone: user.phone,
+        email: user.email,
+        createdAt: user.created_at
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error", message: err.message });
+  }
+});
+
+router.put("/profile", async (req, res) => {
+  try {
+    const adminId = req.user.id;
+    const { fullName, roleTitle, phone, email } = req.body;
+
+    const users = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [adminId]);
+    if (users.length === 0) {
+      return res.status(404).json({ error: "Not found", message: "Admin user not found." });
+    }
+    const adminRecord = users[0];
+
+    const newFullName = fullName !== undefined ? String(fullName).trim() : adminRecord.full_name;
+    const newRoleTitle = roleTitle !== undefined ? String(roleTitle).trim() : (adminRecord.role_title || "Administrator");
+    const newPhone = phone !== undefined ? String(phone).trim() : adminRecord.phone;
+    const newEmail = email !== undefined ? String(email).trim() : adminRecord.email;
+
+    if (!newFullName) {
+      return res.status(400).json({ error: "Validation error", message: "Display name cannot be empty." });
+    }
+
+    // Persist changes to MySQL (strictly preserving login_id and role privileges)
+    await query(
+      "UPDATE users SET full_name = ?, role_title = ?, phone = ?, email = ? WHERE id = ?",
+      [newFullName, newRoleTitle, newPhone, newEmail, adminId]
+    );
+
+    const [updatedUser] = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [adminId]);
+    const { generateToken } = await import("../auth.js");
+    const token = generateToken(updatedUser);
+
+    res.json({
+      message: "Admin profile updated successfully.",
+      token,
+      user: {
+        id: updatedUser.id,
+        loginId: updatedUser.login_id,
+        role: updatedUser.role,
+        roleTitle: updatedUser.role_title || "Administrator",
+        fullName: updatedUser.full_name,
+        phone: updatedUser.phone,
+        email: updatedUser.email
+      }
+    });
+  } catch (err) {
+    console.error("Admin profile update error:", err);
+    res.status(500).json({ error: "Server error", message: err.message });
+  }
+});
+
+// ==========================================================
 // 1. DASHBOARD SUMMARY STATS
 // ==========================================================
 router.get("/dashboard-stats", async (req, res) => {

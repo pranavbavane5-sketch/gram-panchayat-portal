@@ -11,6 +11,7 @@ export async function runMigrations() {
       login_id VARCHAR(100) UNIQUE NOT NULL,
       password_hash VARCHAR(255) NOT NULL,
       role ENUM('admin', 'citizen') NOT NULL DEFAULT 'citizen',
+      role_title VARCHAR(100) DEFAULT 'Administrator',
       full_name VARCHAR(255) NOT NULL,
       phone VARCHAR(20) NOT NULL,
       email VARCHAR(255),
@@ -22,6 +23,17 @@ export async function runMigrations() {
       INDEX idx_role (role)
     ) ENGINE=InnoDB;
   `);
+
+  // 1b. Schema upgrade: Ensure role_title column exists on users table
+  try {
+    const [cols] = await pool.query("SHOW COLUMNS FROM users LIKE 'role_title'");
+    if (cols.length === 0) {
+      await pool.query("ALTER TABLE users ADD COLUMN role_title VARCHAR(100) DEFAULT 'Administrator' AFTER role");
+      console.log("✅ Added role_title column to users table.");
+    }
+  } catch (colErr) {
+    console.warn("Notice checking role_title column:", colErr.message);
+  }
 
   // 2. Table: citizens
   await pool.query(`

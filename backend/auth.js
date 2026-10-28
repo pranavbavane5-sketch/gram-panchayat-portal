@@ -20,10 +20,11 @@ export function generateToken(user) {
   return jwt.sign(
     {
       id: user.id,
-      loginId: user.login_id,
+      loginId: user.login_id || user.loginId,
       role: user.role,
-      citizenId: user.citizen_id || null,
-      fullName: user.full_name,
+      roleTitle: user.role_title || user.roleTitle || (user.role === "admin" ? "Administrator" : "Citizen"),
+      citizenId: user.citizen_id || user.citizenId || null,
+      fullName: user.full_name || user.fullName,
       phone: user.phone || ""
     },
     JWT_SECRET,

@@ -7,10 +7,17 @@ import { authenticateToken, requireRole } from "../auth.js";
 
 const router = express.Router();
 
-// Ensure upload directory exists
-const uploadDir = path.resolve(process.cwd(), "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+// Ensure upload directory exists (Use writable /tmp on serverless environments like Vercel)
+const uploadDir = (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME)
+  ? path.join("/tmp", "uploads")
+  : path.resolve(process.cwd(), "uploads");
+
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn("Upload directory initialization deferred:", err.message);
 }
 
 // Multer Storage Configuration

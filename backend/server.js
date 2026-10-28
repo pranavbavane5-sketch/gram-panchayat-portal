@@ -695,8 +695,13 @@ app.use("/api/*", (req, res) => {
   res.status(404).json({ error: "Not Found", message: `Cannot ${req.method} ${req.originalUrl}` });
 });
 
-// Start Express Server (only when not running inside a serverless runtime like Vercel)
-if (!process.env.VERCEL) {
+// Start Express Server (only when directly run from CLI, not when imported as serverless function)
+const isDirectExecution = process.argv[1] && (
+  process.argv[1].endsWith("server.js") || 
+  process.argv[1].endsWith("server")
+);
+
+if (isDirectExecution && !process.env.VERCEL) {
   app.listen(PORT, async () => {
     console.log(`🚀 JalMitra Backend Server listening on http://localhost:${PORT}`);
     console.log(`👉 Health check: http://localhost:${PORT}/api/health`);

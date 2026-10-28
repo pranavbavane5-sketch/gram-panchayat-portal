@@ -5,15 +5,30 @@
 import app from "../backend/server.js";
 
 export default function handler(req, res) {
-  // If Vercel rewrote URL to /api/index.js or function filename, restore actual request path
-  const matchedPath = req.headers["x-matched-path"] || req.headers["x-invoke-path"];
-  if (matchedPath && matchedPath.startsWith("/api")) {
-    req.url = matchedPath;
-  } else if (req.url && (req.url.startsWith("/api/index.js") || req.url === "/api/index")) {
-    const rawPath = req.url.replace(/^\/api\/index(\.js)?/, "");
-    req.url = rawPath ? (rawPath.startsWith("/") ? "/api" + rawPath : "/api/" + rawPath) : "/api/health";
-  } else if (req.url && !req.url.startsWith("/api")) {
-    req.url = "/api" + req.url;
+  try {
+    const rawTarget = req.headers["x-matched-path"] || req.headers["x-invoke-path"] || req.url || "/api/health";
+    const parsed = new URL(rawTarget, "http://localhost");
+
+    // Remove Vercel's rewrite query parameter (:match*)
+    parsed.searchParams.delete("match");
+    const cleanSearch = parsed.search ? parsed.search : "";
+    let cleanPath = parsed.pathname;
+
+    if (cleanPath.startsWith("/api/index")) {
+      cleanPath = cleanPath.replace(/^\/api\/index(\.js)?/, "");
+      if (!cleanPath) cleanPath = "/health";
+    }
+
+    if (cleanPath.startsWith("/api")) {
+      req.url = cleanPath + cleanSearch;
+    } else {
+      req.url = (cleanPath.startsWith("/") ? "/api" + cleanPath : "/api/" + cleanPath) + cleanSearch;
+    }
+  } catch (err) {
+    if (req.url && !req.url.startsWith("/api")) {
+      req.url = "/api" + req.url;
+    }
   }
+
   return app(req, res);
 }

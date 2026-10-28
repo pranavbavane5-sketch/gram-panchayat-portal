@@ -106,8 +106,8 @@ function resolveCredentials() {
       }
     }
 
-    // Option 3: Local file via GOOGLE_APPLICATION_CREDENTIALS (development only)
-    const credPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    // Option 3: Local file via GOOGLE_APPLICATION_CREDENTIALS or serviceAccountKey.json in root
+    const credPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || (fs.existsSync(path.resolve(process.cwd(), "serviceAccountKey.json")) ? "serviceAccountKey.json" : null);
     if (credPath) {
       const resolvedPath = path.isAbsolute(credPath) ? credPath : path.resolve(process.cwd(), credPath);
       if (fs.existsSync(resolvedPath)) {
@@ -116,7 +116,7 @@ function resolveCredentials() {
           const parsed = JSON.parse(fileContent);
           return {
             type: "file",
-            projectId: parsed.project_id,
+            projectId: stripQuotes(parsed.project_id),
             credential: makeCert(parsed)
           };
         } catch (fileErr) {

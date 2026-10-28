@@ -165,8 +165,9 @@ app.get("/api/migration/audit", async (req, res) => {
 
 // POST /api/migration/import - Controlled one-time database migration ingest
 app.post("/api/migration/import", async (req, res) => {
-  const secret = req.headers["x-migration-secret"];
-  const expectedSecret = process.env.MIGRATION_SECRET || process.env.JWT_SECRET;
+  const secret = (req.headers["x-migration-secret"] || "").trim().replace(/["']/g, "");
+  const rawExpected = process.env.MIGRATION_SECRET || process.env.JWT_SECRET;
+  const expectedSecret = rawExpected ? rawExpected.trim().replace(/["']/g, "") : null;
 
   if (!expectedSecret || secret !== expectedSecret) {
     return res.status(401).json({ error: "Unauthorized", message: "Invalid or missing migration secret." });

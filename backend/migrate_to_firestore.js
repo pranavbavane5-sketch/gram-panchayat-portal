@@ -207,19 +207,52 @@ async function runMigration() {
   console.log(`✅ Clean slate confirmed: 0 existing destination documents.\n`);
 
   console.log(`🚀 Executing single-run live migration to Cloud Firestore...`);
-  const jwtSecret = process.env.JWT_SECRET || "jalmitra_secure_jwt_key_2026_drought_system";
+  let totalMigrated = 0;
 
-  const result = await postJson(
-    "https://gram-panchayat-portal-sandy.vercel.app/api/migration/import",
-    { tables: tablesPayload },
-    { "X-Migration-Secret": jwtSecret }
-  );
+  let localDb = null;
+  try {
+    localDb = initFirestore();
+  } catch (e) {}
+
+  if (localDb) {
+    console.log("  Using local Firebase Admin SDK connection to write directly...");
+    for (const item of TABLE_MAPPINGS) {
+      const { collection, pk } = item;
+      const rows = tablesPayload[collection];
+      if (rows.length === 0) continue;
+
+      for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const chunk = rows.slice(i, i + BATCH_SIZE);
+        const batch = localDb.batch();
+        for (const row of chunk) {
+          const docId = String(row[pk]);
+          const docRef = localDb.collection(collection).doc(docId);
+          batch.set(docRef, row);
+        }
+        await batch.commit();
+        totalMigrated += chunk.length;
+      }
+      console.log(`  ✅ Collection '${collection}' completed (${rows.length} documents).`);
+    }
+  } else {
+    console.log("  Transmitting payload over secure TLS to Vercel Firestore import handler...");
+    const secretArgIndex = process.argv.indexOf("--secret");
+    const customSecret = secretArgIndex !== -1 ? process.argv[secretArgIndex + 1] : null;
+    const jwtSecret = customSecret || process.env.MIGRATION_SECRET || process.env.JWT_SECRET || "jalmitra_secure_jwt_key_2026_drought_system";
+
+    const result = await postJson(
+      "https://gram-panchayat-portal-sandy.vercel.app/api/migration/import",
+      { tables: tablesPayload },
+      { "X-Migration-Secret": jwtSecret }
+    );
+    totalMigrated = result.totalMigrated;
+  }
 
   console.log("\n================================================================================");
   console.log("📊 POST-MIGRATION INDEPENDENT VERIFICATION");
   console.log("================================================================================");
-  console.log(`Target Project:            ${result.targetProjectId}`);
-  console.log(`Total Documents Migrated:  ${result.totalMigrated} of ${totalSourceRows}`);
+  console.log(`Target Project:            ${EXPECTED_PROJECT_ID}`);
+  console.log(`Total Documents Migrated:  ${totalMigrated} of ${totalSourceRows}`);
 
   // Query audit endpoint independently to confirm Firestore state
   const postAudit = await getJson("https://gram-panchayat-portal-sandy.vercel.app/api/migration/audit");

@@ -6,6 +6,10 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { query } from "../db.js";
 import { generateToken, authenticateToken } from "../auth.js";
+import { userRepo } from "../repositories/userRepo.js";
+import { citizenRepo } from "../repositories/citizenRepo.js";
+import { propertyRepo } from "../repositories/propertyRepo.js";
+import { billingRepo } from "../repositories/billingRepo.js";
 
 const router = Router();
 
@@ -13,7 +17,7 @@ const router = Router();
 router.post("/login", async (req, res) => {
   try {
     const { loginId, username, password } = req.body;
-    const identifier = (loginId || username || "").trim();
+    const identifier = String(loginId || username || "").trim();
 
     if (!identifier || !password) {
       return res.status(400).json({
@@ -22,26 +26,33 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Lookup user by login_id or phone
-    const users = await query("SELECT * FROM users WHERE login_id = ? OR phone = ? LIMIT 1", [identifier, identifier]);
-    if (users.length === 0) {
+    // Lookup user by login_id, citizen_id, phone, email, or id (case-insensitive & trimmed)
+    const user = await userRepo.findByLoginOrPhone(identifier);
+    if (!user) {
       return res.status(401).json({
         error: "Authentication failed",
         message: "Invalid login credentials."
       });
     }
 
-    const user = users[0];
-
-    if (!user.is_active) {
+    // Explicit check on account suspension: default to active (1) if undefined
+    const isActive = user.is_active !== undefined ? Boolean(Number(user.is_active)) : true;
+    if (!isActive) {
       return res.status(403).json({
         error: "Account suspended",
         message: "Your account is deactivated. Please contact the Gram Panchayat administrator."
       });
     }
 
-    // Verify password hash
-    const match = await bcrypt.compare(password, user.password_hash);
+    // Verify password hash with bcrypt
+    if (!user.password_hash) {
+      return res.status(401).json({
+        error: "Authentication failed",
+        message: "Invalid login credentials."
+      });
+    }
+
+    const match = await bcrypt.compare(String(password), String(user.password_hash));
     if (!match) {
       return res.status(401).json({
         error: "Authentication failed",
@@ -49,11 +60,14 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // If citizen, fetch citizen record details
+    // If citizen, load citizen profile details
     let citizenData = null;
-    if (user.citizen_id) {
-      const citizens = await query("SELECT * FROM citizens WHERE id = ? LIMIT 1", [user.citizen_id]);
-      if (citizens.length > 0) citizenData = citizens[0];
+    const citIdToLook = user.citizen_id || user.login_id;
+    if (citIdToLook) {
+      citizenData = await citizenRepo.getById(citIdToLook);
+    }
+    if (!citizenData && user.id) {
+      citizenData = await citizenRepo.getById(user.id);
     }
 
     const token = generateToken(user);
@@ -69,7 +83,7 @@ router.post("/login", async (req, res) => {
         fullName: user.full_name,
         phone: user.phone,
         email: user.email,
-        citizenId: user.citizen_id || null,
+        citizenId: user.citizen_id || (citizenData ? citizenData.id : null),
         citizenProfile: citizenData
       }
     });
@@ -82,19 +96,15 @@ router.post("/login", async (req, res) => {
 // GET /api/auth/me (Get current authenticated user)
 router.get("/me", authenticateToken, async (req, res) => {
   try {
-    const users = await query(
-      "SELECT id, login_id, role, role_title, full_name, phone, email, is_active, citizen_id, created_at FROM users WHERE id = ?",
-      [req.user.id]
-    );
-    if (users.length === 0) {
+    const user = await userRepo.findById(req.user.id);
+    if (!user) {
       return res.status(404).json({ error: "Not found", message: "User not found." });
     }
 
-    const user = users[0];
     let citizenData = null;
-    if (user.citizen_id) {
-      const citizens = await query("SELECT * FROM citizens WHERE id = ?", [user.citizen_id]);
-      if (citizens.length > 0) citizenData = citizens[0];
+    const citId = user.citizen_id || (user.role === "citizen" ? user.login_id : null);
+    if (citId) {
+      citizenData = await citizenRepo.getById(citId);
     }
 
     res.json({
@@ -106,7 +116,7 @@ router.get("/me", authenticateToken, async (req, res) => {
         fullName: user.full_name,
         phone: user.phone,
         email: user.email,
-        citizenId: user.citizen_id || null,
+        citizenId: user.citizen_id || (citizenData ? citizenData.id : null),
         citizenProfile: citizenData
       }
     });
@@ -119,14 +129,17 @@ router.get("/me", authenticateToken, async (req, res) => {
 // GET /api/auth/profile
 router.get("/profile", authenticateToken, async (req, res) => {
   try {
-    const users = await query(
-      "SELECT id, login_id, role, role_title, full_name, phone, email, is_active, citizen_id, created_at FROM users WHERE id = ? OR login_id = ? LIMIT 1",
-      [req.user.id, req.user.loginId || req.user.id]
-    );
-    if (users.length === 0) {
+    const user = await userRepo.findById(req.user.id);
+    if (!user) {
       return res.status(404).json({ error: "Not found", message: "User not found." });
     }
-    const user = users[0];
+
+    let citizenProfile = null;
+    const citId = user.citizen_id || (user.role === "citizen" ? user.login_id : null);
+    if (citId) {
+      citizenProfile = await citizenRepo.getById(citId);
+    }
+
     res.json({
       profile: {
         id: user.id,
@@ -136,7 +149,7 @@ router.get("/profile", authenticateToken, async (req, res) => {
         fullName: user.full_name,
         phone: user.phone,
         email: user.email,
-        citizenId: user.citizen_id || null,
+        citizenId: user.citizen_id || (citizenProfile ? citizenProfile.id : null),
         createdAt: user.created_at
       }
     });
@@ -152,11 +165,10 @@ router.put("/profile", authenticateToken, async (req, res) => {
     const userId = req.user.id;
     const { fullName, roleTitle, phone, email } = req.body;
 
-    const users = await query("SELECT * FROM users WHERE id = ? OR login_id = ? LIMIT 1", [userId, req.user.loginId || userId]);
-    if (users.length === 0) {
+    const userRecord = await userRepo.findById(userId);
+    if (!userRecord) {
       return res.status(404).json({ error: "Not found", message: "User not found." });
     }
-    const userRecord = users[0];
 
     const newFullName = fullName !== undefined ? String(fullName).trim() : userRecord.full_name;
     const newRoleTitle = roleTitle !== undefined ? String(roleTitle).trim() : (userRecord.role_title || (userRecord.role === "admin" ? "Administrator" : "Citizen"));
@@ -170,22 +182,26 @@ router.put("/profile", authenticateToken, async (req, res) => {
       });
     }
 
-    // Persist changes to MySQL securely - NEVER modify login_id or role (system permission)
-    await query(
-      "UPDATE users SET full_name = ?, role_title = ?, phone = ?, email = ? WHERE id = ?",
-      [newFullName, newRoleTitle, newPhone, newEmail, userRecord.id]
-    );
+    // Persist changes securely via repository - NEVER modify login_id or role (system permission)
+    const updatedUser = await userRepo.updateProfile(userRecord.id, {
+      fullName: newFullName,
+      roleTitle: newRoleTitle,
+      phone: newPhone,
+      email: newEmail
+    });
 
     // If citizen account, keep citizens table in sync
     if (userRecord.citizen_id) {
-      await query(
-        "UPDATE citizens SET full_name = ?, phone = ?, email = ? WHERE id = ?",
-        [newFullName, newPhone, newEmail, userRecord.citizen_id]
-      );
+      try {
+        await citizenRepo.update(userRecord.citizen_id, {
+          full_name: newFullName,
+          phone: newPhone,
+          email: newEmail
+        });
+      } catch (cErr) {
+        console.warn("Citizen sync note:", cErr.message);
+      }
     }
-
-    // Fetch refreshed user record
-    const [updatedUser] = await query("SELECT * FROM users WHERE id = ? LIMIT 1", [userRecord.id]);
 
     // Issue refreshed token with updated claims
     const token = generateToken(updatedUser);
@@ -222,12 +238,11 @@ router.put("/change-password", authenticateToken, async (req, res) => {
       });
     }
 
-    const users = await query("SELECT * FROM users WHERE id = ?", [req.user.id]);
-    if (users.length === 0) {
+    const user = await userRepo.findById(req.user.id);
+    if (!user) {
       return res.status(404).json({ error: "Not found", message: "User not found." });
     }
 
-    const user = users[0];
     const match = await bcrypt.compare(oldPassword, user.password_hash);
     if (!match) {
       return res.status(400).json({
@@ -237,7 +252,7 @@ router.put("/change-password", authenticateToken, async (req, res) => {
     }
 
     const newHash = await bcrypt.hash(newPassword, 10);
-    await query("UPDATE users SET password_hash = ? WHERE id = ?", [newHash, user.id]);
+    await userRepo.updatePassword(user.id, newHash);
 
     res.json({ message: "Password updated successfully." });
   } catch (err) {
@@ -273,65 +288,126 @@ router.post("/register-citizen", async (req, res) => {
       return res.status(400).json({ error: "Validation error", message: "Password must be at least 6 characters." });
     }
 
-    // Check if phone or property already exists
-    const existing = await query("SELECT id FROM users WHERE phone = ?", [phone]);
-    if (existing.length > 0) {
-      return res.status(409).json({ error: "Conflict", message: "An account with this mobile number already exists." });
+    // Check if phone already registered in users table
+    const existingUser = await userRepo.findByLoginOrPhone(phone);
+    if (existingUser) {
+      return res.status(409).json({
+        error: "Conflict",
+        message: `An account with mobile number '${phone}' is already registered. Please sign in or use another number.`
+      });
     }
 
-    // Generate unique citizen ID
-    const countRow = await query("SELECT COUNT(*) as count FROM citizens");
-    const nextSeq = countRow[0].count + 101;
-    const citizenId = `CIT-${nextSeq}`;
-    const userId = `usr-cit-${Date.now()}`;
+    // Guarantee unique sequential CIT-xxx ID across all existing citizens and users
+    const allCitizens = await citizenRepo.getAll();
+    const existingIds = new Set(allCitizens.map(c => String(c.id).toUpperCase()));
+    try {
+      const allUsers = await query("SELECT login_id, citizen_id FROM users");
+      (allUsers || []).forEach(u => {
+        if (u.login_id) existingIds.add(String(u.login_id).toUpperCase());
+        if (u.citizen_id) existingIds.add(String(u.citizen_id).toUpperCase());
+      });
+    } catch {
+      // Ignore if user query differs
+    }
 
+    let nextSeq = 101;
+    allCitizens.forEach(c => {
+      const m = String(c.id).match(/^CIT-(\d+)$/i);
+      if (m) {
+        const val = parseInt(m[1], 10);
+        if (val >= nextSeq) nextSeq = val + 1;
+      }
+    });
+
+    let citizenId = `CIT-${nextSeq}`;
+    while (existingIds.has(citizenId)) {
+      nextSeq++;
+      citizenId = `CIT-${nextSeq}`;
+    }
+
+    const userId = `usr-cit-${Date.now()}`;
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Link property if matching record exists in properties table
     let propertyId = null;
     try {
-      const propRows = await query("SELECT id FROM properties WHERE property_number = ?", [propertyNo]);
-      if (propRows.length > 0) {
-        propertyId = propRows[0].id;
-        await query("UPDATE properties SET owner_citizen_id = ?, owner_name = ?, ward_area = ? WHERE id = ?", [citizenId, fullName, wardArea, propertyId]);
+      const prop = await propertyRepo.getByPropertyNumber(propertyNo);
+      if (prop) {
+        propertyId = prop.id;
+        await propertyRepo.update(propertyId, {
+          owner_citizen_id: citizenId,
+          owner_name: fullName,
+          ward_area: wardArea
+        });
       }
     } catch (e) {
       console.warn("Property linking note:", e.message);
     }
 
-    // 1. Insert Citizen Profile
-    await query(`
-      INSERT INTO citizens (id, user_id, full_name, phone, email, property_no, ward_area, family_members, meter_no, connection_type, status, property_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Domestic Metered Tap', 'Active', ?)
-    `, [citizenId, userId, fullName, phone, email, propertyNo, wardArea, familyMembers, `MET-${nextSeq}`, propertyId]);
+    // 1. Insert Citizen Profile (Dual driver repository)
+    const newCitizen = await citizenRepo.create({
+      id: citizenId,
+      user_id: userId,
+      full_name: fullName,
+      phone,
+      email: email || null,
+      property_no: propertyNo,
+      ward_area: wardArea,
+      family_members: familyMembers,
+      meter_no: `MET-${nextSeq}`,
+      connection_type: "Domestic Metered Tap",
+      status: "Active",
+      property_id: propertyId
+    });
 
-    // 2. Insert User Login
-    await query(`
-      INSERT INTO users (id, login_id, password_hash, role, full_name, phone, email, is_active, citizen_id)
-      VALUES (?, ?, ?, 'citizen', ?, ?, ?, 1, ?)
-    `, [userId, citizenId, passwordHash, fullName, phone, email, citizenId]);
+    // 2. Insert User Login (Dual driver repository with bcrypt hash & active citizen role)
+    const newUser = await userRepo.create({
+      id: userId,
+      login_id: citizenId,
+      password_hash: passwordHash,
+      role: "citizen",
+      role_title: "Citizen",
+      full_name: fullName,
+      phone,
+      email: email || null,
+      is_active: 1,
+      citizen_id: citizenId
+    });
 
     // 3. Create initial introductory water bill for the citizen
     const billId = `BILL-${Date.now().toString().slice(-6)}`;
     const dueDate = new Date(Date.now() + 15 * 86400000).toISOString().split("T")[0];
-    await query(`
-      INSERT INTO water_bills (id, citizen_id, property_id, billing_period, amount, paid_amount, due_date, status)
-      VALUES (?, ?, ?, 'Current Month (New Connection)', 100.00, 0.00, ?, 'Unpaid')
-    `, [billId, citizenId, propertyId, dueDate]);
+    try {
+      await billingRepo.createBill({
+        id: billId,
+        citizen_id: citizenId,
+        property_id: propertyId || null,
+        billing_period: "Current Month (New Connection)",
+        amount: 100.00,
+        paid_amount: 0.00,
+        due_date: dueDate,
+        status: "Unpaid"
+      });
+    } catch (bErr) {
+      console.warn("Initial bill creation note:", bErr.message);
+    }
 
     res.status(201).json({
+      success: true,
       message: "Citizen account registered successfully.",
       loginId: citizenId,
       citizenId,
       fullName,
-      citizen: {
-        citizenId,
+      phone,
+      user: {
+        id: userId,
         loginId: citizenId,
+        citizenId,
         fullName,
         phone,
-        propertyNo,
-        wardArea
-      }
+        role: "citizen"
+      },
+      citizen: newCitizen
     });
   } catch (err) {
     console.error("Register citizen error:", err);

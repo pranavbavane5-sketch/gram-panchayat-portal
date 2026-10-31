@@ -260,6 +260,15 @@ export const translations = {
     reg_pwd_label: "Set Password",
     reg_confirm_pwd_label: "Confirm Password",
     reg_btn_submit: "Create Citizen Account",
+    reg_success_title: "Registration Successful!",
+    reg_success_subtitle: "Your Citizen Account has been registered with the Gram Panchayat.",
+    reg_success_id_label: "YOUR CITIZEN LOGIN ID",
+    reg_success_copy_btn: "Copy ID",
+    reg_success_copied: "Copied!",
+    reg_success_info_name: "Resident Name",
+    reg_success_info_phone: "Registered Mobile",
+    reg_success_instruction: "You can sign in using either your Citizen ID or your registered mobile number along with the password you set.",
+    reg_btn_proceed_login: "Proceed to Sign In",
 
     // --- Modals Common Actions ---
     modal_btn_save: "Save",
@@ -943,6 +952,15 @@ export const translations = {
     reg_pwd_label: "पासवर्ड सेट करा",
     reg_confirm_pwd_label: "पासवर्डची खात्री करा",
     reg_btn_submit: "नागरिक खाते तयार करा",
+    reg_success_title: "नागरिक नोंदणी यशस्वी!",
+    reg_success_subtitle: "आपले नागरिक खाते ग्रामपंचायतीकडे यशस्वीरीत्या नोंदवले गेले आहे.",
+    reg_success_id_label: "आपला नागरिक लॉगिन आयडी",
+    reg_success_copy_btn: "आयडी कॉपी करा",
+    reg_success_copied: "कॉपी केले!",
+    reg_success_info_name: "नागरिकाचे नाव",
+    reg_success_info_phone: "नोंदणीकृत मोबाईल",
+    reg_success_instruction: "आपण आपल्या नागरिक आयडी किंवा नोंदणीकृत मोबाईल क्रमांकासह आपण सेट केलेल्या पासवर्डचा वापर करून लॉगिन करू शकता.",
+    reg_btn_proceed_login: "लॉगिन करण्यासाठी पुढे जा",
 
     // --- Modals Common Actions ---
     modal_btn_save: "जतन करा",

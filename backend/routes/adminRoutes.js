@@ -337,51 +337,57 @@ router.post("/citizens", async (req, res) => {
       return res.status(400).json({ error: "Validation error", message: "Name, phone, property number, and ward are required." });
     }
 
-    const countRow = await query("SELECT COUNT(*) as count FROM citizens");
-    const countVal = (countRow && countRow[0] && countRow[0].count !== undefined) ? Number(countRow[0].count) : 0;
-    const nextSeq = countVal + 101;
-    const citizenId = (req.body.citizenId || req.body.id || `CIT-${nextSeq}`).trim();
+    // Guarantee collision-free CIT-xxx sequence
+    const allCitizens = await citizenRepo.getAll();
+    const existingIds = new Set(allCitizens.map(c => String(c.id).toUpperCase()));
+    let nextSeq = 101;
+    allCitizens.forEach(c => {
+      const m = String(c.id).match(/^CIT-(\d+)$/i);
+      if (m) {
+        const val = parseInt(m[1], 10);
+        if (val >= nextSeq) nextSeq = val + 1;
+      }
+    });
+
+    let citizenId = (req.body.citizenId || req.body.id || `CIT-${nextSeq}`).trim();
+    if (!req.body.citizenId && !req.body.id) {
+      while (existingIds.has(citizenId)) {
+        nextSeq++;
+        citizenId = `CIT-${nextSeq}`;
+      }
+    }
     const userId = `usr-cit-${Date.now()}`;
     const passwordHash = await bcrypt.hash(initialPassword, 10);
 
     // Check if citizenId or phone already in users table
-    const existingUsers = await query("SELECT id FROM users WHERE login_id = ? OR phone = ?", [citizenId, phone]);
-    if (existingUsers.length > 0) {
+    const existingUser = await userRepo.findByLoginOrPhone(citizenId) || await userRepo.findByLoginOrPhone(phone);
+    if (existingUser) {
       return res.status(409).json({ error: "Conflict", message: `A user account with Citizen ID '${citizenId}' or phone '${phone}' already exists.` });
     }
 
     // Link property if matching record exists in properties table
     let propertyId = null;
     try {
-      const propRows = await query("SELECT id FROM properties WHERE property_number = ?", [propertyNo]);
-      if (propRows.length > 0) {
-        propertyId = propRows[0].id;
-        await query("UPDATE properties SET owner_citizen_id = ?, owner_name = ?, ward_area = ? WHERE id = ?", [citizenId, fullName, wardArea, propertyId]);
+      const prop = await propertyRepo.getByPropertyNumber(propertyNo);
+      if (prop) {
+        propertyId = prop.id;
+        await propertyRepo.update(propertyId, {
+          owner_citizen_id: citizenId,
+          owner_name: fullName,
+          ward_area: wardArea
+        });
       }
     } catch (e) {
       console.warn("Property linking note:", e.message);
     }
 
-    // 1. Insert Citizen Profile
-    await query(`
-      INSERT INTO citizens (id, user_id, full_name, phone, email, property_no, ward_area, family_members, meter_no, connection_type, status, property_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?)
-    `, [citizenId, userId, fullName, phone, email, propertyNo, wardArea, familyMembers, meterNo || `MET-${nextSeq}`, connectionType, propertyId]);
-
-    // 2. Insert User Login Credentials
-    await query(`
-      INSERT INTO users (id, login_id, password_hash, role, full_name, phone, email, is_active, citizen_id)
-      VALUES (?, ?, ?, 'citizen', ?, ?, ?, 1, ?)
-    `, [userId, citizenId, passwordHash, fullName, phone, email, citizenId]);
-
-    const newCitizen = {
+    // 1. Insert Citizen Profile (Dual driver repository)
+    const newCitizen = await citizenRepo.create({
       id: citizenId,
-      citizenId,
       user_id: userId,
-      login_id: citizenId,
       full_name: fullName,
       phone,
-      email,
+      email: email || null,
       property_no: propertyNo,
       ward_area: wardArea,
       family_members: familyMembers,
@@ -389,7 +395,21 @@ router.post("/citizens", async (req, res) => {
       connection_type: connectionType,
       status: "Active",
       property_id: propertyId
-    };
+    });
+
+    // 2. Insert User Login Credentials (Dual driver repository)
+    await userRepo.create({
+      id: userId,
+      login_id: citizenId,
+      password_hash: passwordHash,
+      role: "citizen",
+      role_title: "Citizen",
+      full_name: fullName,
+      phone,
+      email: email || null,
+      is_active: 1,
+      citizen_id: citizenId
+    });
 
     res.status(201).json({
       success: true,

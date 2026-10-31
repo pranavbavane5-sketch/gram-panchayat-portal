@@ -69,6 +69,10 @@ export async function executeFirestoreQuery(sql, params = []) {
       const count = await userRepo.count();
       return [{ count }];
     }
+    // General SELECT across users
+    const coll = getCollectionRef("users");
+    const snap = await coll.get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   }
 
   // 3. CITIZENS
@@ -303,10 +307,56 @@ export async function executeFirestoreQuery(sql, params = []) {
   if (insertMatch) {
     const tableName = insertMatch[1];
     const columns = insertMatch[2].split(",").map(c => c.trim().replace(/[`"']/g, ""));
+    const rawValuesClause = insertMatch[3];
+
+    // Safely parse literal strings, numbers, booleans, and ? placeholders in VALUES (...)
+    const tokens = [];
+    let currentToken = "";
+    let inQuote = false;
+    let quoteType = "";
+
+    for (let i = 0; i < rawValuesClause.length; i++) {
+      const ch = rawValuesClause[i];
+      if ((ch === "'" || ch === '"') && (i === 0 || rawValuesClause[i - 1] !== "\\")) {
+        if (!inQuote) {
+          inQuote = true;
+          quoteType = ch;
+        } else if (ch === quoteType) {
+          inQuote = false;
+          quoteType = "";
+        }
+        currentToken += ch;
+      } else if (ch === "," && !inQuote) {
+        tokens.push(currentToken.trim());
+        currentToken = "";
+      } else {
+        currentToken += ch;
+      }
+    }
+    if (currentToken.trim()) tokens.push(currentToken.trim());
+
+    let paramIndex = 0;
+    const evaluatedValues = tokens.map(token => {
+      if (token === "?") {
+        const val = params[paramIndex++];
+        return val !== undefined ? val : null;
+      }
+      if ((token.startsWith("'") && token.endsWith("'")) || (token.startsWith('"') && token.endsWith('"'))) {
+        return token.slice(1, -1);
+      }
+      if (/^-?\d+(\.\d+)?$/.test(token)) {
+        return Number(token);
+      }
+      if (token.toUpperCase() === "NULL") return null;
+      if (token.toUpperCase() === "TRUE") return 1;
+      if (token.toUpperCase() === "FALSE") return 0;
+      return token;
+    });
+
     const record = {};
     columns.forEach((col, idx) => {
-      if (params[idx] !== undefined) {
-        record[col] = params[idx];
+      if (evaluatedValues[idx] !== undefined) {
+        record[col] = evaluatedValues[idx];
       }
     });
 

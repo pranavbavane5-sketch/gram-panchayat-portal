@@ -1454,16 +1454,71 @@ function initAuth() {
   const regForm = document.getElementById("citizenRegisterForm");
   const btnSubmitReg = document.getElementById("btnSubmitCitizenRegister");
 
-  if (linkRegister && modalReg) {
-    linkRegister.addEventListener("click", () => {
-      modalReg.hidden = false;
-      if (regForm) regForm.reset();
+  const regSuccessView = document.getElementById("citizenRegisterSuccessView");
+  const regSuccessCitizenId = document.getElementById("regSuccessCitizenId");
+  const regSuccessName = document.getElementById("regSuccessName");
+  const regSuccessPhone = document.getElementById("regSuccessPhone");
+  const btnCopyCitizenId = document.getElementById("btnCopyCitizenId");
+  const btnCopyCitizenIdText = document.getElementById("btnCopyCitizenIdText");
+  const btnCloseRegSuccess = document.getElementById("btnCloseCitizenRegisterSuccess");
+  const btnProceedToLogin = document.getElementById("btnProceedToLogin");
+
+  const openReg = () => {
+    if (modalReg) modalReg.hidden = false;
+    if (regForm) {
+      regForm.reset();
+      regForm.hidden = false;
+    }
+    if (regSuccessView) regSuccessView.hidden = true;
+  };
+
+  const closeReg = () => {
+    if (modalReg) modalReg.hidden = true;
+    if (regForm) regForm.hidden = false;
+    if (regSuccessView) regSuccessView.hidden = true;
+  };
+
+  if (linkRegister) linkRegister.addEventListener("click", openReg);
+  if (btnCloseReg) btnCloseReg.addEventListener("click", closeReg);
+  if (btnCancelReg) btnCancelReg.addEventListener("click", closeReg);
+  if (btnCloseRegSuccess) btnCloseRegSuccess.addEventListener("click", closeReg);
+
+  let lastRegisteredPassword = "";
+
+  if (btnCopyCitizenId && regSuccessCitizenId) {
+    btnCopyCitizenId.addEventListener("click", async () => {
+      const textToCopy = regSuccessCitizenId.textContent.trim();
+      if (!textToCopy) return;
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        if (btnCopyCitizenIdText) {
+          const original = btnCopyCitizenIdText.textContent;
+          btnCopyCitizenIdText.textContent = t("reg_success_copied", "Copied!");
+          setTimeout(() => {
+            btnCopyCitizenIdText.textContent = original;
+          }, 2000);
+        }
+        showToast(t("reg_success_copied", "Citizen ID copied to clipboard!"), "info");
+      } catch (err) {
+        showToast("Copied: " + textToCopy, "info");
+      }
     });
   }
 
-  const closeReg = () => { if (modalReg) modalReg.hidden = true; };
-  if (btnCloseReg) btnCloseReg.addEventListener("click", closeReg);
-  if (btnCancelReg) btnCancelReg.addEventListener("click", closeReg);
+  if (btnProceedToLogin) {
+    btnProceedToLogin.addEventListener("click", () => {
+      const cid = regSuccessCitizenId ? regSuccessCitizenId.textContent.trim() : "";
+      closeReg();
+      selectLoginRole("citizen");
+      switchPage("login");
+      const idInput = document.getElementById("loginIdentifier");
+      const pwInput = document.getElementById("loginPassword");
+      if (idInput && cid) idInput.value = cid;
+      if (pwInput && lastRegisteredPassword) pwInput.value = lastRegisteredPassword;
+      if (pwInput) pwInput.focus();
+      showToast("Ready to sign in! Your Citizen ID is pre-filled.", "info");
+    });
+  }
 
   if (regForm) {
     regForm.addEventListener("submit", async (e) => {
@@ -1480,8 +1535,19 @@ function initAuth() {
         return;
       }
 
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(phone)) {
+        showToast("Please enter a valid 10-digit mobile number.", "error");
+        return;
+      }
+
       if (password !== confirmPassword) {
         showToast("Passwords do not match.", "error");
+        return;
+      }
+
+      if (password.length < 6) {
+        showToast("Password must be at least 6 characters.", "error");
         return;
       }
 
@@ -1504,14 +1570,26 @@ function initAuth() {
           ward,
           password
         });
-        const cid = res.citizenId || (res.citizen && res.citizen.citizenId) || (res.citizen && res.citizen.loginId) || res.loginId || "";
-        showToast(`Registration complete! Your Citizen ID is ${cid}`, "success");
-        closeReg();
+        const cid = res.loginId || res.citizenId || (res.citizen && res.citizen.citizenId) || (res.citizen && res.citizen.loginId) || "";
+        lastRegisteredPassword = password;
+
+        // Populate Success Screen
+        if (regSuccessCitizenId) regSuccessCitizenId.textContent = cid;
+        if (regSuccessName) regSuccessName.textContent = fullName;
+        if (regSuccessPhone) regSuccessPhone.textContent = phone;
+
+        // Pre-fill login inputs
         selectLoginRole("citizen");
         const idInput = document.getElementById("loginIdentifier");
         const pwInput = document.getElementById("loginPassword");
         if (idInput && cid) idInput.value = cid;
         if (pwInput) pwInput.value = password;
+
+        // Switch modal view to Success Screen
+        regForm.hidden = true;
+        if (regSuccessView) regSuccessView.hidden = false;
+
+        showToast(`Registration complete! Your Citizen ID is ${cid}`, "success");
       } catch (err) {
         console.error("Registration error:", err);
         showToast("Registration error: " + err.message, "error");

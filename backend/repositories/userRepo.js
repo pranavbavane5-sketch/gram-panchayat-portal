@@ -8,33 +8,74 @@ export const userRepo = {
   async findByLoginOrPhone(identifier) {
     if (!identifier) return null;
     const cleanId = String(identifier).trim();
+    const upperId = cleanId.toUpperCase();
+    const lowerId = cleanId.toLowerCase();
+
+    function normalizeUser(u) {
+      if (!u) return null;
+      return {
+        ...u,
+        login_id: u.login_id || u.citizen_id || u.id,
+        citizen_id: u.citizen_id || (u.role === "citizen" ? (u.login_id || u.id) : null),
+        role: (u.role && ["admin", "citizen"].includes(u.role)) ? u.role : "citizen",
+        role_title: u.role_title || (u.role === "admin" ? "Administrator" : "Citizen"),
+        is_active: u.is_active !== undefined ? (Number(u.is_active) === 1 ? 1 : 0) : 1
+      };
+    }
 
     if (isFirestore()) {
       const db = getDb();
-      // Try login_id first
-      const snap1 = await db.collection(COLLECTIONS.USERS)
-        .where("login_id", "==", cleanId)
-        .limit(1)
-        .get();
+      const coll = db.collection(COLLECTIONS.USERS);
 
-      if (!snap1.empty) {
-        return docToData(snap1.docs[0]);
+      // 1. Exact login_id
+      let snap = await coll.where("login_id", "==", cleanId).limit(1).get();
+      if (!snap.empty) return normalizeUser(docToData(snap.docs[0]));
+
+      // 2. Uppercase login_id (e.g. cit-101 -> CIT-101)
+      if (upperId !== cleanId) {
+        snap = await coll.where("login_id", "==", upperId).limit(1).get();
+        if (!snap.empty) return normalizeUser(docToData(snap.docs[0]));
       }
 
-      // Try phone
-      const snap2 = await db.collection(COLLECTIONS.USERS)
-        .where("phone", "==", cleanId)
-        .limit(1)
-        .get();
-
-      if (!snap2.empty) {
-        return docToData(snap2.docs[0]);
+      // 3. Lowercase login_id (e.g. ADMIN -> admin)
+      if (lowerId !== cleanId) {
+        snap = await coll.where("login_id", "==", lowerId).limit(1).get();
+        if (!snap.empty) return normalizeUser(docToData(snap.docs[0]));
       }
 
-      // Also try doc(id)
-      const directDoc = await db.collection(COLLECTIONS.USERS).doc(cleanId).get();
-      if (directDoc.exists) {
-        return docToData(directDoc);
+      // 4. By citizen_id
+      snap = await coll.where("citizen_id", "==", cleanId).limit(1).get();
+      if (!snap.empty) return normalizeUser(docToData(snap.docs[0]));
+
+      if (upperId !== cleanId) {
+        snap = await coll.where("citizen_id", "==", upperId).limit(1).get();
+        if (!snap.empty) return normalizeUser(docToData(snap.docs[0]));
+      }
+
+      // 5. By phone
+      snap = await coll.where("phone", "==", cleanId).limit(1).get();
+      if (!snap.empty) return normalizeUser(docToData(snap.docs[0]));
+
+      // 6. By email
+      snap = await coll.where("email", "==", lowerId).limit(1).get();
+      if (!snap.empty) return normalizeUser(docToData(snap.docs[0]));
+
+      // 7. Direct doc by ID
+      const directDoc = await coll.doc(cleanId).get();
+      if (directDoc.exists) return normalizeUser(docToData(directDoc));
+
+      // 8. Case-insensitive document fallback scan
+      const allSnap = await coll.get();
+      for (const d of allSnap.docs) {
+        const data = d.data();
+        if (
+          (data.login_id && String(data.login_id).toLowerCase() === lowerId) ||
+          (data.citizen_id && String(data.citizen_id).toLowerCase() === lowerId) ||
+          (data.phone && String(data.phone).trim() === cleanId) ||
+          (data.email && String(data.email).toLowerCase() === lowerId)
+        ) {
+          return normalizeUser({ id: d.id, ...data });
+        }
       }
 
       return null;
@@ -42,10 +83,18 @@ export const userRepo = {
 
     // MySQL
     const rows = await mysqlQuery(
-      "SELECT * FROM users WHERE login_id = ? OR phone = ? OR id = ? LIMIT 1",
-      [cleanId, cleanId, cleanId]
+      `SELECT * FROM users 
+       WHERE login_id = ? 
+          OR UPPER(login_id) = ? 
+          OR citizen_id = ? 
+          OR UPPER(citizen_id) = ? 
+          OR phone = ? 
+          OR LOWER(email) = ? 
+          OR id = ? 
+       LIMIT 1`,
+      [cleanId, upperId, cleanId, upperId, cleanId, lowerId, cleanId]
     );
-    return rows.length > 0 ? rows[0] : null;
+    return rows.length > 0 ? normalizeUser(rows[0]) : null;
   },
 
   async findById(id) {

@@ -947,6 +947,51 @@ export async function initAdminPanchayatModule(showToast) {
     });
   }
 
+  // Wire Operations Center Toolbar Listeners
+  const opsSearch = document.getElementById("opsSearchInput");
+  if (opsSearch) {
+    opsSearch.addEventListener("input", (e) => {
+      currentTaskSearchQuery = e.target.value.trim();
+      filterAndRenderAdminTasks();
+    });
+  }
+
+  const opsCat = document.getElementById("opsCategoryFilter");
+  if (opsCat) {
+    opsCat.addEventListener("change", (e) => {
+      currentTaskCategoryFilter = e.target.value;
+      filterAndRenderAdminTasks();
+    });
+  }
+
+  const opsPills = document.querySelectorAll("#opsStatusPillsNav .ops-pill-btn");
+  opsPills.forEach(btn => {
+    btn.addEventListener("click", () => {
+      opsPills.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentTaskStatusFilter = btn.getAttribute("data-status-filter") || "";
+      currentTaskOnlyUrgent = false;
+      filterAndRenderAdminTasks();
+    });
+  });
+
+  const btnUrgent = document.getElementById("btnOpsFilterUrgent");
+  if (btnUrgent) {
+    btnUrgent.addEventListener("click", () => {
+      currentTaskOnlyUrgent = !currentTaskOnlyUrgent;
+      if (currentTaskOnlyUrgent) {
+        btnUrgent.classList.remove("btn-outline-danger");
+        btnUrgent.classList.add("btn-danger");
+        btnUrgent.textContent = "Show All Works";
+      } else {
+        btnUrgent.classList.remove("btn-danger");
+        btnUrgent.classList.add("btn-outline-danger");
+        btnUrgent.textContent = "Show Urgent Works";
+      }
+      filterAndRenderAdminTasks();
+    });
+  }
+
   // Wire New Notice Button & Modal
   const btnAddNotice = document.getElementById("btnOpenAddNoticeModal");
   const modalNotice = document.getElementById("adminAddNoticeModal");
@@ -1183,57 +1228,132 @@ export async function loadAdminRtiRegister() {
   }
 }
 
-export async function loadAdminTasks() {
+let currentTaskStatusFilter = "";
+let currentTaskCategoryFilter = "";
+let currentTaskSearchQuery = "";
+let currentTaskOnlyUrgent = false;
+
+export function filterAndRenderAdminTasks() {
   const tbody = document.getElementById("adminTasksTableBody");
   const emptyState = document.getElementById("adminTasksEmpty");
   if (!tbody) return;
 
+  const tasks = allAdminTasks || [];
+
+  // Update KPI Metrics Cards
+  const total = tasks.length;
+  const inProgress = tasks.filter(t => t.status === "In Progress").length;
+  const critical = tasks.filter(t => t.priority === "Critical" || t.priority === "Urgent" || t.priority === "High").length;
+  const completed = tasks.filter(t => t.status === "Completed").length;
+  const pending = tasks.filter(t => t.status === "Pending").length;
+
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(val);
+  };
+
+  setEl("opsKpiTotal", total);
+  setEl("opsKpiProgress", inProgress);
+  setEl("opsKpiCritical", critical);
+  setEl("opsKpiCompleted", completed);
+
+  setEl("opsCountAll", total);
+  setEl("opsCountProgress", inProgress);
+  setEl("opsCountPending", pending);
+  setEl("opsCountDone", completed);
+
+  // Update Attention banner text if critical tasks exist
+  const alertText = document.getElementById("opsAlertText");
+  if (alertText) {
+    if (critical > 0) {
+      alertText.textContent = `${critical} urgent maintenance work${critical > 1 ? "s" : ""} requiring prompt field resolution. Crew active.`;
+    } else {
+      alertText.textContent = "All village development and maintenance works operating on regular schedule.";
+    }
+  }
+
+  // Filter tasks
+  const filtered = tasks.filter(t => {
+    if (currentTaskStatusFilter && t.status !== currentTaskStatusFilter) return false;
+    if (currentTaskCategoryFilter && (t.category || "") !== currentTaskCategoryFilter) return false;
+    if (currentTaskOnlyUrgent && !(t.priority === "Critical" || t.priority === "Urgent" || t.priority === "High")) return false;
+    if (currentTaskSearchQuery) {
+      const q = currentTaskSearchQuery.toLowerCase();
+      const match = (t.title && t.title.toLowerCase().includes(q)) ||
+                    (t.id && String(t.id).toLowerCase().includes(q)) ||
+                    (t.assigned_to && t.assigned_to.toLowerCase().includes(q)) ||
+                    (t.ward && t.ward.toLowerCase().includes(q)) ||
+                    (t.category && t.category.toLowerCase().includes(q));
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = "";
+    if (emptyState) emptyState.style.display = "block";
+    return;
+  }
+
+  if (emptyState) emptyState.style.display = "none";
+
+  tbody.innerHTML = filtered.map(t => {
+    const isDone = t.status === "Completed";
+    const isInProg = t.status === "In Progress";
+    const progressPct = isDone ? 100 : (isInProg ? 65 : 15);
+    const progressClass = isDone ? "ops-progress-100" : (isInProg ? "ops-progress-mid" : "ops-progress-low");
+    const priorityClass = `priority-${(t.priority || "Normal").toLowerCase()}`;
+
+    return `
+      <tr>
+        <td><strong>#TSK-${t.id}</strong></td>
+        <td>
+          <div style="font-weight:700; color:var(--text-main); font-size:0.94rem;">${escapeHtml(t.title)}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Target Due: ${t.due_date ? String(t.due_date).split("T")[0] : "Scheduled"}</div>
+        </td>
+        <td>
+          <span class="category-tag">
+            <span>${escapeHtml(t.category || "General")}</span>
+          </span>
+        </td>
+        <td>
+          <span class="priority-pill ${priorityClass}">
+            ${escapeHtml(t.priority || "Normal")}
+          </span>
+        </td>
+        <td>${escapeHtml(t.ward || "-")}</td>
+        <td>${escapeHtml(t.assigned_to || "-")}</td>
+        <td>
+          <span class="ops-progress-track">
+            <span class="ops-progress-bar ${progressClass}" style="width:${progressPct}%;"></span>
+          </span>
+          <span style="font-size:0.75rem; font-weight:750; color:${isDone ? '#059669' : (isInProg ? '#0284c7' : '#d97706')};">${progressPct}%</span>
+        </td>
+        <td>
+          <span class="status-tag ${isDone ? 'status-completed' : (isInProg ? 'status-in-progress' : 'status-open')}">
+            ${escapeHtml(t.status)}
+          </span>
+        </td>
+        <td>
+          <div style="display:inline-flex; gap:6px;">
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="window.viewAdminTask('${escapeHtml(JSON.stringify(t)).replace(/'/g, "&#39;")}')">
+              View
+            </button>
+            <button type="button" class="btn btn-sm ${isDone ? 'btn-secondary' : 'btn-outline-success'}" onclick="window.toggleAdminTaskStatus('${escapeHtml(String(t.id))}', '${isDone ? 'Pending' : 'Completed'}')">
+              ${isDone ? 'Reopen' : 'Mark Done'}
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+export async function loadAdminTasks() {
   try {
     const tasks = await api.getPanchayatTasks();
-    allAdminTasks = tasks;
-
-    if (!tasks || tasks.length === 0) {
-      tbody.innerHTML = "";
-      if (emptyState) emptyState.style.display = "block";
-      return;
-    }
-
-    if (emptyState) emptyState.style.display = "none";
-
-    tbody.innerHTML = tasks.map(t => {
-      const isDone = t.status === "Completed";
-      return `
-        <tr>
-          <td><strong>#TSK-${t.id}</strong></td>
-          <td>
-            <strong>${escapeHtml(t.title)}</strong>
-          </td>
-          <td>${escapeHtml(t.category || "General")}</td>
-          <td>
-            <span class="priority-pill priority-${(t.priority || "Normal").toLowerCase()}">
-              ${escapeHtml(t.priority || "Normal")}
-            </span>
-          </td>
-          <td>${escapeHtml(t.ward || "-")}</td>
-          <td>${escapeHtml(t.assigned_to || "-")}</td>
-          <td>
-            <span class="status-tag ${isDone ? 'status-completed' : (t.status === 'In Progress' ? 'status-in-progress' : 'status-open')}">
-              ${escapeHtml(t.status)}
-            </span>
-          </td>
-          <td>
-            <div style="display:inline-flex; gap:6px;">
-              <button type="button" class="btn btn-sm btn-outline-primary" onclick="window.viewAdminTask('${escapeHtml(JSON.stringify(t)).replace(/'/g, "&#39;")}')">
-                View
-              </button>
-              <button type="button" class="btn btn-sm ${isDone ? 'btn-secondary' : 'btn-outline-success'}" onclick="window.toggleAdminTaskStatus('${escapeHtml(String(t.id))}', '${isDone ? 'Pending' : 'Completed'}')">
-                ${isDone ? 'Reopen' : 'Mark Done'}
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join("");
+    allAdminTasks = tasks || [];
+    filterAndRenderAdminTasks();
   } catch (err) {
     console.error("Failed to load admin tasks:", err);
   }

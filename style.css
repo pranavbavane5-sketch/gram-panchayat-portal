@@ -86,6 +86,12 @@
   padding: 0;
 }
 
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
 body {
   font-family: var(--font-body);
   color: var(--text-main);
@@ -94,12 +100,22 @@ body {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   padding-bottom: 72px; /* Space for mobile navigation */
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  position: relative;
 }
 
 @media (min-width: 900px) {
   body {
     padding-bottom: 0;
   }
+}
+
+.main-content {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* Container */
@@ -110,6 +126,14 @@ body {
   margin-right: auto;
   padding-left: 20px;
   padding-right: 20px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
 }
 
 /* ========================================================
@@ -1733,16 +1757,26 @@ body {
   justify-content: flex-end;
 }
 
-/* Tables */
+/* Tables & Universal Responsive Scroll Wrapping */
+.admin-table-wrap,
+.table-responsive,
 .admin-sources-table-wrap,
 .admin-schedule-table-wrap,
 .admin-complaints-table-wrap {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin-top: 14px;
+  margin-bottom: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
 }
 
 .admin-table {
   width: 100%;
+  min-width: 680px;
   border-collapse: collapse;
   font-size: 0.92rem;
   text-align: left;
@@ -4385,13 +4419,23 @@ body {
    Interactive Village Map, 360° Modals & Print Styles
    ======================================================== */
 
-/* --- Admin Layout Shell --- */
+/* --- Admin Layout Shell & Viewport Containment --- */
+.page-view#page-admin {
+  padding-top: 0;
+  padding-bottom: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 .admin-shell {
   display: flex;
   min-height: calc(100vh - 72px);
   background: #f8fafc;
   position: relative;
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* --- Admin Collapsible Sidebar --- */
@@ -4691,15 +4735,28 @@ body {
 
 .admin-panes-container {
   padding: 24px;
-  flex: 1;
+  flex: 1 1 0%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .admin-panes-container {
+    padding: 14px;
+  }
 }
 
 /* --- 13 Executive KPI Cards Grid --- */
 .admin-kpi-13-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   gap: 16px;
   margin-bottom: 28px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .kpi-card-v2 {
@@ -5275,6 +5332,236 @@ body {
   .admin-panes-container {
     padding: 14px;
   }
+}
+
+/* ========================================================
+   OPERATIONS CENTER & DEVELOPMENT WORKS MODULE
+   (Inspired by Municipal Operations Dashboard Reference)
+   ======================================================== */
+.ops-attention-banner {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fde68a;
+  border-left: 5px solid #d97706;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08);
+}
+
+.ops-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ops-banner-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #fde68a;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ops-banner-text {
+  font-size: 0.9rem;
+  color: #78350f;
+  line-height: 1.4;
+}
+
+.ops-banner-text strong {
+  color: #451a03;
+  font-weight: 700;
+}
+
+.ops-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.ops-kpi-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ops-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.ops-kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ops-icon-blue { background: #e0f2fe; color: #0284c7; }
+.ops-icon-amber { background: #fef3c7; color: #d97706; }
+.ops-icon-rose { background: #ffe4e6; color: #e11d48; }
+.ops-icon-emerald { background: #dcfce7; color: #059669; }
+
+.ops-kpi-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.ops-kpi-val {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.ops-kpi-label {
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.ops-filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #ffffff;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.ops-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 300px;
+}
+
+.ops-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ops-pills-nav {
+  display: inline-flex;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: 8px;
+  gap: 2px;
+}
+
+.ops-pill-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: #64748b;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ops-pill-btn:hover {
+  color: #0f172a;
+}
+
+.ops-pill-btn.active {
+  background: #ffffff;
+  color: #0284c7;
+  font-weight: 750;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.ops-pill-badge {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.ops-pill-btn.active .ops-pill-badge {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.ops-progress-track {
+  width: 90px;
+  height: 7px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.ops-progress-bar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s;
+}
+
+.ops-progress-100 { background: #10b981; }
+.ops-progress-mid { background: #0284c7; }
+.ops-progress-low { background: #f59e0b; }
+
+.priority-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  font-weight: 750;
+  padding: 3px 8px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.priority-critical { background: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
+.priority-high { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.priority-medium, .priority-normal { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+.priority-low { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+.category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
 }
 
 /* --- Print Stylesheet for Receipts, Bills & Official Reports --- */

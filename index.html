@@ -3201,16 +3201,72 @@
           </div>
         </div>
 
-        <!-- ================= ADMIN TAB: WORK REGISTER & TASKS ================= -->
+        <!-- ================= ADMIN TAB: WORK REGISTER & OPERATIONS CENTER ================= -->
         <div class="admin-tab-pane" id="adminPaneTasks">
+          <!-- Attention / SLA Alert Banner (Image 5 style) -->
+          <div class="ops-attention-banner" id="opsAttentionBanner">
+            <div class="ops-banner-left">
+              <div class="ops-banner-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              </div>
+              <div class="ops-banner-text">
+                <strong>Attention:</strong> <span id="opsAlertText" data-i18n="ops_attention_alert">High-priority maintenance works assigned for execution today. Field crew dispatched.</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger" id="btnOpsFilterUrgent" data-i18n="ops_btn_show_urgent">Show Urgent Works</button>
+          </div>
+
+          <!-- 4 Operations KPI Cards (Image 1 & 5 style) -->
+          <div class="ops-kpi-grid">
+            <div class="ops-kpi-card">
+              <div class="ops-kpi-icon ops-icon-blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+              </div>
+              <div class="ops-kpi-content">
+                <div class="ops-kpi-val" id="opsKpiTotal">0</div>
+                <div class="ops-kpi-label" data-i18n="ops_kpi_total">Total Works & Tasks</div>
+              </div>
+            </div>
+
+            <div class="ops-kpi-card">
+              <div class="ops-kpi-icon ops-icon-amber">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+              <div class="ops-kpi-content">
+                <div class="ops-kpi-val" id="opsKpiProgress">0</div>
+                <div class="ops-kpi-label" data-i18n="ops_kpi_progress">Active In Progress</div>
+              </div>
+            </div>
+
+            <div class="ops-kpi-card">
+              <div class="ops-kpi-icon ops-icon-rose">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              </div>
+              <div class="ops-kpi-content">
+                <div class="ops-kpi-val" id="opsKpiCritical">0</div>
+                <div class="ops-kpi-label" data-i18n="ops_kpi_critical">Urgent & Critical</div>
+              </div>
+            </div>
+
+            <div class="ops-kpi-card">
+              <div class="ops-kpi-icon ops-icon-emerald">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="ops-kpi-content">
+                <div class="ops-kpi-val" id="opsKpiCompleted">0</div>
+                <div class="ops-kpi-label" data-i18n="ops_kpi_completed">Completed & Inspected</div>
+              </div>
+            </div>
+          </div>
+
           <div class="admin-card-section">
             <div class="section-header-flex">
               <div>
                 <h2 class="admin-section-heading">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                  <span data-i18n="admin_tab_tasks">Gram Panchayat Daily Work Register & Maintenance</span>
+                  <span data-i18n="admin_tab_tasks">Work Register & Projects</span>
                 </h2>
-                <p class="section-subtitle">Track pipeline repairs, streetlight fixes, garbage clearance, and sanitation crew dispatch.</p>
+                <p class="section-subtitle">Real-time tracking of village development works, pipeline leakages, streetlights, and sanitation crews.</p>
               </div>
               <button type="button" class="btn btn-primary btn-sm" id="btnOpenAddTaskModal">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -3218,18 +3274,55 @@
               </button>
             </div>
 
+            <!-- Operations Filter Toolbar (Image 5 style) -->
+            <div class="ops-filter-toolbar">
+              <div class="ops-toolbar-left">
+                <input type="text" id="opsSearchInput" class="form-control" style="max-width: 280px; height: 36px; font-size: 0.85rem;" placeholder="Search works, lineman, ward...">
+                <select id="opsCategoryFilter" class="form-control" style="max-width: 200px; height: 36px; font-size: 0.85rem;">
+                  <option value="">All Categories</option>
+                  <option value="Water Supply">Water Supply / Pipeline</option>
+                  <option value="Streetlight">Streetlight Maintenance</option>
+                  <option value="Drainage">Drainage & Gutter</option>
+                  <option value="Sanitation">Sanitation & Garbage</option>
+                  <option value="Road Repair">Road & Pathway Repair</option>
+                </select>
+              </div>
+
+              <div class="ops-toolbar-right">
+                <div class="ops-pills-nav" id="opsStatusPillsNav">
+                  <button type="button" class="ops-pill-btn active" data-status-filter="">
+                    <span data-i18n="ops_tab_all">All</span>
+                    <span class="ops-pill-badge" id="opsCountAll">0</span>
+                  </button>
+                  <button type="button" class="ops-pill-btn" data-status-filter="In Progress">
+                    <span data-i18n="ops_tab_progress">In Progress</span>
+                    <span class="ops-pill-badge" id="opsCountProgress">0</span>
+                  </button>
+                  <button type="button" class="ops-pill-btn" data-status-filter="Pending">
+                    <span data-i18n="ops_tab_pending">Pending</span>
+                    <span class="ops-pill-badge" id="opsCountPending">0</span>
+                  </button>
+                  <button type="button" class="ops-pill-btn" data-status-filter="Completed">
+                    <span data-i18n="ops_tab_completed">Completed</span>
+                    <span class="ops-pill-badge" id="opsCountDone">0</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div class="admin-table-wrap">
               <table class="admin-table" id="adminTasksTable">
                 <thead>
                   <tr>
-                    <th>Task ID</th>
-                    <th>Work Description</th>
-                    <th>Category</th>
-                    <th>Priority</th>
-                    <th>Location / Ward</th>
-                    <th>Assigned Crew</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th data-i18n="ops_col_task_id">Work ID</th>
+                    <th data-i18n="ops_col_title">Work Description</th>
+                    <th data-i18n="ops_col_category">Category</th>
+                    <th data-i18n="ops_col_priority">Priority</th>
+                    <th data-i18n="ops_col_location">Ward / Location</th>
+                    <th data-i18n="ops_col_assigned">Crew / Lineman</th>
+                    <th data-i18n="ops_col_progress">Progress</th>
+                    <th data-i18n="ops_col_status">Status</th>
+                    <th data-i18n="ops_col_actions">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="adminTasksTableBody">
@@ -3237,7 +3330,7 @@
                 </tbody>
               </table>
               <div class="admin-empty-state" id="adminTasksEmpty" style="display:none;">
-                <p>No open maintenance tasks.</p>
+                <p>No open maintenance tasks found matching filters.</p>
               </div>
             </div>
           </div>

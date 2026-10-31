@@ -36,6 +36,19 @@ import {
   loadAdminExecutiveKPIs
 } from "./panchayatApp.js";
 
+import {
+  initAdminSidebarAndNavbar,
+  populateDashboardKpiCards,
+  renderDashboardCharts,
+  renderDashboardActivitiesAndAlerts,
+  initCitizenProfile360,
+  initPropertyProfile360,
+  initPrintWaterBill,
+  initVillageMap,
+  renderVillageMapView,
+  renderAdminReportsView
+} from "./adminSmartVillage.js";
+
 // ==========================================================
 // 1. DEFAULT VILLAGE SAMPLE DATA
 // (Used as seed data for empty database or local fallback)
@@ -2125,6 +2138,14 @@ function initAdminView() {
   const activeNameEl = document.getElementById("adminNavActiveName");
   const activeIconEl = document.getElementById("adminNavActiveIcon");
 
+  // Initialize Smart Village UI modules
+  initAdminSidebarAndNavbar(switchPage, showToast);
+  initCitizenProfile360();
+  initPropertyProfile360();
+  initPrintWaterBill();
+  initVillageMap();
+  window.refreshAdminData = renderAdminView;
+
   // Mobile menu dropdown toggle
   if (mobileToggle && navContainer) {
     mobileToggle.addEventListener("click", () => {
@@ -2181,6 +2202,7 @@ function initAdminView() {
       else if (tabKey === "schedule") renderAdminScheduleTable();
       else if (tabKey === "complaints") renderAdminComplaintsTable();
       else if (tabKey === "reports") renderAdminReportsView();
+      else if (tabKey === "map") renderVillageMapView();
     });
   });
 
@@ -3823,7 +3845,8 @@ async function renderAdminView() {
     loadAdminRtiRegister(),
     loadAdminTasks(),
     loadAdminNotices(),
-    renderAdminReportsView()
+    renderAdminReportsView(),
+    renderVillageMapView()
   ]);
 }
 
@@ -3831,6 +3854,15 @@ async function renderAdminStats() {
   try {
     const stats = await api.getAdminDashboardStats();
     if (!stats) return;
+
+    // Smart Village 13 Real-Data KPI Cards
+    populateDashboardKpiCards(stats);
+
+    // 7 Dynamic Pure-SVG Vector Charts
+    renderDashboardCharts(stats);
+
+    // Live Administrative Activity Stream & Statutory SLA Alerts
+    renderDashboardActivitiesAndAlerts(stats);
 
     const elCitizens = document.getElementById("admKpiCitizens");
     const elSources = document.getElementById("admKpiSources");
@@ -3901,6 +3933,10 @@ async function renderAdminCitizensTable(search = "", status = "", ward = "") {
           </td>
           <td>
             <div style="display:flex; gap:6px;">
+              <button class="btn btn-secondary btn-sm" onclick="window.viewCitizenProfile360('${c.id || citId}')" title="360° Profile & Household Dossier">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>360°</span>
+              </button>
               <button class="btn btn-secondary btn-sm" onclick="window.editAdminCitizen('${cJson}')">${t("btn_edit", "Edit")}</button>
               <button class="btn btn-secondary btn-sm" style="color:${isActive ? '#b91c1c' : '#16a34a'};" onclick="window.toggleCitizenStatus('${c.id || citId}', '${c.status}')">
                 ${isActive ? t("btn_deactivate", "Deactivate") : t("btn_activate", "Activate")}
@@ -3974,6 +4010,10 @@ async function renderAdminPropertiesTable(search = "", ward = "", type = "") {
           <td>${duesBadge}</td>
           <td>
             <div style="display:flex; gap:6px;">
+              <button class="btn btn-secondary btn-sm" onclick="window.viewPropertyProfile360('${p.id || propNo}')" title="360° Property & Assessment Dossier">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>360°</span>
+              </button>
               <button class="btn btn-secondary btn-sm" onclick="window.editAdminProperty('${pJson}')">${t("btn_edit", "Edit")}</button>
               <button class="btn btn-secondary btn-sm" style="color:#dc2626;" onclick="window.deleteAdminProperty('${p.id}', '${escapeHtml(propNo)}')">${t("btn_delete", "Delete")}</button>
             </div>
@@ -4151,10 +4191,16 @@ async function renderAdminBillsTable() {
             </span>
           </td>
           <td>
-            ${isPaid 
-              ? `<span style="color:#0f766e; font-weight:700; font-size:0.85rem;">✓ ${t("status_paid", "Paid")}</span>`
-              : `<button class="btn btn-secondary btn-sm" onclick="window.quickPayBillAdmin('${b.id}', ${amt})">${t("adm_record_pay", "Record Pay")}</button>`
-            }
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="btn btn-outline-primary btn-sm" onclick="window.printWaterBill('${b.id || billNo}')" title="Print Official Gram Panchayat Water Bill">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>${getLanguage() === "mr" ? "देयक" : "Bill"}</span>
+              </button>
+              ${isPaid 
+                ? `<span style="color:#0f766e; font-weight:700; font-size:0.85rem;">✓ ${t("status_paid", "Paid")}</span>`
+                : `<button class="btn btn-secondary btn-sm" onclick="window.quickPayBillAdmin('${b.id}', ${amt})">${t("adm_record_pay", "Record Pay")}</button>`
+              }
+            </div>
           </td>
         </tr>
       `;
@@ -4430,85 +4476,7 @@ window.handleComplaintStatusChange = async function(complaintId, newStatus) {
   }
 };
 
-async function renderAdminReportsView() {
-  const container = document.getElementById("adminReportsContainer");
-  if (!container) return;
 
-  try {
-    const reports = await api.getAdminReports();
-    if (!reports) return;
-
-    const { financial, complaints, waterReserves } = reports;
-
-    container.innerHTML = `
-      <div class="report-summary-card">
-        <h3 class="report-card-title">💰 Financial & Collections Summary</h3>
-        <div class="report-stat-row">
-          <span>Total Demand Billed:</span>
-          <span class="report-stat-val">₹${Number(financial.totalBilled || 0).toFixed(2)}</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Total Collections Verified:</span>
-          <span class="report-stat-val" style="color:#0f766e;">₹${Number(financial.totalCollected || 0).toFixed(2)}</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Outstanding Dues Balance:</span>
-          <span class="report-stat-val" style="color:#e11d48;">₹${Number(financial.outstandingBalance || 0).toFixed(2)}</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Revenue Realization Rate:</span>
-          <span class="report-stat-val"><strong>${financial.collectionPercentage}%</strong></span>
-        </div>
-      </div>
-
-      <div class="report-summary-card">
-        <h3 class="report-card-title">📋 Grievances Resolution Performance</h3>
-        <div class="report-stat-row">
-          <span>Total Lodged Issues:</span>
-          <span class="report-stat-val">${complaints.totalComplaints}</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Resolved & Closed:</span>
-          <span class="report-stat-val" style="color:#16a34a;">${complaints.resolvedCount}</span>
-        </div>
-        <div class="report-stat-row">
-          <span>In Progress / Dispatched:</span>
-          <span class="report-stat-val" style="color:#0284c7;">${complaints.inProgressCount}</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Pending Action:</span>
-          <span class="report-stat-val" style="color:#d97706;">${complaints.pendingCount}</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Resolution Rate:</span>
-          <span class="report-stat-val"><strong>${complaints.resolutionRate}%</strong></span>
-        </div>
-      </div>
-
-      <div class="report-summary-card">
-        <h3 class="report-card-title">💧 Village Water Reserves Aggregation</h3>
-        <div class="report-stat-row">
-          <span>Active Water Sources:</span>
-          <span class="report-stat-val">${waterReserves.totalSources} sources</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Cumulative Village Capacity:</span>
-          <span class="report-stat-val">${Number(waterReserves.totalCapacityLiters).toLocaleString()} Liters</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Current Available Storage:</span>
-          <span class="report-stat-val" style="color:#0284c7;">${Number(waterReserves.totalAvailableLiters).toLocaleString()} Liters</span>
-        </div>
-        <div class="report-stat-row">
-          <span>Overall Village Reserve Fill:</span>
-          <span class="report-stat-val"><strong>${waterReserves.overallFillPercent}%</strong></span>
-        </div>
-      </div>
-    `;
-  } catch (err) {
-    container.innerHTML = `<div style="color:#ef4444; padding:20px;">Could not generate live reports from database.</div>`;
-  }
-}
 
 // ==========================================================
 // 15. UTILITIES

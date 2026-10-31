@@ -171,6 +171,7 @@ export const api = {
   deleteAdminCitizen: (id) => request(`/admin/citizens/${encodeURIComponent(id)}`, { method: "DELETE" }),
   toggleCitizenStatus: (id, status) => request(`/admin/citizens/${encodeURIComponent(id)}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
   toggleAdminCitizenStatus: (id, status) => request(`/admin/citizens/${encodeURIComponent(id)}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  getAdminCitizenProfile: (id) => request(`/admin/citizens/${encodeURIComponent(id)}`),
 
   // Property & Household Management (Admin)
   getProperties: (search = "") => {

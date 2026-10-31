@@ -644,6 +644,9 @@
           </div>
         </div>
 
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1602,242 +1605,532 @@
 
     <!-- ================= PAGE 7: ADMIN CONTROL PORTAL ================= -->
     <section class="page-view" id="page-admin" aria-labelledby="adminHeading">
-      <div class="container admin-portal-wrap">
-        
-        <!-- Admin Master Header -->
-        <div class="admin-top-banner">
-          <div class="admin-title-wrap">
-            <div class="admin-badge">Gram Panchayat Administration</div>
-            <h1 class="page-heading" id="adminHeading">Gram Panchayat Administration</h1>
-            <p class="page-subheading" id="adminSubheading" data-i18n="official_gp_subtitle">Official Gram Panchayat Citizen Services Portal</p>
+      <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop"></div>
+
+      <div class="admin-shell" id="adminShell">
+        <!-- Responsive navigation & compatibility hook -->
+        <div id="adminNavContainer" style="display:none;" aria-hidden="true">
+          <div id="adminNavMobileBar">
+            <span id="adminNavActivePill"><span id="adminNavActiveIcon"></span><span id="adminNavActiveName">Dashboard</span></span>
+            <button id="btnToggleAdminNavMenu" aria-expanded="false" aria-label="Toggle Navigation"></button>
           </div>
-          <div class="admin-quick-actions">
-            <button class="btn btn-secondary btn-sm" id="btnAdminRefresh">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
-              <span data-i18n="admin_btn_refresh">Refresh Records</span>
-            </button>
-            <button class="btn btn-primary btn-sm" id="btnExitAdmin">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-              <span>Back to Public View</span>
-            </button>
-          </div>
+          <div id="adminSubnavBar"></div>
         </div>
 
-        <!-- Admin Portal Sub-Navigation Tabs Card -->
-        <div class="admin-nav-container" id="adminNavContainer">
-          <div class="admin-nav-mobile-bar" id="adminNavMobileBar">
-            <div class="admin-nav-mobile-title">
-              <span class="admin-nav-mobile-kicker">Admin Section</span>
-              <span class="admin-nav-active-pill" id="adminNavActivePill">
-                <span class="admin-nav-active-icon" id="adminNavActiveIcon">📊</span>
-                <span class="admin-nav-active-name" id="adminNavActiveName" data-i18n="admin_tab_dashboard">Dashboard Overview</span>
-              </span>
+        <!-- Collapsible Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar" aria-label="Gram Panchayat Navigation">
+          <div class="admin-sidebar-header">
+            <div class="admin-sidebar-brand">
+              <div class="gp-seal-icon">🏛️</div>
+              <div class="gp-brand-text">
+                <span class="gp-title" data-i18n="admin_gp_title">Sundarpur GP</span>
+                <span class="gp-subtitle" data-i18n="admin_gp_badge">Smart Panchayat</span>
+              </div>
             </div>
-            <button type="button" class="btn btn-sm btn-outline-primary admin-nav-toggle-btn" id="btnToggleAdminNavMenu" aria-expanded="false" aria-controls="adminSubnavBar">
-              <span id="btnToggleAdminNavText">All Sections</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <button type="button" class="admin-sidebar-toggle-btn" id="btnCollapseSidebar" aria-label="Collapse Navigation">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </button>
           </div>
 
-          <!-- Admin Portal Sub-Navigation Tabs (Multi-row wrapped on desktop, stacked on mobile) -->
-          <nav class="portal-subnav-bar admin-subnav-bar" id="adminSubnavBar" aria-label="Gram Panchayat Admin Navigation">
+          <nav class="admin-sidebar-nav portal-subnav-bar admin-subnav-bar" id="adminSidebarNav" aria-label="Gram Panchayat Admin Navigation">
+            <!-- Group 1: Overview -->
+            <div class="admin-nav-group-title" data-i18n="admin_nav_overview">Overview</div>
             <button class="portal-subnav-tab active" data-admin-tab="dashboard">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-              <span data-i18n="admin_tab_dashboard">Dashboard Overview</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span data-i18n="admin_tab_dashboard">Executive Dashboard</span>
             </button>
-            <button class="portal-subnav-tab" data-admin-tab="services">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-              <span data-i18n="admin_tab_services">Manage Services</span>
+            <button class="portal-subnav-tab" data-admin-tab="map">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+              <span data-i18n="admin_tab_village_map">Village Map & Facilities</span>
             </button>
+
+            <!-- Group 2: Civic Administration -->
+            <div class="admin-nav-group-title" data-i18n="admin_nav_civic">Civic Administration</div>
             <button class="portal-subnav-tab" data-admin-tab="citizens">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              <span data-i18n="admin_tab_citizens">Citizen Management</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <span data-i18n="admin_tab_citizens">Citizens & Households</span>
             </button>
             <button class="portal-subnav-tab" data-admin-tab="properties">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-              <span data-i18n="admin_tab_properties">Properties & Households</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              <span data-i18n="admin_tab_properties">Properties & Dues</span>
             </button>
-            <button class="portal-subnav-tab" data-admin-tab="sources">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
-              <span data-i18n="admin_tab_tanks">Water Tanks & Levels</span>
+            <button class="portal-subnav-tab" data-admin-tab="services">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              <span data-i18n="admin_tab_services">Civic Services</span>
             </button>
+
+            <!-- Group 3: Revenue & Utilities -->
+            <div class="admin-nav-group-title" data-i18n="admin_nav_revenue">Revenue & Utilities</div>
             <button class="portal-subnav-tab" data-admin-tab="bills">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
               <span data-i18n="admin_tab_bills">Water Bills & Payments</span>
             </button>
             <button class="portal-subnav-tab" data-admin-tab="taxes">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
               <span data-i18n="admin_tab_taxes">Taxes & Charges</span>
             </button>
+            <button class="portal-subnav-tab" data-admin-tab="sources">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+              <span data-i18n="admin_tab_tanks">Water Tanks & Levels</span>
+            </button>
             <button class="portal-subnav-tab" data-admin-tab="schedule">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              <span data-i18n="admin_tab_schedule">Distribution Timetable</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span data-i18n="admin_tab_schedule">Water Timetable</span>
             </button>
-            <button class="portal-subnav-tab" data-admin-tab="complaints">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-              <span data-i18n="admin_tab_complaints">Complaints & Grievances</span>
-            </button>
+
+            <!-- Group 4: Governance & Operations -->
+            <div class="admin-nav-group-title" data-i18n="admin_nav_governance">Governance & Operations</div>
             <button class="portal-subnav-tab" data-admin-tab="applications">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
               <span data-i18n="admin_tab_applications">Applications Register</span>
             </button>
+            <button class="portal-subnav-tab" data-admin-tab="complaints">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span data-i18n="admin_tab_complaints">Complaints & Grievances</span>
+            </button>
             <button class="portal-subnav-tab" data-admin-tab="rti">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               <span data-i18n="admin_tab_rti">RTI Register (30-Day SLA)</span>
             </button>
             <button class="portal-subnav-tab" data-admin-tab="tasks">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-              <span data-i18n="admin_tab_tasks">Work Register & Tasks</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+              <span data-i18n="admin_tab_tasks">Work Register & Projects</span>
             </button>
             <button class="portal-subnav-tab" data-admin-tab="notices">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               <span data-i18n="admin_tab_notices">Public Notices</span>
             </button>
+
+            <!-- Group 5: Intelligence -->
+            <div class="admin-nav-group-title" data-i18n="admin_nav_intelligence">Intelligence</div>
             <button class="portal-subnav-tab" data-admin-tab="reports">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
               <span data-i18n="admin_tab_reports">Reports & Analytics</span>
             </button>
           </nav>
-        </div>
+          
+          <div class="admin-sidebar-footer">
+            <button class="btn btn-outline-danger btn-sm sidebar-logout-btn" id="btnSidebarExitAdmin">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+              <span data-i18n="admin_btn_exit">Exit Admin Portal</span>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main Viewport -->
+        <div class="admin-main-viewport">
+          <!-- Top App Bar -->
+          <header class="admin-top-navbar" id="adminTopNavbar">
+            <div class="admin-top-left">
+              <button type="button" class="admin-mobile-menu-btn" id="btnToggleSidebarMobile" aria-label="Toggle menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+              </button>
+              <div class="admin-breadcrumb-trail">
+                <span class="bc-prefix" data-i18n="admin_bc_portal">Gram Panchayat</span>
+                <span class="bc-sep">/</span>
+                <span class="bc-current" id="adminBreadcrumbCurrent" data-i18n="admin_tab_dashboard">Executive Dashboard</span>
+              </div>
+            </div>
+
+            <div class="admin-top-actions">
+              <div class="admin-sync-indicator" id="adminLiveSyncBadge" title="Live Database Synchronized">
+                <span class="sync-dot"></span>
+                <span class="sync-text" data-i18n="admin_status_live">Live Sync</span>
+              </div>
+
+              <!-- Quick Action Shortcut Buttons -->
+              <div class="admin-quick-pills">
+                <button type="button" class="btn btn-outline-primary btn-sm quick-pill-btn" id="topBtnAddCitizen">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span data-i18n="btn_add_citizen">+ Citizen</span>
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm quick-pill-btn" id="topBtnCreateBill">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                  <span data-i18n="btn_issue_bill">+ Bill</span>
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm quick-pill-btn" id="topBtnRecordPayment">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span data-i18n="btn_record_payment">+ Payment</span>
+                </button>
+              </div>
+
+              <button class="btn btn-secondary btn-sm" id="btnAdminRefresh" title="Refresh database records">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
+                <span data-i18n="admin_btn_refresh">Refresh</span>
+              </button>
+
+              <button class="btn btn-primary btn-sm" id="btnExitAdmin">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                <span data-i18n="btn_public_portal">Public View</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Admin Panes Container -->
+          <div class="admin-panes-container">
 
         <!-- ================= ADMIN TAB 1: DASHBOARD OVERVIEW ================= -->
         <div class="admin-tab-pane active" id="adminPaneDashboard">
-          <!-- 6 High-Level KPI Summary Cards -->
-          <div class="admin-kpi-grid">
-            <div class="admin-kpi-card">
-              <div class="kpi-icon-wrap kpi-blue">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+          <!-- 13 Real-Data Executive KPI Cards -->
+          <div class="admin-kpi-13-grid">
+            <!-- KPI 1: Citizens -->
+            <div class="kpi-card-v2 kpi-border-navy">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-navy">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_citizens">Demographics</span>
               </div>
-              <div class="kpi-info">
-                <span class="kpi-label">Registered Citizens</span>
-                <span class="kpi-value" id="admKpiCitizens">0</span>
-                <small class="kpi-sub">Total households managed</small>
-              </div>
-            </div>
-
-            <div class="admin-kpi-card">
-              <div class="kpi-icon-wrap kpi-teal">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
-              </div>
-              <div class="kpi-info">
-                <span class="kpi-label">Water Sources</span>
-                <span class="kpi-value" id="admKpiSources">0</span>
-                <small class="kpi-sub" id="admKpiTotalCapacity">0 L capacity</small>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_total_citizens">Total Registered Citizens</div>
+                <div class="kpi-card-v2-val" id="admKpiTotalCitizens">0</div>
+                <div class="kpi-card-v2-sub"><span id="admKpiActiveCitizens">0</span> <span data-i18n="kpi_active_residents">active residents</span></div>
               </div>
             </div>
 
-            <div class="admin-kpi-card">
-              <div class="kpi-icon-wrap kpi-rose">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            <!-- KPI 2: Households -->
+            <div class="kpi-card-v2 kpi-border-blue">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-blue">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_families">Families</span>
               </div>
-              <div class="kpi-info">
-                <span class="kpi-label">Outstanding Water Bills</span>
-                <span class="kpi-value" id="admKpiOutstandingBills">₹0.00</span>
-                <small class="kpi-sub" id="admKpiUnpaidBillsCount">0 unpaid bills</small>
-              </div>
-            </div>
-
-            <div class="admin-kpi-card">
-              <div class="kpi-icon-wrap kpi-green">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              </div>
-              <div class="kpi-info">
-                <span class="kpi-label">Total Revenue Collected</span>
-                <span class="kpi-value" id="admKpiRevenueCollected">₹0.00</span>
-                <small class="kpi-sub">Water bills + tax receipts</small>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_total_households">Total Households</div>
+                <div class="kpi-card-v2-val" id="admKpiTotalHouseholds">0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_across_wards">Across all 4 village wards</div>
               </div>
             </div>
 
-            <div class="admin-kpi-card">
-              <div class="kpi-icon-wrap kpi-amber">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <!-- KPI 3: Properties -->
+            <div class="kpi-card-v2 kpi-border-teal">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-teal">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_properties">Registry</span>
               </div>
-              <div class="kpi-info">
-                <span class="kpi-label">Total Complaints</span>
-                <span class="kpi-value" id="admKpiTotalComplaints">0</span>
-                <small class="kpi-sub">Reported community issues</small>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_total_properties">Total Properties</div>
+                <div class="kpi-card-v2-val" id="admKpiTotalProperties">0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_residential_commercial">Residential & commercial</div>
               </div>
             </div>
 
-            <div class="admin-kpi-card">
-              <div class="kpi-icon-wrap kpi-purple">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <!-- KPI 4: Total Applications -->
+            <div class="kpi-card-v2 kpi-border-indigo">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-indigo">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_services">Services</span>
               </div>
-              <div class="kpi-info">
-                <span class="kpi-label">Pending Complaints</span>
-                <span class="kpi-value" id="admKpiPendingComplaints">0</span>
-                <small class="kpi-sub">Action urgently needed</small>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_total_applications">Total Applications</div>
+                <div class="kpi-card-v2-val" id="admKpiTotalApplications">0</div>
+                <div class="kpi-card-v2-sub"><span id="admKpiAppsToday">0</span> <span data-i18n="kpi_submitted_today">received today</span></div>
+              </div>
+            </div>
+
+            <!-- KPI 5: Pending Applications -->
+            <div class="kpi-card-v2 kpi-border-amber">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-amber">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_pipeline">In Review</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_pending_applications">Pending Applications</div>
+                <div class="kpi-card-v2-val" id="admKpiPendingApplications">0</div>
+                <div class="kpi-card-v2-sub"><span id="admKpiRtiPendingCount">0</span> <span data-i18n="kpi_active_rti_matters">RTI statutory matters</span></div>
+              </div>
+            </div>
+
+            <!-- KPI 6: Resolved Complaints -->
+            <div class="kpi-card-v2 kpi-border-emerald">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-emerald">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_redressed">Redressed</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_resolved_complaints">Resolved Complaints</div>
+                <div class="kpi-card-v2-val" id="admKpiResolvedComplaints">0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_citizen_grievances_settled">Villager grievances settled</div>
+              </div>
+            </div>
+
+            <!-- KPI 7: Pending Complaints -->
+            <div class="kpi-card-v2 kpi-border-rose">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-rose">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_action">Urgent</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_pending_complaints">Pending Complaints</div>
+                <div class="kpi-card-v2-val" id="admKpiPendingComplaints">0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_action_required">Action required by staff</div>
+              </div>
+            </div>
+
+            <!-- KPI 8: Total Water Bills -->
+            <div class="kpi-card-v2 kpi-border-blue">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-blue">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_utility">Utility</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_total_water_bills">Total Water Bills</div>
+                <div class="kpi-card-v2-val" id="admKpiTotalWaterBills">0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_issued_cycles">Issued across billing cycles</div>
+              </div>
+            </div>
+
+            <!-- KPI 9: Paid and Unpaid Bills -->
+            <div class="kpi-card-v2 kpi-border-purple">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-purple">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_status">Billing Status</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_paid_unpaid_bills">Paid & Unpaid Bills</div>
+                <div class="kpi-card-v2-val" id="admKpiPaidUnpaidBills">0 / 0</div>
+                <div class="kpi-card-v2-sub" id="admKpiBillsRatioSub">0% payment collection rate</div>
+              </div>
+            </div>
+
+            <!-- KPI 10: Total Tax Collection -->
+            <div class="kpi-card-v2 kpi-border-emerald">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-emerald">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_revenue">Revenue</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_total_tax_collection">Total Tax Collection</div>
+                <div class="kpi-card-v2-val" id="admKpiTotalTaxCollection">₹0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_property_sanitation_cess">Property, water & cess</div>
+              </div>
+            </div>
+
+            <!-- KPI 11: Pending Tax Collection -->
+            <div class="kpi-card-v2 kpi-border-rose">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-rose">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_arrears">Arrears</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_pending_tax_collection">Pending Tax Collection</div>
+                <div class="kpi-card-v2-val" id="admKpiPendingTaxCollection">₹0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_outstanding_assessments">Outstanding assessments</div>
+              </div>
+            </div>
+
+            <!-- KPI 12: Active Development Works -->
+            <div class="kpi-card-v2 kpi-border-amber">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-amber">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_ongoing">Ongoing</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_active_works">Active Development Works</div>
+                <div class="kpi-card-v2-val" id="admKpiActiveWorks">0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_works_in_progress">Village works in progress</div>
+              </div>
+            </div>
+
+            <!-- KPI 13: Completed Development Works -->
+            <div class="kpi-card-v2 kpi-border-emerald">
+              <div class="kpi-card-v2-header">
+                <div class="kpi-card-v2-icon icon-bg-emerald">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <span class="kpi-card-v2-tag" data-i18n="kpi_tag_completed">Delivered</span>
+              </div>
+              <div class="kpi-card-v2-body">
+                <div class="kpi-card-v2-label" data-i18n="kpi_completed_works">Completed Development Works</div>
+                <div class="kpi-card-v2-val" id="admKpiCompletedWorks">0</div>
+                <div class="kpi-card-v2-sub" data-i18n="kpi_delivered_projects">Inspected and verified</div>
               </div>
             </div>
           </div>
-          <!-- Year-Round Gram Panchayat Executive Dashboard -->
-          <div class="admin-card-section" style="margin-bottom: 24px;">
-            <div class="section-header-flex">
-              <div>
-                <h2 class="admin-section-heading">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                  <span data-i18n="admin_exec_dashboard">Year-Round Gram Panchayat Executive Dashboard</span>
-                </h2>
-                <p class="section-subtitle">Real-time governance KPIs combining citizen records, statutory RTI SLA deadlines, revenue, and daily works.</p>
+
+          <!-- Legacy KPI Bridge Span IDs for 100% Backward-Compatibility with existing functions -->
+          <div style="display:none;" aria-hidden="true">
+            <span id="admKpiCitizens">0</span>
+            <span id="admKpiSources">0</span>
+            <span id="admKpiTotalCapacity">0 L</span>
+            <span id="admKpiOutstandingBills">₹0</span>
+            <span id="admKpiUnpaidBillsCount">0</span>
+            <span id="admKpiRevenueCollected">₹0</span>
+            <span id="admKpiTotalComplaints">0</span>
+            <span id="admKpiPendingComplaintsLegacy">0</span>
+            <span id="execKpiCitizens">0</span>
+            <span id="execKpiProps">0</span>
+            <span id="execKpiToday">0</span>
+            <span id="execKpiTotalApps">0</span>
+            <span id="execKpiPending">0</span>
+            <span id="execKpiResolved">0</span>
+            <span id="execKpiRti">0</span>
+            <span id="execKpiRtiOverdue">0</span>
+            <span id="execKpiCollected">₹0</span>
+            <span id="execKpiOutstanding">₹0</span>
+            <span id="execKpiWaterFill">0%</span>
+            <span id="execKpiWaterLiters">0</span>
+            <span id="execKpiTasks">0</span>
+            <span id="execKpiTasksOpen">0</span>
+            <span id="execKpiNotices">0</span>
+          </div>
+
+          <!-- 7 Dynamic SVG Chart Visualizations Grid -->
+          <div class="dashboard-charts-grid">
+            <!-- Chart 1: Citizen Registration & Ward Demographics -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                  <span data-i18n="chart_ward_citizens_title">Ward-Wise Citizen Distribution</span>
+                </div>
+                <span class="chart-card-badge" data-i18n="chart_badge_demographics">Demographics</span>
               </div>
-              <div style="font-size:0.82rem; color:var(--text-muted); font-weight:600;" id="adminExecTimestamp">Live Synchronized</div>
+              <div class="chart-card-body" id="chartWardDemographics">
+                <!-- Dynamic SVG injected via JS -->
+              </div>
+              <div class="chart-card-legend" id="legendWardDemographics"></div>
             </div>
 
-            <div class="panchayat-exec-kpis">
-              <!-- KPI 1: Citizens & Households -->
-              <div class="exec-kpi-card" style="border-left-color: #0284c7;">
-                <span class="exec-kpi-label" data-i18n="admin_kpi_citizens_households">Citizens & Households</span>
-                <span class="exec-kpi-val" id="execKpiCitizens">0</span>
-                <span class="exec-kpi-sub" id="execKpiProps">0 properties registered</span>
+            <!-- Chart 2: Ward-Wise Households -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                  <span data-i18n="chart_ward_households_title">Ward-Wise Households & Properties</span>
+                </div>
+                <span class="chart-card-badge" data-i18n="chart_badge_properties">Housing</span>
               </div>
-
-              <!-- KPI 2: Received Today -->
-              <div class="exec-kpi-card" style="border-left-color: #2563eb;">
-                <span class="exec-kpi-label" data-i18n="admin_kpi_apps_today">Received Today</span>
-                <span class="exec-kpi-val" id="execKpiToday">0</span>
-                <span class="exec-kpi-sub" id="execKpiTotalApps">0 total applications</span>
+              <div class="chart-card-body" id="chartWardHouseholds">
+                <!-- Dynamic SVG injected via JS -->
               </div>
+              <div class="chart-card-legend" id="legendWardHouseholds"></div>
+            </div>
 
-              <!-- KPI 3: Pending Matters -->
-              <div class="exec-kpi-card" style="border-left-color: #d97706;">
-                <span class="exec-kpi-label" data-i18n="admin_kpi_pending_matters">Pending Applications</span>
-                <span class="exec-kpi-val" id="execKpiPending">0</span>
-                <span class="exec-kpi-sub" id="execKpiResolved">0 resolved / closed</span>
+            <!-- Chart 3: Monthly Revenue & Tax Collection Trend -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                  <span data-i18n="chart_revenue_trend_title">Monthly Revenue & Tax Collection Trend</span>
+                </div>
+                <span class="chart-card-badge" data-i18n="chart_badge_finance">Collections</span>
               </div>
-
-              <!-- KPI 4: Active RTI Matters -->
-              <div class="exec-kpi-card" style="border-left-color: #dc2626;">
-                <span class="exec-kpi-label" data-i18n="admin_kpi_pending_rti">Active RTI Matters</span>
-                <span class="exec-kpi-val" id="execKpiRti">0</span>
-                <span class="exec-kpi-sub" id="execKpiRtiOverdue">0 overdue SLA</span>
+              <div class="chart-card-body" id="chartMonthlyRevenue">
+                <!-- Dynamic SVG injected via JS -->
               </div>
+              <div class="chart-card-legend" id="legendMonthlyRevenue"></div>
+            </div>
 
-              <!-- KPI 5: Revenue & Dues -->
-              <div class="exec-kpi-card" style="border-left-color: #059669;">
-                <span class="exec-kpi-label" data-i18n="admin_kpi_revenue_total">Collections & Dues</span>
-                <span class="exec-kpi-val" id="execKpiCollected">₹0</span>
-                <span class="exec-kpi-sub" id="execKpiOutstanding">₹0 pending dues</span>
+            <!-- Chart 4: Water Bill Collection Status -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                  <span data-i18n="chart_water_bills_title">Water Bill Collection Status</span>
+                </div>
+                <span class="chart-card-badge" data-i18n="chart_badge_water_bills">Utility Bills</span>
               </div>
-
-              <!-- KPI 6: Water Storage -->
-              <div class="exec-kpi-card" style="border-left-color: #0891b2;">
-                <span class="exec-kpi-label" data-i18n="admin_kpi_village_water">Water Reserve Fill</span>
-                <span class="exec-kpi-val" id="execKpiWaterFill">0%</span>
-                <span class="exec-kpi-sub" id="execKpiWaterLiters">0 / 0 Litres</span>
+              <div class="chart-card-body" id="chartWaterBillDonut">
+                <!-- Dynamic SVG injected via JS -->
               </div>
+              <div class="chart-card-legend" id="legendWaterBillDonut"></div>
+            </div>
 
-              <!-- KPI 7: Maintenance Tasks -->
-              <div class="exec-kpi-card" style="border-left-color: #8b5cf6;">
-                <span class="exec-kpi-label" data-i18n="admin_kpi_open_tasks">Maintenance Tasks</span>
-                <span class="exec-kpi-val" id="execKpiTasks">0</span>
-                <span class="exec-kpi-sub" id="execKpiTasksOpen">Open village works</span>
+            <!-- Chart 5: Complaint Resolution Status -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  <span data-i18n="chart_complaints_title">Grievance & Complaint Redressal</span>
+                </div>
+                <span class="chart-card-badge" data-i18n="chart_badge_grievances">Grievances</span>
               </div>
+              <div class="chart-card-body" id="chartComplaintDonut">
+                <!-- Dynamic SVG injected via JS -->
+              </div>
+              <div class="chart-card-legend" id="legendComplaintDonut"></div>
+            </div>
 
-              <!-- KPI 8: Public Notices -->
-              <div class="exec-kpi-card" style="border-left-color: #475569;">
-                <span class="exec-kpi-label">Active Notices</span>
-                <span class="exec-kpi-val" id="execKpiNotices">0</span>
-                <span class="exec-kpi-sub">Public announcements</span>
+            <!-- Chart 6: Application Status Pipeline -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                  <span data-i18n="chart_applications_title">Citizen Applications Pipeline</span>
+                </div>
+                <span class="chart-card-badge" data-i18n="chart_badge_pipeline">Workflow</span>
+              </div>
+              <div class="chart-card-body" id="chartApplicationPipeline">
+                <!-- Dynamic SVG injected via JS -->
+              </div>
+              <div class="chart-card-legend" id="legendApplicationPipeline"></div>
+            </div>
+
+            <!-- Chart 7: Development Work Progress & Completion -->
+            <div class="chart-card" style="grid-column: 1 / -1;">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                  <span data-i18n="chart_work_progress_title">Development Projects Progress & Completion</span>
+                </div>
+                <span class="chart-card-badge" data-i18n="chart_badge_works">Operations</span>
+              </div>
+              <div class="chart-card-body" id="chartWorkProgress">
+                <!-- Dynamic SVG injected via JS -->
+              </div>
+              <div class="chart-card-legend" id="legendWorkProgress"></div>
+            </div>
+          </div>
+
+          <!-- Recent Activities Stream & SLA Alerts Side-by-Side -->
+          <div class="dashboard-activity-grid">
+            <!-- Live Activity Stream -->
+            <div class="activity-feed-box">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                  <span data-i18n="dash_recent_activity_title">Recent Panchayat Activities</span>
+                </div>
+                <span class="chart-card-badge" data-i18n="dash_activity_live">Live Stream</span>
+              </div>
+              <div class="activity-feed-list" id="adminRecentActivitiesStream">
+                <div style="text-align:center; padding:20px; color:#94a3b8;"><span class="spinner-inline spinner-dark"></span> Loading activities...</div>
+              </div>
+            </div>
+
+            <!-- Important Pending Tasks & SLA Alerts -->
+            <div class="sla-alerts-box">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  <span data-i18n="dash_sla_alerts_title">SLA Deadlines & Urgent Alerts</span>
+                </div>
+                <span class="sla-alert-badge" id="slaAlertsCountBadge">0 Alerts</span>
+              </div>
+              <div class="sla-alert-list" id="adminSlaAlertsList">
+                <div style="text-align:center; padding:20px; color:#94a3b8;"><span class="spinner-inline spinner-dark"></span> Loading alerts...</div>
               </div>
             </div>
           </div>
@@ -2043,6 +2336,156 @@
                 <button type="submit" class="btn btn-primary" id="btnSaveVillageInfo">Save Official Village Settings</button>
               </div>
             </form>
+          </div>
+        </div>
+
+        <!-- ================= ADMIN TAB: INTERACTIVE VILLAGE MAP & FACILITIES ================= -->
+        <div class="admin-tab-pane" id="adminPaneMap">
+          <div class="village-map-container">
+            <div class="section-header-flex" style="margin-bottom: 20px;">
+              <div>
+                <h2 class="admin-section-heading">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                  <span data-i18n="admin_tab_village_map">Village Map & Facilities</span>
+                </h2>
+                <p class="section-subtitle">Interactive geographic overview of Sundarpur's 4 civic wards, water infrastructure, community centers, and active work orders.</p>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <span class="status-tag status-active" style="display:inline-flex; align-items:center; gap:6px;">
+                  <span class="sync-dot" style="background:#0284c7;"></span> 4 Wards Telemetry Active
+                </span>
+              </div>
+            </div>
+
+            <div class="village-map-layout">
+              <!-- SVG Schematic Village Map -->
+              <div class="village-map-svg-wrap" id="villageMapSvgContainer">
+                <svg id="sundarpurVillageMapSvg" viewBox="0 0 800 500" width="100%" height="100%" style="display:block;">
+                  <defs>
+                    <linearGradient id="riverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8"/>
+                      <stop offset="100%" stop-color="#0284c7" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <filter id="pinShadow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.3"/>
+                    </filter>
+                  </defs>
+
+                  <!-- Village Land Base -->
+                  <rect x="0" y="0" width="800" height="500" fill="#f0fdf4" rx="12"/>
+
+                  <!-- Ward 1 (North-East: Gaikwad Mala) -->
+                  <path id="wardPoly1" class="map-ward-polygon" d="M 400 30 L 760 30 L 760 230 L 400 230 Z" fill="#dcfce7" stroke="#86efac" stroke-width="2"/>
+                  <text x="560" y="70" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="14" fill="#166534" text-anchor="middle">Ward 1: Gaikwad Mala</text>
+                  <text x="560" y="90" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="11" fill="#15803d" text-anchor="middle">Agricultural & Residential</text>
+
+                  <!-- Ward 2 (Central: Bazar Peth & GP Office) -->
+                  <path id="wardPoly2" class="map-ward-polygon active-ward" d="M 40 30 L 390 30 L 390 230 L 40 230 Z" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="2"/>
+                  <text x="210" y="70" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="14" fill="#0369a1" text-anchor="middle">Ward 2: Bazar Peth (Town Center)</text>
+                  <text x="210" y="90" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="11" fill="#0284c7" text-anchor="middle">Administrative & Commercial</text>
+
+                  <!-- Ward 3 (South-East: Navi Vasti) -->
+                  <path id="wardPoly3" class="map-ward-polygon" d="M 400 240 L 760 240 L 760 410 L 400 410 Z" fill="#fef3c7" stroke="#fcd34d" stroke-width="2"/>
+                  <text x="560" y="280" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="14" fill="#92400e" text-anchor="middle">Ward 3: Navi Vasti</text>
+                  <text x="560" y="300" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="11" fill="#b45309" text-anchor="middle">New Housing Sector</text>
+
+                  <!-- Ward 4 (South-West: Khadki Area) -->
+                  <path id="wardPoly4" class="map-ward-polygon" d="M 40 240 L 390 240 L 390 410 L 40 410 Z" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="2"/>
+                  <text x="210" y="280" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="14" fill="#6b21a8" text-anchor="middle">Ward 4: Khadki Area</text>
+                  <text x="210" y="300" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="11" fill="#7e22ce" text-anchor="middle">Hill Slope & Water Reservoirs</text>
+
+                  <!-- River Meander Along South -->
+                  <path d="M 0 450 Q 200 430, 400 460 T 800 440 L 800 500 L 0 500 Z" fill="url(#riverGrad)"/>
+                  <text x="400" y="480" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="12" fill="#ffffff" text-anchor="middle">Sundara River / जल जीवन मुख्य कालवा</text>
+
+                  <!-- Key Facility Pins -->
+                  <!-- Pin 1: Gram Panchayat Bhawan (Ward 2) -->
+                  <g class="map-facility-pin" data-facility="gp-office" transform="translate(200, 140)" filter="url(#pinShadow)">
+                    <circle cx="0" cy="0" r="16" fill="#0284c7" stroke="#ffffff" stroke-width="2.5"/>
+                    <text x="0" y="5" font-size="14" text-anchor="middle" fill="#ffffff">🏛️</text>
+                    <text x="0" y="26" font-family="'Plus Jakarta Sans', sans-serif" font-weight="750" font-size="10" fill="#0f172a" text-anchor="middle">GP Office</text>
+                  </g>
+
+                  <!-- Pin 2: Primary Health Sub-Center (Ward 2) -->
+                  <g class="map-facility-pin" data-facility="health" transform="translate(100, 160)" filter="url(#pinShadow)">
+                    <circle cx="0" cy="0" r="14" fill="#e11d48" stroke="#ffffff" stroke-width="2.5"/>
+                    <text x="0" y="4" font-size="12" text-anchor="middle" fill="#ffffff">🏥</text>
+                    <text x="0" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="750" font-size="9" fill="#0f172a" text-anchor="middle">PHC Sub-Center</text>
+                  </g>
+
+                  <!-- Pin 3: ZP Primary School (Ward 1) -->
+                  <g class="map-facility-pin" data-facility="school" transform="translate(640, 130)" filter="url(#pinShadow)">
+                    <circle cx="0" cy="0" r="14" fill="#d97706" stroke="#ffffff" stroke-width="2.5"/>
+                    <text x="0" y="4" font-size="12" text-anchor="middle" fill="#ffffff">🏫</text>
+                    <text x="0" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="750" font-size="9" fill="#0f172a" text-anchor="middle">ZP School</text>
+                  </g>
+
+                  <!-- Pin 4: Water Filtration Plant (Ward 4) -->
+                  <g class="map-facility-pin" data-facility="filter-plant" transform="translate(140, 330)" filter="url(#pinShadow)">
+                    <circle cx="0" cy="0" r="15" fill="#0d9488" stroke="#ffffff" stroke-width="2.5"/>
+                    <text x="0" y="4" font-size="12" text-anchor="middle" fill="#ffffff">⚙️</text>
+                    <text x="0" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="750" font-size="9" fill="#0f172a" text-anchor="middle">Water Filter Plant</text>
+                  </g>
+
+                  <!-- Pin 5: Overhead Storage Tank (Ward 4) -->
+                  <g class="map-facility-pin" data-facility="tank-main" transform="translate(280, 340)" filter="url(#pinShadow)">
+                    <circle cx="0" cy="0" r="15" fill="#2563eb" stroke="#ffffff" stroke-width="2.5"/>
+                    <text x="0" y="4" font-size="12" text-anchor="middle" fill="#ffffff">💧</text>
+                    <text x="0" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="750" font-size="9" fill="#0f172a" text-anchor="middle">Main ESR 50k L</text>
+                  </g>
+
+                  <!-- Pin 6: Community Well (Ward 3) -->
+                  <g class="map-facility-pin" data-facility="well" transform="translate(580, 340)" filter="url(#pinShadow)">
+                    <circle cx="0" cy="0" r="14" fill="#059669" stroke="#ffffff" stroke-width="2.5"/>
+                    <text x="0" y="4" font-size="12" text-anchor="middle" fill="#ffffff">🌊</text>
+                    <text x="0" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="750" font-size="9" fill="#0f172a" text-anchor="middle">Public Well</text>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- Ward & Landmark Details Sidebar -->
+              <div class="map-sidebar-panel">
+                <div class="ward-summary-card active" id="mapWardCard">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h3 style="font-size:1.1rem; font-weight:800; color:#0f172a; margin:0;" id="mapWardTitle">Ward 2: Bazar Peth</h3>
+                    <span class="status-tag status-active" id="mapWardStatus">Optimal Supply</span>
+                  </div>
+                  <p style="font-size:0.84rem; color:#64748b; margin-bottom:12px;" id="mapWardDesc">Town central administrative zone, commercial market hub, and Gram Panchayat office.</p>
+                  
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.82rem; margin-bottom:12px;">
+                    <div style="background:#fff; padding:8px; border-radius:6px; border:1px solid #e2e8f0;">
+                      <span style="color:#64748b; display:block; font-size:0.72rem;">Residents</span>
+                      <strong id="mapWardCitizens" style="font-size:1rem; color:#0284c7;">5 Citizens</strong>
+                    </div>
+                    <div style="background:#fff; padding:8px; border-radius:6px; border:1px solid #e2e8f0;">
+                      <span style="color:#64748b; display:block; font-size:0.72rem;">Properties</span>
+                      <strong id="mapWardProps" style="font-size:1rem; color:#059669;">4 Houses</strong>
+                    </div>
+                    <div style="background:#fff; padding:8px; border-radius:6px; border:1px solid #e2e8f0;">
+                      <span style="color:#64748b; display:block; font-size:0.72rem;">Supply Hours</span>
+                      <strong id="mapWardSupply" style="font-size:0.85rem; color:#334155;">06:30 - 09:00 AM</strong>
+                    </div>
+                    <div style="background:#fff; padding:8px; border-radius:6px; border:1px solid #e2e8f0;">
+                      <span style="color:#64748b; display:block; font-size:0.72rem;">Open Works</span>
+                      <strong id="mapWardTasks" style="font-size:0.85rem; color:#d97706;">2 Active Tasks</strong>
+                    </div>
+                  </div>
+
+                  <div id="mapFacilityInfo" style="background:#eff6ff; border:1px dashed #bfdbfe; border-radius:6px; padding:10px; font-size:0.8rem; color:#1e40af;">
+                    <strong>🏛️ Civic Facility Spotlight:</strong><br>
+                    <span>Gram Panchayat Bhawan: Operational 10:00 AM - 05:30 PM. Public services counter and Grievance desk open.</span>
+                  </div>
+                </div>
+
+                <!-- Quick Ward Switcher Buttons -->
+                <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="window.selectVillageWard(1)">Ward 1 (Mala)</button>
+                  <button type="button" class="btn btn-primary btn-sm" onclick="window.selectVillageWard(2)">Ward 2 (Bazar)</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="window.selectVillageWard(3)">Ward 3 (Navi Vasti)</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="window.selectVillageWard(4)">Ward 4 (Khadki)</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2549,18 +2992,87 @@
           </div>
         </div>
 
-        <!-- ================= ADMIN TAB 8: REPORTS & ANALYTICS ================= -->
+        <!-- ================= ADMIN TAB: REPORTS & DATA ANALYTICS ================= -->
         <div class="admin-tab-pane" id="adminPaneReports">
           <div class="admin-card-section">
-            <h2 class="admin-section-heading">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              <span>Gram Panchayat Water & Revenue Analytics</span>
-            </h2>
-            <p class="section-subtitle">Aggregated metrics calculated directly from live system records.</p>
-            
-            <div class="reports-summary-grid" id="adminReportsContainer">
-              <!-- Rendered via JS -->
+            <div class="section-header-flex">
+              <div>
+                <h2 class="admin-section-heading">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                  <span data-i18n="admin_tab_reports">Gram Panchayat Data Analytics & Official Reports</span>
+                </h2>
+                <p class="section-subtitle">Generate, filter, print, and export statutory Gram Panchayat registers and financial summaries directly from live system records.</p>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="btnPrintAdminReport">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  <span data-i18n="report_btn_print">Print Official Report</span>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnExportReportCsv">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span data-i18n="report_btn_export">Export to CSV</span>
+                </button>
+              </div>
             </div>
+
+            <!-- Report Type & Filter Controls -->
+            <div class="table-filter-bar" style="margin-bottom: 20px;">
+              <select id="adminReportTypeSelect" class="form-control" style="font-weight:700; color:#0f172a; min-width:260px;">
+                <option value="citizens">1. Citizens & Demographics Directory</option>
+                <option value="properties">2. Households & Property Assessment Register</option>
+                <option value="bills">3. Water Bills & Consumption Register</option>
+                <option value="payments">4. Revenue, Taxes & Payment Receipts</option>
+                <option value="applications">5. Applications & RTI Statutory Register</option>
+                <option value="complaints">6. Grievance & Redressal Register</option>
+                <option value="tasks">7. Development Projects & Expenditure Register</option>
+              </select>
+
+              <select id="adminReportWardFilter" class="form-control filter-select">
+                <option value="">All Wards (गावातील सर्व प्रभाग)</option>
+                <option value="Ward 1">Ward 1 (Gaikwad Mala)</option>
+                <option value="Ward 2">Ward 2 (Bazar Peth)</option>
+                <option value="Ward 3">Ward 3 (Navi Vasti)</option>
+                <option value="Ward 4">Ward 4 (Khadki Area)</option>
+              </select>
+
+              <select id="adminReportStatusFilter" class="form-control filter-select">
+                <option value="">All Statuses (सर्व स्थिती)</option>
+                <option value="active_or_paid">Active / Paid / Resolved Only</option>
+                <option value="pending_or_due">Pending / Unpaid / Due Only</option>
+              </select>
+
+              <button type="button" class="btn btn-secondary btn-sm" id="btnRunReportFilter">Filter</button>
+            </div>
+
+            <!-- Printable Official Report Container -->
+            <div id="printableReportArea" style="background:#ffffff; padding:16px; border-radius:8px; border:1px solid #e2e8f0;">
+              <div style="border-bottom:2px solid #0f2c59; padding-bottom:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:flex-end;">
+                <div>
+                  <div style="font-size:0.75rem; text-transform:uppercase; font-weight:800; color:#0284c7;">Government of Maharashtra &bull; Rural Development Department</div>
+                  <h3 style="font-size:1.3rem; font-weight:800; color:#0f172a; margin:4px 0 2px 0;" id="reportHeaderTitle">Gram Panchayat Sundarpur &bull; Official Register</h3>
+                  <div style="font-size:0.82rem; color:#64748b;" id="reportHeaderSubtitle">Official Administrative Audit & Governance Report</div>
+                </div>
+                <div style="text-align:right; font-size:0.8rem; color:#64748b;">
+                  <div>Generated: <strong id="reportGeneratedDate" style="color:#0f172a;">Live</strong></div>
+                  <div>Total Count: <strong id="reportTotalCount" style="color:#0284c7; font-size:0.95rem;">0 Records</strong></div>
+                </div>
+              </div>
+
+              <!-- Report Table Preview -->
+              <div class="admin-table-wrap">
+                <table class="admin-table" id="adminReportPreviewTable">
+                  <thead id="adminReportThead">
+                    <!-- Dynamic Headers based on selected report type -->
+                  </thead>
+                  <tbody id="adminReportTbody">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Legacy container hook -->
+            <div id="adminReportsContainer" style="display:none;"></div>
           </div>
         </div>
 
@@ -4329,5 +4841,278 @@
   </div>
 
   <script type="module" src="app.js"></script>
+
+  <!-- Citizen 360° Profile Modal -->
+  <div class="modal-backdrop" id="adminCitizenProfileModal" role="dialog" aria-modal="true" aria-labelledby="cit360Title" hidden>
+    <div class="modal-dialog profile-360-dialog">
+      <div class="modal-header">
+        <h3 id="cit360Title" data-i18n="admin_btn_view_profile">Citizen 360° Profile & Household Dossier</h3>
+        <button class="modal-close-btn" id="btnCloseCitizenProfileModal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div class="profile-360-hero">
+          <div>
+            <div style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em; color: #38bdf8; font-weight: 800;">Gram Panchayat Registered Resident</div>
+            <h2 class="profile-360-name" id="cit360Name">Resident Name</h2>
+            <div class="profile-360-meta">
+              <span><strong>ID:</strong> <span id="cit360Id">CIT-xxx</span></span>
+              <span>&bull;</span>
+              <span><strong>Ward:</strong> <span id="cit360Ward">Ward 1</span></span>
+              <span>&bull;</span>
+              <span><strong>Phone:</strong> <span id="cit360Phone">-</span></span>
+              <span>&bull;</span>
+              <span><strong>House:</strong> <span id="cit360PropNo">H-101</span></span>
+            </div>
+          </div>
+          <div>
+            <span class="status-tag status-active" id="cit360Status">Active</span>
+          </div>
+        </div>
+
+        <div class="profile-360-kpis">
+          <div class="profile-mini-kpi">
+            <div class="profile-mini-kpi-val" id="cit360TotalDues" style="color: #e11d48;">₹0.00</div>
+            <div class="profile-mini-kpi-lbl">Total Outstanding Dues</div>
+          </div>
+          <div class="profile-mini-kpi">
+            <div class="profile-mini-kpi-val" id="cit360FamilyCount" style="color: #0284c7;">1</div>
+            <div class="profile-mini-kpi-lbl">Family Members</div>
+          </div>
+          <div class="profile-mini-kpi">
+            <div class="profile-mini-kpi-val" id="cit360AppsCount" style="color: #059669;">0</div>
+            <div class="profile-mini-kpi-lbl">Applications & Grievances</div>
+          </div>
+        </div>
+
+        <div class="profile-360-tabs">
+          <button type="button" class="profile-tab-btn active" data-cit-tab="family">Family & Household</button>
+          <button type="button" class="profile-tab-btn" data-cit-tab="bills">Water Bills (<span id="cit360BillsBadge">0</span>)</button>
+          <button type="button" class="profile-tab-btn" data-cit-tab="taxes">Taxes & Dues (<span id="cit360TaxesBadge">0</span>)</button>
+          <button type="button" class="profile-tab-btn" data-cit-tab="applications">Applications (<span id="cit360AppsBadge">0</span>)</button>
+          <button type="button" class="profile-tab-btn" data-cit-tab="complaints">Grievances (<span id="cit360CmpBadge">0</span>)</button>
+        </div>
+
+        <div class="profile-section-pane active" id="citSecFamily">
+          <h4 style="font-size: 0.95rem; font-weight: 750; margin: 0 0 8px 0;">Household Co-Residents & Family Members</h4>
+          <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 12px;">Registered family members sharing this property and household ration unit.</p>
+          <div class="family-chips-grid" id="cit360FamilyGrid">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <div class="profile-section-pane" id="citSecBills">
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Bill ID</th><th>Period</th><th>Amount</th><th>Paid</th><th>Due Date</th><th>Status</th></tr>
+              </thead>
+              <tbody id="cit360BillsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="profile-section-pane" id="citSecTaxes">
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Charge Type</th><th>Assessment Period</th><th>Amount</th><th>Status</th></tr>
+              </thead>
+              <tbody id="cit360TaxesTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="profile-section-pane" id="citSecApps">
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Reference</th><th>Type</th><th>Subject</th><th>Status</th><th>Submitted</th></tr>
+              </thead>
+              <tbody id="cit360AppsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="profile-section-pane" id="citSecComplaints">
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Report ID</th><th>Category</th><th>Issue</th><th>Urgency</th><th>Status</th></tr>
+              </thead>
+              <tbody id="cit360CmpTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn-secondary" id="btnCancelCitizenProfileModal">Close Dossier</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Property 360° Profile Modal -->
+  <div class="modal-backdrop" id="adminPropertyProfileModal" role="dialog" aria-modal="true" aria-labelledby="prop360Title" hidden>
+    <div class="modal-dialog profile-360-dialog">
+      <div class="modal-header">
+        <h3 id="prop360Title">Property & Household Assessment Dossier</h3>
+        <button class="modal-close-btn" id="btnClosePropertyProfileModal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div class="profile-360-hero" style="background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);">
+          <div>
+            <div style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em; color: #a7f3d0; font-weight: 800;">Village Property Register</div>
+            <h2 class="profile-360-name" id="prop360Number">House Number: H-101</h2>
+            <div class="profile-360-meta">
+              <span><strong>Owner:</strong> <span id="prop360Owner">-</span></span>
+              <span>&bull;</span>
+              <span><strong>Ward:</strong> <span id="prop360Ward">Ward 1</span></span>
+              <span>&bull;</span>
+              <span><strong>Type:</strong> <span id="prop360Type">Residential</span></span>
+              <span>&bull;</span>
+              <span><strong>Meter:</strong> <span id="prop360Meter">-</span></span>
+            </div>
+          </div>
+          <div>
+            <span class="status-tag status-active" id="prop360WaterTag">Water Connected</span>
+          </div>
+        </div>
+
+        <div class="profile-360-kpis">
+          <div class="profile-mini-kpi">
+            <div class="profile-mini-kpi-val" id="prop360WaterDues" style="color: #e11d48;">₹0.00</div>
+            <div class="profile-mini-kpi-lbl">Water Tariff Dues</div>
+          </div>
+          <div class="profile-mini-kpi">
+            <div class="profile-mini-kpi-val" id="prop360TaxDues" style="color: #d97706;">₹0.00</div>
+            <div class="profile-mini-kpi-lbl">Annual Property Tax Dues</div>
+          </div>
+          <div class="profile-mini-kpi">
+            <div class="profile-mini-kpi-val" id="prop360ResidentsCount" style="color: #0284c7;">0</div>
+            <div class="profile-mini-kpi-lbl">Registered Residents</div>
+          </div>
+        </div>
+
+        <h4 style="font-size: 0.95rem; font-weight: 750; margin: 16px 0 8px 0;">Household Occupants & Residents</h4>
+        <div class="family-chips-grid" id="prop360ResidentsGrid" style="margin-bottom: 20px;">
+          <!-- Populated via JS -->
+        </div>
+
+        <h4 style="font-size: 0.95rem; font-weight: 750; margin: 16px 0 8px 0;">Property Water Utility & Tax Billing History</h4>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Reference / Bill</th><th>Description</th><th>Amount</th><th>Status</th></tr>
+            </thead>
+            <tbody id="prop360BillingTbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn-secondary" id="btnCancelPropertyProfileModal">Close Property</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Printable Official Water Bill Modal -->
+  <div class="modal-backdrop" id="adminPrintWaterBillModal" role="dialog" aria-modal="true" aria-labelledby="printBillTitle" hidden>
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 id="printBillTitle">Official Gram Panchayat Water Bill</h3>
+        <button class="modal-close-btn" id="btnClosePrintWaterBillModal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 24px; background: #fff; color: #0f172a;" id="printableWaterBillArea">
+        <div style="border: 2px solid #0284c7; border-radius: 8px; padding: 22px;">
+          <!-- Bill Header -->
+          <div style="text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 16px;">
+            <div style="font-size: 0.78rem; font-weight: 800; color: #0284c7; text-transform: uppercase;">
+              Government of Maharashtra &bull; Rural Water Supply & Sanitation Department
+            </div>
+            <h2 style="font-size: 1.4rem; font-weight: 800; margin: 4px 0; color: #0f172a;">
+              Gram Panchayat Sundarpur &bull; अधिकृत पाणीपट्टी देयक
+            </h2>
+            <div style="font-size: 0.85rem; color: #64748b;">
+              Village Water Supply & Distribution Board &bull; Assessment Notice
+            </div>
+          </div>
+
+          <!-- Bill Meta -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.88rem; background: #f8fafc; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+            <div><strong>Bill No / देयक क्र.:</strong> <span id="billPrintNo" style="font-family:monospace; font-weight:700; color:#0369a1;">-</span></div>
+            <div><strong>Billing Period / महिना:</strong> <span id="billPrintPeriod">-</span></div>
+            <div><strong>Consumer ID / ग्राहक क्र.:</strong> <span id="billPrintConsumerId" style="font-family:monospace;">-</span></div>
+            <div><strong>Due Date / अंतिम मुदत:</strong> <span id="billPrintDueDate" style="color:#e11d48; font-weight:700;">-</span></div>
+          </div>
+
+          <!-- Consumer Details -->
+          <div style="font-size: 0.88rem; margin-bottom: 16px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 12px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div><strong>Consumer Name / नाव:</strong> <span id="billPrintName">-</span></div>
+              <div><strong>Property No / घर क्र.:</strong> <span id="billPrintPropNo">-</span></div>
+              <div><strong>Ward / प्रभाग:</strong> <span id="billPrintWard">-</span></div>
+              <div><strong>Meter No / मीटर क्र.:</strong> <span id="billPrintMeter">-</span></div>
+            </div>
+          </div>
+
+          <!-- Meter Readings Table -->
+          <div style="margin-bottom: 16px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+              <thead>
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                  <th style="padding: 8px; text-align: left;">Reading Type</th>
+                  <th style="padding: 8px; text-align: right;">Units (Litres / Units)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                  <td style="padding: 8px;">Previous Reading / मागील नोंद</td>
+                  <td style="padding: 8px; text-align: right;" id="billPrintPrevReading">0 Units</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                  <td style="padding: 8px;">Current Reading / चालू नोंद</td>
+                  <td style="padding: 8px; text-align: right;" id="billPrintCurrReading">0 Units</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e2e8f0; font-weight: 700;">
+                  <td style="padding: 8px;">Net Consumption / वापरलेले युनिट्स</td>
+                  <td style="padding: 8px; text-align: right; color:#0284c7;" id="billPrintNetUnits">0 Units</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                  <td style="padding: 8px;">Current Period Water Tariff / चालू पाणीपट्टी दर</td>
+                  <td style="padding: 8px; text-align: right;" id="billPrintCurrentTariff">₹0.00</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                  <td style="padding: 8px;">Previous Arrears / मागील थकबाकी</td>
+                  <td style="padding: 8px; text-align: right; color:#e11d48;" id="billPrintArrears">₹0.00</td>
+                </tr>
+                <tr style="background: #f8fafc; font-size: 1.1rem; font-weight: 800;">
+                  <td style="padding: 10px 8px;">Total Payable / एकूण देय रक्कम</td>
+                  <td style="padding: 10px 8px; text-align: right; color:#16a34a;" id="billPrintTotalDue">₹0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Bill Footer -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 0.8rem; color: #64748b;">
+            <div>
+              <p style="margin: 0;">Please pay before due date at Gram Panchayat counter or online via JalMitra portal.</p>
+              <p style="margin: 4px 0 0 0; color: #e11d48;">Late fee penalty of 2% applicable after due date.</p>
+            </div>
+            <div style="text-align: center;">
+              <div style="border-top: 1px solid #94a3b8; width: 140px; margin-top: 36px; padding-top: 4px; font-weight: 600; color: #334155;">
+                Water Supply Officer<br>Gram Panchayat
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex; justify-content:space-between;">
+        <button type="button" class="btn btn-secondary" id="btnCancelPrintWaterBillModal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="window.print()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          Print Water Bill
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

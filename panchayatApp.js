@@ -119,6 +119,82 @@ export function renderPanchayatWelcomeHero(villageInfo = {}) {
     }
   }
 
+  // --- Header Officials Strip Synchronization (Maharashtra Government Portal Style) ---
+  // 1. Sarpanch
+  const stripSarpanchName = document.getElementById("stripSarpanchName");
+  const stripSarpanchPhoto = document.getElementById("stripSarpanchPhoto");
+  const stripSarpanchFallback = document.getElementById("stripSarpanchFallback");
+  const stripSarpanchSub = document.getElementById("stripSarpanchSub");
+  const stripSarpanchTitle = document.getElementById("stripSarpanchTitle");
+
+  if (stripSarpanchName) stripSarpanchName.textContent = sName;
+  if (stripSarpanchSub) stripSarpanchSub.textContent = vName;
+  if (stripSarpanchTitle) stripSarpanchTitle.textContent = isMr ? "सरपंच (Sarpanch)" : "Sarpanch";
+  if (stripSarpanchPhoto) {
+    if (villageInfo.sarpanch_photo) {
+      stripSarpanchPhoto.src = villageInfo.sarpanch_photo;
+      stripSarpanchPhoto.style.display = "block";
+      if (stripSarpanchFallback) stripSarpanchFallback.style.display = "none";
+    } else {
+      stripSarpanchPhoto.style.display = "none";
+      if (stripSarpanchFallback) {
+        stripSarpanchFallback.style.display = "flex";
+        const initialEl = stripSarpanchFallback.querySelector(".official-badge-initial");
+        if (initialEl) initialEl.textContent = isMr ? "स" : (sName.charAt(0) || "S");
+      }
+    }
+  }
+
+  // 2. Gram Sevak / Village Development Officer
+  const stripGramSevakName = document.getElementById("stripGramSevakName");
+  const stripGramSevakPhoto = document.getElementById("stripGramSevakPhoto");
+  const stripGramSevakFallback = document.getElementById("stripGramSevakFallback");
+  const stripGramSevakSub = document.getElementById("stripGramSevakSub");
+  const stripGramSevakTitle = document.getElementById("stripGramSevakTitle");
+
+  if (stripGramSevakName) stripGramSevakName.textContent = gsName;
+  if (stripGramSevakSub) stripGramSevakSub.textContent = isMr ? "ग्राम विकास अधिकारी" : "Village Development Officer";
+  if (stripGramSevakTitle) stripGramSevakTitle.textContent = isMr ? "ग्रामसेवक तथा ग्रा.वि.अ." : "Gram Sevak / VDO";
+  if (stripGramSevakPhoto) {
+    if (villageInfo.gram_sevak_photo) {
+      stripGramSevakPhoto.src = villageInfo.gram_sevak_photo;
+      stripGramSevakPhoto.style.display = "block";
+      if (stripGramSevakFallback) stripGramSevakFallback.style.display = "none";
+    } else {
+      stripGramSevakPhoto.style.display = "none";
+      if (stripGramSevakFallback) {
+        stripGramSevakFallback.style.display = "flex";
+        const initialEl = stripGramSevakFallback.querySelector(".official-badge-initial");
+        if (initialEl) initialEl.textContent = isMr ? "ग" : (gsName.charAt(0) || "G");
+      }
+    }
+  }
+
+  // 3. Panchayat Secretary
+  const stripSecretaryName = document.getElementById("stripSecretaryName");
+  const stripSecretaryPhoto = document.getElementById("stripSecretaryPhoto");
+  const stripSecretaryFallback = document.getElementById("stripSecretaryFallback");
+  const stripSecretarySub = document.getElementById("stripSecretarySub");
+  const stripSecretaryTitle = document.getElementById("stripSecretaryTitle");
+
+  if (stripSecretaryName) stripSecretaryName.textContent = secName;
+  if (stripSecretarySub) stripSecretarySub.textContent = isMr ? "प्रशासकीय सचिव" : "Administrative Secretary";
+  if (stripSecretaryTitle) stripSecretaryTitle.textContent = isMr ? "पंचायत सचिव (Panchayat Secretary)" : "Panchayat Secretary";
+  if (stripSecretaryPhoto) {
+    if (villageInfo.secretary_photo) {
+      stripSecretaryPhoto.src = villageInfo.secretary_photo;
+      stripSecretaryPhoto.style.display = "block";
+      if (stripSecretaryFallback) stripSecretaryFallback.style.display = "none";
+    } else {
+      stripSecretaryPhoto.style.display = "none";
+      if (stripSecretaryFallback) {
+        stripSecretaryFallback.style.display = "flex";
+        const initialEl = stripSecretaryFallback.querySelector(".official-badge-initial");
+        if (initialEl) initialEl.textContent = isMr ? "प" : (secName.charAt(0) || "P");
+      }
+    }
+  }
+
   // Contact Info Strip
   const phoneDisplay = document.getElementById("gpOfficePhoneDisplay");
   const emailDisplay = document.getElementById("gpOfficeEmailDisplay");

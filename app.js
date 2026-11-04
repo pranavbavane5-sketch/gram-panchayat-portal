@@ -460,6 +460,12 @@ export function applyDynamicGramPanchayatBranding() {
   if (headerVillageName) {
     headerVillageName.textContent = fullSubtitle;
   }
+  const headerGovDeptTag = document.getElementById("headerGovDeptTag");
+  if (headerGovDeptTag) {
+    headerGovDeptTag.textContent = isMr
+      ? "महाराष्ट्र शासन • ग्राम विकास व पंचायत राज विभाग"
+      : "Government of Maharashtra • Rural Development & Panchayat Raj Department";
+  }
 
   // 3. Home Page Hero Label
   const heroVillageLabel = document.getElementById("heroVillageLabel");

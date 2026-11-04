@@ -575,6 +575,11 @@ export const translations = {
     admin_kpi_open_tasks: "Maintenance Tasks",
 
     // --- Official Gram Panchayat & 14 Services ---
+    gov_dept_tag: "Government of Maharashtra • Rural Development & Panchayat Raj Department",
+    gov_header_helpline_label: "Helpline:",
+    gp_officials_heading: "Office Bearers & Key Officials",
+    gp_vdo_sub: "Village Development Officer",
+    gp_sec_sub: "Administrative Secretary",
     gp_state_tag: "Government of Maharashtra • Rural Development & Water Conservation",
     gp_name_default: "Gram Panchayat",
     gp_jurisdiction_default: "Official Gram Panchayat Citizen Services Portal",
@@ -1301,6 +1306,11 @@ export const translations = {
     admin_kpi_open_tasks: "दैनिक दुरुस्ती कामे",
 
     // --- Official Gram Panchayat & 14 Services ---
+    gov_dept_tag: "महाराष्ट्र शासन • ग्राम विकास व पंचायत राज विभाग",
+    gov_header_helpline_label: "हेल्पलाईन:",
+    gp_officials_heading: "ग्रामपंचायत पदाधिकारी व मुख्य अधिकारी",
+    gp_vdo_sub: "ग्राम विकास अधिकारी",
+    gp_sec_sub: "प्रशासकीय सचिव",
     gp_state_tag: "महाराष्ट्र शासन • ग्रामविकास व जलसंधारण विभाग",
     gp_name_default: "ग्रामपंचायत",
     gp_jurisdiction_default: "अधिकृत ग्रामपंचायत नागरिक सेवा पोर्टल",

@@ -87,6 +87,8 @@ async function request(endpoint, options = {}) {
       const err = new Error(errorMsg);
       err.status = res.status;
       err.data = data;
+      const retryHeader = res.headers && typeof res.headers.get === "function" ? res.headers.get("retry-after") : null;
+      err.retryAfter = retryHeader ? parseInt(retryHeader, 10) : (data?.retryAfter || null);
       throw err;
     }
 

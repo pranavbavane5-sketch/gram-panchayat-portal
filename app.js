@@ -1350,6 +1350,100 @@ function initAuth() {
     });
   }
 
+  // Lockout & Rate-Limiting Timer State
+  let lockoutTimerInterval = null;
+  let isLoginPending = false;
+
+  function isLockoutActive() {
+    if (typeof sessionStorage === "undefined") return false;
+    const lockedUntil = parseInt(sessionStorage.getItem("gp_login_lockout_until"), 10);
+    return !isNaN(lockedUntil) && lockedUntil > Date.now();
+  }
+
+  function formatCountdown(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
+
+  function startLockoutTimer(durationSeconds) {
+    if (lockoutTimerInterval) {
+      clearInterval(lockoutTimerInterval);
+      lockoutTimerInterval = null;
+    }
+
+    const expiryTime = Date.now() + Math.max(0, durationSeconds) * 1000;
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.setItem("gp_login_lockout_until", String(expiryTime));
+    }
+
+    const pwdInput = document.getElementById("loginPassword");
+    const btnSubmit = document.getElementById("btnLoginSubmit");
+    const banner = document.getElementById("loginLockoutBanner");
+    const timerEl = document.getElementById("lockoutCountdown");
+
+    if (pwdInput) {
+      pwdInput.value = "";
+      pwdInput.disabled = true;
+    }
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+    }
+    if (banner) {
+      banner.style.display = "flex";
+    }
+
+    const updateTick = () => {
+      const now = Date.now();
+      const remainingSecs = Math.max(0, Math.ceil((expiryTime - now) / 1000));
+      const formatted = formatCountdown(remainingSecs);
+
+      if (timerEl) {
+        timerEl.textContent = formatted;
+      }
+
+      const isMr = typeof getLanguage === "function" && getLanguage() === "mr";
+      if (btnSubmit) {
+        btnSubmit.innerHTML = `<span class="lock-icon">🔒</span> ${isMr ? "लॉगिन तात्पुरते बंद" : "Login Locked"} (${formatted})`;
+      }
+
+      if (remainingSecs <= 0) {
+        clearInterval(lockoutTimerInterval);
+        lockoutTimerInterval = null;
+        if (typeof sessionStorage !== "undefined") {
+          sessionStorage.removeItem("gp_login_lockout_until");
+        }
+
+        if (banner) {
+          banner.style.display = "none";
+        }
+        if (pwdInput) {
+          pwdInput.disabled = false;
+          pwdInput.value = "";
+          pwdInput.focus();
+        }
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = `<span data-i18n="login_btn_submit">${isMr ? "सुरक्षित लॉगिन करा" : "Sign In Securely"}</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        }
+        showToast(isMr ? "प्रतीक्षा कालावधी संपला आहे. आपण आता पुन्हा लॉगिन करू शकता." : "Lockout expired. You may now attempt to sign in.", "info");
+      }
+    };
+
+    updateTick();
+    lockoutTimerInterval = setInterval(updateTick, 1000);
+  }
+
+  // Restore active lockout on page load if session was previously rate-limited
+  if (isLockoutActive()) {
+    const lockedUntil = parseInt(sessionStorage.getItem("gp_login_lockout_until"), 10);
+    const remaining = Math.ceil((lockedUntil - Date.now()) / 1000);
+    if (remaining > 0) {
+      startLockoutTimer(remaining);
+    }
+  }
+
   // Quick Demo Logins
   const chipAdmin = document.getElementById("chipAdminLogin");
   const chipCit1 = document.getElementById("chipCitizen1Login");
@@ -1357,6 +1451,11 @@ function initAuth() {
 
   if (chipAdmin) {
     chipAdmin.addEventListener("click", () => {
+      if (isLockoutActive()) {
+        const isMr = typeof getLanguage === "function" && getLanguage() === "mr";
+        showToast(isMr ? "लॉगिन तात्पुरते बंद आहे. कृपया काउंटडाउन पूर्ण होईपर्यंत थांबा." : "Login is currently locked. Please wait for the countdown to complete.", "warning");
+        return;
+      }
       selectLoginRole("admin");
       const idInput = document.getElementById("loginIdentifier");
       const pwInput = document.getElementById("loginPassword");
@@ -1368,6 +1467,11 @@ function initAuth() {
 
   if (chipCit1) {
     chipCit1.addEventListener("click", () => {
+      if (isLockoutActive()) {
+        const isMr = typeof getLanguage === "function" && getLanguage() === "mr";
+        showToast(isMr ? "लॉगिन तात्पुरते बंद आहे. कृपया काउंटडाउन पूर्ण होईपर्यंत थांबा." : "Login is currently locked. Please wait for the countdown to complete.", "warning");
+        return;
+      }
       selectLoginRole("citizen");
       const idInput = document.getElementById("loginIdentifier");
       const pwInput = document.getElementById("loginPassword");
@@ -1379,6 +1483,11 @@ function initAuth() {
 
   if (chipCit2) {
     chipCit2.addEventListener("click", () => {
+      if (isLockoutActive()) {
+        const isMr = typeof getLanguage === "function" && getLanguage() === "mr";
+        showToast(isMr ? "लॉगिन तात्पुरते बंद आहे. कृपया काउंटडाउन पूर्ण होईपर्यंत थांबा." : "Login is currently locked. Please wait for the countdown to complete.", "warning");
+        return;
+      }
       selectLoginRole("citizen");
       const idInput = document.getElementById("loginIdentifier");
       const pwInput = document.getElementById("loginPassword");
@@ -1395,15 +1504,30 @@ function initAuth() {
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const identifier = document.getElementById("loginIdentifier").value.trim();
-      const password = document.getElementById("loginPassword").value;
+
+      if (isLockoutActive()) {
+        const isMr = typeof getLanguage === "function" && getLanguage() === "mr";
+        showToast(isMr ? "लॉगिन तात्पुरते बंद आहे. कृपया काउंटडाउन पूर्ण होईपर्यंत थांबा." : "Login is temporarily locked. Please wait for the countdown to complete.", "error");
+        return;
+      }
+
+      if (isLoginPending) {
+        return;
+      }
+
+      const identInput = document.getElementById("loginIdentifier");
+      const pwdInput = document.getElementById("loginPassword");
+      const identifier = identInput ? identInput.value.trim() : "";
+      const password = pwdInput ? pwdInput.value : "";
       const role = document.getElementById("loginSelectedRole").value;
 
       if (!identifier || !password) {
         showToast("Please enter both ID/Username and password.", "error");
+        if (!password && pwdInput) pwdInput.focus();
         return;
       }
 
+      isLoginPending = true;
       if (btnSubmit) {
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = `<span class="spinner-inline"></span> Verifying credentials...`;
@@ -1413,6 +1537,9 @@ function initAuth() {
         const response = await api.login(identifier, password, role);
         api.setAuthSession(response.token, response.user);
         updateAuthUI();
+        if (typeof sessionStorage !== "undefined") {
+          sessionStorage.removeItem("gp_login_lockout_until");
+        }
         showToast(`Welcome back, ${response.user.fullName || response.user.username}!`, "success");
 
         if (response.user.role === "admin") {
@@ -1422,17 +1549,35 @@ function initAuth() {
         }
       } catch (err) {
         console.error("Login failure:", err);
+
+        // 1. Immediately clear password field after every failed login (preserving Login ID)
+        if (pwdInput) {
+          pwdInput.value = "";
+        }
+
+        const isMarathi = (typeof currentLang !== "undefined" && currentLang === "mr") || (document.documentElement.lang === "mr");
+
+        // 2. Lockout activated when server confirms HTTP 429 Too Many Requests
         if (err.status === 429) {
-          const isMarathi = (typeof currentLang !== "undefined" && currentLang === "mr") || (document.documentElement.lang === "mr");
+          const retrySeconds = err.retryAfter || (err.data && err.data.retryAfter) || 900;
+          startLockoutTimer(retrySeconds);
           const msg = (isMarathi && err.data?.message_mr) ? err.data.message_mr : (err.data?.message || err.message);
           showToast(msg, "error");
         } else {
-          showToast("Login failed: " + err.message, "error");
+          // Standard invalid credentials (HTTP 401) or other errors: refocus password field
+          const msg = (isMarathi && err.data?.message_mr) ? err.data.message_mr : (err.data?.message || err.message);
+          showToast(msg ? ("Login failed: " + msg) : "Login failed: Invalid login credentials.", "error");
+          if (pwdInput) {
+            pwdInput.focus();
+          }
         }
       } finally {
-        if (btnSubmit) {
+        isLoginPending = false;
+        // Re-enable button only if form is not under an active rate-limiting lockout
+        if (btnSubmit && !isLockoutActive()) {
+          const isMr = typeof getLanguage === "function" && getLanguage() === "mr";
           btnSubmit.disabled = false;
-          btnSubmit.innerHTML = `<span>Sign In Securely</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+          btnSubmit.innerHTML = `<span data-i18n="login_btn_submit">${isMr ? "सुरक्षित लॉगिन करा" : "Sign In Securely"}</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
         }
       }
     });

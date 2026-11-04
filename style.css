@@ -2606,6 +2606,57 @@ body {
   opacity: 1;
 }
 
+/* Login Lockout Banner & Countdown */
+.login-lockout-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #991b1b;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.login-lockout-banner .lockout-icon {
+  color: #dc2626;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.login-lockout-banner .lockout-text {
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.login-lockout-banner .lockout-title {
+  font-weight: 700;
+  color: #7f1d1d;
+  font-size: 0.94rem;
+  margin-bottom: 3px;
+}
+
+.login-lockout-banner .lockout-desc {
+  color: #991b1b;
+}
+
+.login-lockout-banner .timer-badge {
+  display: inline-block;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.96rem;
+  border: 1px solid #fca5a5;
+  margin-left: 4px;
+}
+
 .login-extra-row {
   display: flex;
   align-items: center;

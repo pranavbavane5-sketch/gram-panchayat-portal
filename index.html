@@ -1129,6 +1129,20 @@
           <form id="authLoginForm" class="login-form">
             <input type="hidden" id="loginSelectedRole" value="citizen">
 
+            <!-- Rate-Limiting & Lockout Notice Banner -->
+            <div id="loginLockoutBanner" class="login-lockout-banner" style="display: none;" role="alert" aria-live="assertive">
+              <div class="lockout-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+              <div class="lockout-text">
+                <div class="lockout-title" id="lockoutTitle" data-i18n="login_locked_title">Too Many Failed Attempts</div>
+                <div class="lockout-desc">
+                  <span id="lockoutDescText" data-i18n="login_locked_banner">Login is temporarily locked for 15 minutes to protect your account. Please wait:</span>
+                  <strong id="lockoutCountdown" class="timer-badge">15:00</strong>
+                </div>
+              </div>
+            </div>
+
             <div class="form-group">
               <label for="loginIdentifier" class="form-label" id="loginIdentifierLabel">Citizen Unique ID / Phone</label>
               <div class="input-icon-wrap">

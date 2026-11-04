@@ -353,11 +353,9 @@ async function initDatabaseAndLoadData() {
         status: "CONNECTED",
         databaseName: health.database.database
       });
-      showToast("Connected to Express & MySQL database.", "success");
     } else {
       appState.isDatabaseConnected = false;
       updateDatabaseUIState({ status: "DB_DISCONNECTED" });
-      showToast("Express running, but MySQL connection is pending. Check backend/.env", "info");
     }
   } catch (err) {
     console.warn("Backend not running or unreachable:", err.message);

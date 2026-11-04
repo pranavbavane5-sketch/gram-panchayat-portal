@@ -135,10 +135,22 @@ export function renderPanchayatWelcomeHero(villageInfo = {}) {
   const hoursDisplay = document.getElementById("gpOfficeHoursDisplay");
   const addressDisplay = document.getElementById("gpOfficeAddressDisplay");
 
-  if (phoneDisplay) phoneDisplay.textContent = villageInfo.office_phone || villageInfo.helpline || "02489-234567 / 1800-120-JAL";
-  if (emailDisplay) emailDisplay.textContent = villageInfo.office_email || "grampanchayat.sundarpur@gov.in";
-  if (hoursDisplay) hoursDisplay.textContent = villageInfo.office_hours || "Mon – Sat: 10:00 AM – 05:30 PM";
-  if (addressDisplay) addressDisplay.textContent = villageInfo.office_address || "Gram Panchayat Karyalaya, Main Chowk, Sundarpur";
+  if (phoneDisplay) {
+    phoneDisplay.textContent = villageInfo.office_phone || villageInfo.helpline || "02489-234567 / 1800-120-JAL";
+    phoneDisplay.title = phoneDisplay.textContent;
+  }
+  if (emailDisplay) {
+    emailDisplay.textContent = villageInfo.office_email || "grampanchayat.sundarpur@gov.in";
+    emailDisplay.title = emailDisplay.textContent;
+  }
+  if (hoursDisplay) {
+    hoursDisplay.textContent = villageInfo.office_hours || "Mon – Sat: 10:00 AM – 05:30 PM";
+    hoursDisplay.title = hoursDisplay.textContent;
+  }
+  if (addressDisplay) {
+    addressDisplay.textContent = villageInfo.office_address || "Gram Panchayat Karyalaya, Main Chowk, Sundarpur";
+    addressDisplay.title = addressDisplay.textContent;
+  }
 }
 
 export function initServiceCardsNavigation(switchPage, switchCitizenTab) {

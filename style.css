@@ -304,8 +304,9 @@ body {
 .gp-header-officials-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  flex-shrink: 0;
+  flex: 1;
 }
 
 .gp-official-card {

@@ -56,11 +56,11 @@ assert(html.includes('class="official-separator-line"'), "Subtle vertical separa
 // Dark Navy Navigation Bar
 assert(html.includes('id="gpNavBar"') && html.includes('gp-nav-bar'), "Dark navy navigation bar (#gpNavBar) exists");
 assert(html.includes('id="navHome"') && html.includes('data-i18n="nav_home"'), "Home nav item exists");
-assert(html.includes('id="navGpInfo"') && html.includes('data-i18n="nav_gp_info"'), "GP Info nav item exists");
-assert(html.includes('id="navCitizen"') && html.includes('data-i18n="nav_citizen_services"'), "Citizen services nav item exists");
-assert(html.includes('id="navStorage"') && html.includes('data-i18n="nav_schemes"'), "Schemes nav item exists");
-assert(html.includes('id="navReport"') && html.includes('data-i18n="nav_reports"'), "Reports nav item exists");
-assert(html.includes('id="navContact"') && html.includes('data-i18n="nav_contact"'), "Contact nav item exists");
+assert(html.includes('id="navStorage"') && html.includes('data-i18n="nav_storage"'), "Water Storage nav item exists");
+assert(html.includes('id="navSchedule"') && html.includes('data-i18n="nav_schedule"'), "Schedule nav item exists");
+assert(html.includes('id="navReport"') && html.includes('data-i18n="nav_report"'), "Report Problem nav item exists");
+assert(html.includes('id="navCitizen"') && html.includes('data-i18n="nav_citizen"'), "Citizen Portal nav item exists");
+assert(html.includes('id="navAdmin"') && html.includes('data-i18n="nav_admin"'), "Admin Portal nav item exists");
 assert(html.includes('id="langSwitcherWrap"'), "Language switcher wrap exists in nav bar");
 assert(html.includes('id="navLoginBtn"'), "Login button exists in nav bar");
 

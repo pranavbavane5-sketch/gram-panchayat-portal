@@ -146,7 +146,7 @@ export function openNoticeDetail(noticeId) {
   const title = isMr && notice.title_mr ? notice.title_mr : (notice.title || notice.title_en || "Public Notice");
   const content = isMr && notice.content_mr ? notice.content_mr : (notice.content || notice.content_en || "Notice details not available.");
   const dateStr = formatDate(notice.publish_date || notice.created_at, isMr);
-  const issuedBy = notice.issued_by || "Gram Panchayat Sundarpur";
+  const issuedBy = notice.issued_by || "Gram Panchayat Ugwa";
   const category = notice.category || notice.notice_type || "Public Notice";
   const isPinned = Boolean(notice.is_pinned);
 

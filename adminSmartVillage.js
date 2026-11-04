@@ -1001,7 +1001,7 @@ export function initVillageMap() {
       if (!fEl) return;
 
       if (fType === "gp-office") {
-        fEl.innerHTML = `<strong>🏛️ Gram Panchayat Bhawan:</strong><br>Administrative HQ of Sundarpur. Sarpanch, Gram Sevak & Secretary desks open 10:00 AM – 05:30 PM.`;
+        fEl.innerHTML = `<strong>🏛️ Gram Panchayat Bhawan:</strong><br>Administrative HQ of Ugwa. Sarpanch, Gram Sevak & Secretary desks open 10:00 AM – 05:30 PM.`;
       } else if (fType === "health") {
         fEl.innerHTML = `<strong>🏥 Primary Health Sub-Center:</strong><br>Daily OPD, maternal care, primary first aid, and weekly village vaccination drives.`;
       } else if (fType === "school") {
@@ -1086,7 +1086,7 @@ async function generateSelectedReport() {
 
   try {
     if (currentReportType === "citizens") {
-      if (titleEl) titleEl.textContent = "Gram Panchayat Sundarpur • Village Resident & Citizen Directory";
+      if (titleEl) titleEl.textContent = "Gram Panchayat Ugwa • Village Resident & Citizen Directory";
       if (subtitleEl) subtitleEl.textContent = "Statutory Register of Electors & Residents under Section 8 of Bombay Village Panchayats Act";
 
       const citizens = await api.getAdminCitizens();
@@ -1119,7 +1119,7 @@ async function generateSelectedReport() {
       }
 
     } else if (currentReportType === "properties") {
-      if (titleEl) titleEl.textContent = "Gram Panchayat Sundarpur • Property & Household Assessment Register";
+      if (titleEl) titleEl.textContent = "Gram Panchayat Ugwa • Property & Household Assessment Register";
       if (subtitleEl) subtitleEl.textContent = "Village Form No. 8 (नमुना ८) • Property Tax & Water Infrastructure Ledger";
 
       const props = await api.getAdminProperties();
@@ -1155,7 +1155,7 @@ async function generateSelectedReport() {
       }
 
     } else if (currentReportType === "bills") {
-      if (titleEl) titleEl.textContent = "Gram Panchayat Sundarpur • Water Tariff Demand & Collection Register";
+      if (titleEl) titleEl.textContent = "Gram Panchayat Ugwa • Water Tariff Demand & Collection Register";
       if (subtitleEl) subtitleEl.textContent = "Monthly Water Utility Metered Assessment Ledger";
 
       const bills = await api.getAdminBills();
@@ -1188,7 +1188,7 @@ async function generateSelectedReport() {
       }
 
     } else if (currentReportType === "payments") {
-      if (titleEl) titleEl.textContent = "Gram Panchayat Sundarpur • Official Revenue & Tax Receipts Journal";
+      if (titleEl) titleEl.textContent = "Gram Panchayat Ugwa • Official Revenue & Tax Receipts Journal";
       if (subtitleEl) subtitleEl.textContent = "Treasury Credit Register (नमुना ९) • Cash, UPI & Counter Collections";
 
       const payments = await api.getAdminPayments();
@@ -1217,7 +1217,7 @@ async function generateSelectedReport() {
       }
 
     } else if (currentReportType === "applications") {
-      if (titleEl) titleEl.textContent = "Gram Panchayat Sundarpur • Statutory Citizen Applications & RTI Register";
+      if (titleEl) titleEl.textContent = "Gram Panchayat Ugwa • Statutory Citizen Applications & RTI Register";
       if (subtitleEl) subtitleEl.textContent = "Right to Information Act & Maharashtra Right to Public Services Act (RTS) Register";
 
       const apps = await api.getAdminApplications();
@@ -1250,7 +1250,7 @@ async function generateSelectedReport() {
       }
 
     } else if (currentReportType === "complaints") {
-      if (titleEl) titleEl.textContent = "Gram Panchayat Sundarpur • Grievance Redressal & Civic Issues Register";
+      if (titleEl) titleEl.textContent = "Gram Panchayat Ugwa • Grievance Redressal & Civic Issues Register";
       if (subtitleEl) subtitleEl.textContent = "Community Feedback & Rapid Infrastructure Resolution Ledger";
 
       const complaints = await api.getCommunityReports();
@@ -1283,7 +1283,7 @@ async function generateSelectedReport() {
       }
 
     } else if (currentReportType === "tasks") {
-      if (titleEl) titleEl.textContent = "Gram Panchayat Sundarpur • Works Register & Village Development Projects";
+      if (titleEl) titleEl.textContent = "Gram Panchayat Ugwa • Works Register & Village Development Projects";
       if (subtitleEl) subtitleEl.textContent = "Capital Expenditure & Infrastructure Maintenance Ledger (15th Finance Commission)";
 
       const tasks = await api.getPanchayatTasks();

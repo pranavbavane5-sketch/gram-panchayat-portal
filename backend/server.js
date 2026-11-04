@@ -294,6 +294,10 @@ app.get("/api/village-settings", async (req, res) => {
       sarpanch_name: sarpanchName,
       sarpanchName: sarpanchName,
       sarpanch_photo: row.sarpanch_photo || null,
+      deputy_sarpanch_name: row.deputy_sarpanch_name || "Shri. Ramesh Patil",
+      deputySarpanchName: row.deputy_sarpanch_name || "Shri. Ramesh Patil",
+      deputy_sarpanch_photo: row.deputy_sarpanch_photo || null,
+      deputySarpanchPhoto: row.deputy_sarpanch_photo || null,
       sarpanchPhoto: row.sarpanch_photo || null,
       gram_sevak_name: gramSevakName,
       gramSevakName: gramSevakName,
@@ -344,6 +348,8 @@ app.put("/api/village-settings", authenticateToken, requireRole(["admin"]), asyn
     const taluka = req.body.taluka !== undefined ? req.body.taluka : (existing ? existing.taluka : "");
     const state = req.body.state !== undefined ? req.body.state : (existing ? existing.state : "Maharashtra");
     const sarpanchName = req.body.sarpanch_name || req.body.sarpanchName || (existing ? existing.sarpanch_name : "Shri. Vitthalrao Deshmukh");
+    const deputySarpanchName = req.body.deputy_sarpanch_name || req.body.deputySarpanchName || (existing ? existing.deputy_sarpanch_name : "Shri. Ramesh Patil");
+    const deputySarpanchPhoto = req.body.deputy_sarpanch_photo !== undefined ? req.body.deputy_sarpanch_photo : (req.body.deputySarpanchPhoto !== undefined ? req.body.deputySarpanchPhoto : (existing ? existing.deputy_sarpanch_photo : null));
     const sarpanchPhoto = req.body.sarpanch_photo !== undefined ? req.body.sarpanch_photo : (req.body.sarpanchPhoto !== undefined ? req.body.sarpanchPhoto : (existing ? existing.sarpanch_photo : null));
     const gramSevakName = req.body.gram_sevak_name || req.body.gramSevakName || (existing ? existing.gram_sevak_name : "Shri. Ramesh Patil");
     const gramSevakPhoto = req.body.gram_sevak_photo !== undefined ? req.body.gram_sevak_photo : (req.body.gramSevakPhoto !== undefined ? req.body.gramSevakPhoto : (existing ? existing.gram_sevak_photo : null));

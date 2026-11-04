@@ -667,7 +667,7 @@ export const translations = {
     admin_services_heading: "Gram Panchayat Citizen Services Management",
 
     // --- Smart Village Admin Portal Keys ---
-    admin_gp_title: "Sundarpur GP",
+    admin_gp_title: "Ugwa Gram Panchayat",
     admin_gp_badge: "Smart Panchayat",
     admin_nav_overview: "Overview",
     admin_nav_civic: "Civic Administration",
@@ -1334,7 +1334,7 @@ export const translations = {
     gp_state_tag: "महाराष्ट्र शासन • ग्रामविकास व जलसंधारण विभाग",
     gp_name_default: "ग्रामपंचायत",
     gp_jurisdiction_default: "अधिकृत ग्रामपंचायत नागरिक सेवा पोर्टल",
-    gp_intro_default: "ग्रामपंचायत सुंदरपूरच्या अधिकृत ई-प्रशासन पोर्टलवर आपले सहर्ष स्वागत आहे. ग्रामस्थांना पारदर्शक प्रशासन, सर्व नागरी सेवा, वेळेवर तक्रार निवारण आणि वर्षभर सुरळीत पाणीपुरवठा उपलब्ध करून देण्यासाठी हे पोर्टल कटिबद्ध आहे.",
+    gp_intro_default: "उगवा ग्रामपंचायतीच्या अधिकृत ई-प्रशासन पोर्टलवर आपले सहर्ष स्वागत आहे. ग्रामस्थांना पारदर्शक प्रशासन, सर्व नागरी सेवा, वेळेवर तक्रार निवारण आणि वर्षभर सुरळीत पाणीपुरवठा उपलब्ध करून देण्यासाठी हे पोर्टल कटिबद्ध आहे.",
     gp_sarpanch: "सरपंच (Sarpanch)",
     gp_gram_sevak: "ग्रामसेवक / ग्रामविकास अधिकारी",
     gp_secretary: "पंचायत सचिव (Panchayat Secretary)",
@@ -1408,7 +1408,7 @@ export const translations = {
     admin_services_heading: "ग्रामपंचायत नागरिक सेवा व्यवस्थापन",
 
     // --- Smart Village Admin Portal Keys ---
-    admin_gp_title: "सुंदरपूर ग्रा.पं.",
+    admin_gp_title: "उगवा ग्रामपंचायत",
     admin_gp_badge: "स्मार्ट पंचायत",
     admin_nav_overview: "विहंगावलोकन",
     admin_nav_civic: "नागरी प्रशासन",

@@ -311,7 +311,7 @@
               </div>
               <div class="contact-details-v2">
                 <span class="contact-label-v2" data-i18n="gp_office_email">अधिकृत ईमेल</span>
-                <span class="contact-value-v2" id="gpOfficeEmailDisplay">grampanchayat.sundarpur@gov.in</span>
+                <span class="contact-value-v2" id="gpOfficeEmailDisplay">grampanchayat.ugwa@gov.in</span>
               </div>
             </div>
 
@@ -333,7 +333,7 @@
               </div>
               <div class="contact-details-v2">
                 <span class="contact-label-v2" data-i18n="gp_office_address">कार्यालयाचा पत्ता</span>
-                <span class="contact-value-v2" id="gpOfficeAddressDisplay">Gram Panchayat Karyalaya, Main Chowk, Sundarpur</span>
+                <span class="contact-value-v2" id="gpOfficeAddressDisplay">Gram Panchayat Karyalaya, Main Chowk, Ugwa</span>
               </div>
             </div>
           </div>
@@ -1095,8 +1095,8 @@
                 <!-- Official Header -->
                 <div class="letter-official-header">
                   <div class="letter-gov-crest">महाराष्ट्र शासन • ग्रामविकास विभाग</div>
-                  <div class="letter-gp-name" id="letterGpHdrName">ग्रामपंचायत कार्यालय सुंदरपूर</div>
-                  <div class="letter-gp-sub">ता. करवीर, जि. कोल्हापूर, महाराष्ट्र - ४१६००१ • ई-मेल: gp.sundarpur@gov.in</div>
+                  <div class="letter-gp-name" id="letterGpHdrName">ग्रामपंचायत कार्यालय उगवा</div>
+                  <div class="letter-gp-sub">ता. करवीर, जि. कोल्हापूर, महाराष्ट्र - ४१६००१ • ई-मेल: gp.ugwa@gov.in</div>
                 </div>
 
                 <!-- Meta Row -->
@@ -1109,7 +1109,7 @@
                 <div class="letter-recipient-block">
                   <div><strong>प्रति,</strong></div>
                   <div>मा. सरपंच / ग्रामसेवक महोदय,</div>
-                  <div>ग्रामपंचायत कार्यालय सुंदरपूर,</div>
+                  <div>ग्रामपंचायत कार्यालय उगवा,</div>
                   <div>ता. करवीर, जि. कोल्हापूर.</div>
                 </div>
 
@@ -1398,7 +1398,7 @@
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                   <span>My Monthly Water Bills</span>
                 </h2>
-                <p class="section-subtitle">Official water consumption charges issued by Gram Panchayat Sundarpur.</p>
+                <p class="section-subtitle">Official water consumption charges issued by Gram Panchayat Ugwa.</p>
               </div>
             </div>
 
@@ -1737,7 +1737,7 @@
             <div class="admin-sidebar-brand">
               <div class="gp-seal-icon">🏛️</div>
               <div class="gp-brand-text">
-                <span class="gp-title" data-i18n="admin_gp_title">Sundarpur GP</span>
+                <span class="gp-title" data-i18n="admin_gp_title">उगवा ग्रामपंचायत</span>
                 <span class="gp-subtitle" data-i18n="admin_gp_badge">Smart Panchayat</span>
               </div>
             </div>
@@ -2345,7 +2345,7 @@
             <form id="adminVillageSettingsForm" class="admin-settings-grid">
               <div class="form-group">
                 <label for="adminVillageName" class="form-label">Gram Panchayat Name (English)</label>
-                <input type="text" id="adminVillageName" class="form-control" placeholder="e.g. Sundarpur Gram Panchayat" required>
+                <input type="text" id="adminVillageName" class="form-control" placeholder="e.g. Ugwa Gram Panchayat" required>
               </div>
 
               <div class="form-group">
@@ -2370,35 +2370,106 @@
 
               <!-- Office Bearer: Sarpanch -->
               <div class="form-group">
-                <label for="adminSarpanchName" class="form-label">Sarpanch Full Name</label>
+                <label for="adminSarpanchName" class="form-label">सरपंच पूर्ण नाव (Sarpanch Full Name)</label>
                 <input type="text" id="adminSarpanchName" class="form-control" value="Shri. Vitthalrao Deshmukh">
               </div>
 
               <div class="form-group">
-                <label for="adminSarpanchPhoto" class="form-label">Sarpanch Official Photo URL / Path</label>
-                <input type="text" id="adminSarpanchPhoto" class="form-control" placeholder="https://... or /uploads/...">
+                <label class="form-label">सरपंच अधिकृत फोटो (Sarpanch Official Photo)</label>
+                <div class="official-photo-card">
+                  <div class="official-photo-thumb-wrap">
+                    <img id="sarpanchPhotoPreview" src="/sarpanch.jpg" alt="Sarpanch Preview" class="official-thumb-img" onerror="this.src='/sarpanch.jpg'">
+                  </div>
+                  <div class="official-photo-controls">
+                    <div class="photo-controls-row">
+                      <label class="btn-photo-upload" for="fileUploadSarpanch">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>फोटो अपलोड करा (Upload Photo)</span>
+                        <input type="file" id="fileUploadSarpanch" accept="image/*" class="sr-only official-file-input" data-target="adminSarpanchPhoto" data-preview="sarpanchPhotoPreview">
+                      </label>
+                      <button type="button" class="btn-photo-reset" data-target="adminSarpanchPhoto" data-preview="sarpanchPhotoPreview" data-default="/sarpanch.jpg">डिफॉल्ट फोटो</button>
+                    </div>
+                    <input type="text" id="adminSarpanchPhoto" class="form-control form-control-sm official-photo-url-field" placeholder="फोटो लिंक किंवा पाथ (/uploads/... किंवा https://...)">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Office Bearer: Deputy Sarpanch -->
+              <div class="form-group">
+                <label for="adminDeputyName" class="form-label">उपसरपंच पूर्ण नाव (Deputy Sarpanch Full Name)</label>
+                <input type="text" id="adminDeputyName" class="form-control" value="Shri. Ramesh Patil">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">उपसरपंच अधिकृत फोटो (Deputy Sarpanch Photo)</label>
+                <div class="official-photo-card">
+                  <div class="official-photo-thumb-wrap">
+                    <img id="deputyPhotoPreview" src="/deputy_sarpanch.jpg" alt="Deputy Sarpanch Preview" class="official-thumb-img" onerror="this.src='/deputy_sarpanch.jpg'">
+                  </div>
+                  <div class="official-photo-controls">
+                    <div class="photo-controls-row">
+                      <label class="btn-photo-upload" for="fileUploadDeputy">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>फोटो अपलोड करा (Upload Photo)</span>
+                        <input type="file" id="fileUploadDeputy" accept="image/*" class="sr-only official-file-input" data-target="adminDeputyPhoto" data-preview="deputyPhotoPreview">
+                      </label>
+                      <button type="button" class="btn-photo-reset" data-target="adminDeputyPhoto" data-preview="deputyPhotoPreview" data-default="/deputy_sarpanch.jpg">डिफॉल्ट फोटो</button>
+                    </div>
+                    <input type="text" id="adminDeputyPhoto" class="form-control form-control-sm official-photo-url-field" placeholder="फोटो लिंक किंवा पाथ (/uploads/... किंवा https://...)">
+                  </div>
+                </div>
               </div>
 
               <!-- Office Bearer: Gram Sevak -->
               <div class="form-group">
-                <label for="adminGramSevakName" class="form-label">Gram Sevak / VDO Full Name</label>
-                <input type="text" id="adminGramSevakName" class="form-control" value="Shri. Ramesh Patil">
+                <label for="adminGramSevakName" class="form-label">ग्रामसेवक पूर्ण नाव (Gram Sevak / VDO Full Name)</label>
+                <input type="text" id="adminGramSevakName" class="form-control" value="Smt. Sunita Pawar">
               </div>
 
               <div class="form-group">
-                <label for="adminGramSevakPhoto" class="form-label">Gram Sevak Official Photo URL / Path</label>
-                <input type="text" id="adminGramSevakPhoto" class="form-control" placeholder="https://... or /uploads/...">
+                <label class="form-label">ग्रामसेवक अधिकृत फोटो (Gram Sevak Photo)</label>
+                <div class="official-photo-card">
+                  <div class="official-photo-thumb-wrap">
+                    <img id="gramSevakPhotoPreview" src="/gram_sevak.jpg" alt="Gram Sevak Preview" class="official-thumb-img" onerror="this.src='/gram_sevak.jpg'">
+                  </div>
+                  <div class="official-photo-controls">
+                    <div class="photo-controls-row">
+                      <label class="btn-photo-upload" for="fileUploadGramSevak">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>फोटो अपलोड करा (Upload Photo)</span>
+                        <input type="file" id="fileUploadGramSevak" accept="image/*" class="sr-only official-file-input" data-target="adminGramSevakPhoto" data-preview="gramSevakPhotoPreview">
+                      </label>
+                      <button type="button" class="btn-photo-reset" data-target="adminGramSevakPhoto" data-preview="gramSevakPhotoPreview" data-default="/gram_sevak.jpg">डिफॉल्ट फोटो</button>
+                    </div>
+                    <input type="text" id="adminGramSevakPhoto" class="form-control form-control-sm official-photo-url-field" placeholder="फोटो लिंक किंवा पाथ (/uploads/... किंवा https://...)">
+                  </div>
+                </div>
               </div>
 
               <!-- Office Bearer: Secretary -->
               <div class="form-group">
-                <label for="adminSecretaryName" class="form-label">Panchayat Secretary Full Name</label>
+                <label for="adminSecretaryName" class="form-label">पंचायत सचिव पूर्ण नाव (Secretary Full Name)</label>
                 <input type="text" id="adminSecretaryName" class="form-control" value="Smt. Sunita Kulkarni">
               </div>
 
               <div class="form-group">
-                <label for="adminSecretaryPhoto" class="form-label">Secretary Photo URL / Path</label>
-                <input type="text" id="adminSecretaryPhoto" class="form-control" placeholder="https://... or /uploads/...">
+                <label class="form-label">पंचायत सचिव फोटो (Secretary Photo)</label>
+                <div class="official-photo-card">
+                  <div class="official-photo-thumb-wrap">
+                    <img id="secretaryPhotoPreview" src="/secretary.jpg" alt="Secretary Preview" class="official-thumb-img" onerror="this.src='/secretary.jpg'">
+                  </div>
+                  <div class="official-photo-controls">
+                    <div class="photo-controls-row">
+                      <label class="btn-photo-upload" for="fileUploadSecretary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>फोटो अपलोड करा (Upload Photo)</span>
+                        <input type="file" id="fileUploadSecretary" accept="image/*" class="sr-only official-file-input" data-target="adminSecretaryPhoto" data-preview="secretaryPhotoPreview">
+                      </label>
+                      <button type="button" class="btn-photo-reset" data-target="adminSecretaryPhoto" data-preview="secretaryPhotoPreview" data-default="/secretary.jpg">डिफॉल्ट फोटो</button>
+                    </div>
+                    <input type="text" id="adminSecretaryPhoto" class="form-control form-control-sm official-photo-url-field" placeholder="फोटो लिंक किंवा पाथ (/uploads/... किंवा https://...)">
+                  </div>
+                </div>
               </div>
 
               <!-- Contacts -->
@@ -2409,7 +2480,7 @@
 
               <div class="form-group">
                 <label for="adminOfficeEmail" class="form-label">Official Email Address</label>
-                <input type="email" id="adminOfficeEmail" class="form-control" value="grampanchayat.sundarpur@gov.in">
+                <input type="email" id="adminOfficeEmail" class="form-control" value="grampanchayat.ugwa@gov.in">
               </div>
 
               <div class="form-group">
@@ -2428,7 +2499,7 @@
 
               <div class="form-group col-full">
                 <label for="adminOfficeAddress" class="form-label">Panchayat Office Physical Address</label>
-                <input type="text" id="adminOfficeAddress" class="form-control" value="Gram Panchayat Karyalaya, Main Chowk, Sundarpur">
+                <input type="text" id="adminOfficeAddress" class="form-control" value="Gram Panchayat Karyalaya, Main Chowk, Ugwa">
               </div>
 
               <div class="form-group col-full">
@@ -2462,7 +2533,7 @@
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
                   <span data-i18n="admin_tab_village_map">Village Map & Facilities</span>
                 </h2>
-                <p class="section-subtitle">Interactive geographic overview of Sundarpur's 4 civic wards, water infrastructure, community centers, and active work orders.</p>
+                <p class="section-subtitle">Interactive geographic overview of Ugwa's 4 civic wards, water infrastructure, community centers, and active work orders.</p>
               </div>
               <div style="display:flex; gap:10px; align-items:center;">
                 <span class="status-tag status-active" style="display:inline-flex; align-items:center; gap:6px;">
@@ -3163,7 +3234,7 @@
               <div style="border-bottom:2px solid #0f2c59; padding-bottom:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:flex-end;">
                 <div>
                   <div style="font-size:0.75rem; text-transform:uppercase; font-weight:800; color:#0284c7;">Government of Maharashtra &bull; Rural Development Department</div>
-                  <h3 style="font-size:1.3rem; font-weight:800; color:#0f172a; margin:4px 0 2px 0;" id="reportHeaderTitle">Gram Panchayat Sundarpur &bull; Official Register</h3>
+                  <h3 style="font-size:1.3rem; font-weight:800; color:#0f172a; margin:4px 0 2px 0;" id="reportHeaderTitle">Gram Panchayat Ugwa &bull; Official Register</h3>
                   <div style="font-size:0.82rem; color:#64748b;" id="reportHeaderSubtitle">Official Administrative Audit & Governance Report</div>
                 </div>
                 <div style="text-align:right; font-size:0.8rem; color:#64748b;">
@@ -3991,7 +4062,7 @@
           <div class="payment-summary-box">
             <div style="font-size:0.85rem; color:#64748b;" id="citPayBillMonth">Billing Period</div>
             <div style="font-size:1.6rem; font-weight:800; color:#0f766e; margin:6px 0;" id="citPayBillAmount">₹0.00</div>
-            <small style="color:#64748b;">Payee: Gram Panchayat Sundarpur Water Supply Fund</small>
+            <small style="color:#64748b;">Payee: Gram Panchayat Ugwa Water Supply Fund</small>
           </div>
 
           <div class="form-group">
@@ -4033,7 +4104,7 @@
           <div class="payment-summary-box">
             <div style="font-size:0.85rem; color:#64748b;" id="citPayTaxTitle">Panchayat Charge</div>
             <div style="font-size:1.6rem; font-weight:800; color:#0f766e; margin:6px 0;" id="citPayTaxAmount">₹0.00</div>
-            <small style="color:#64748b;">Payee: Gram Panchayat Sundarpur Revenue Account</small>
+            <small style="color:#64748b;">Payee: Gram Panchayat Ugwa Revenue Account</small>
           </div>
 
           <div class="form-group">
@@ -4978,7 +5049,7 @@
               Government of Maharashtra &bull; Rural Development Department
             </div>
             <h2 style="font-size: 1.35rem; font-weight: 800; margin: 4px 0; color: #0f172a;" id="rcptGpName">
-              Gram Panchayat Sundarpur
+              Gram Panchayat Ugwa
             </h2>
             <div style="font-size: 0.85rem; color: #64748b;">
               Water Supply & Village Tax Collection Department &bull; Digital Receipt
@@ -5313,7 +5384,7 @@
               Government of Maharashtra &bull; Rural Water Supply & Sanitation Department
             </div>
             <h2 style="font-size: 1.4rem; font-weight: 800; margin: 4px 0; color: #0f172a;">
-              Gram Panchayat Sundarpur &bull; अधिकृत पाणीपट्टी देयक
+              Gram Panchayat Ugwa &bull; अधिकृत पाणीपट्टी देयक
             </h2>
             <div style="font-size: 0.85rem; color: #64748b;">
               Village Water Supply & Distribution Board &bull; Assessment Notice

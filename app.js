@@ -2545,6 +2545,80 @@ function initAdminView() {
   }
 
   // Save Village Overall Settings
+  
+  // --- Direct Official Photo Uploader Controller ---
+  const initOfficialPhotoUploaders = () => {
+    const fileInputs = document.querySelectorAll(".official-file-input");
+    fileInputs.forEach(input => {
+      input.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const targetId = input.getAttribute("data-target");
+        const previewId = input.getAttribute("data-preview");
+        const targetInput = document.getElementById(targetId);
+        const previewImg = document.getElementById(previewId);
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          const img = new Image();
+          img.onload = () => {
+            const maxDim = 400;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressed = canvas.toDataURL("image/jpeg", 0.85);
+
+            if (targetInput) targetInput.value = compressed;
+            if (previewImg) previewImg.src = compressed;
+            showToast("फोटो निवडला गेला आहे. बदल लागू करण्यासाठी 'माहिती जतन करा' बटण दाबा.", "info");
+          };
+          img.src = dataUrl;
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const resetBtns = document.querySelectorAll(".btn-photo-reset");
+    resetBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.getAttribute("data-target");
+        const previewId = btn.getAttribute("data-preview");
+        const defaultSrc = btn.getAttribute("data-default") || "";
+        const targetInput = document.getElementById(targetId);
+        const previewImg = document.getElementById(previewId);
+
+        if (targetInput) targetInput.value = defaultSrc;
+        if (previewImg) previewImg.src = defaultSrc;
+        showToast("डिफॉल्ट फोटो रिस्टोअर केला.", "info");
+      });
+    });
+
+    const urlFields = document.querySelectorAll(".official-photo-url-field");
+    urlFields.forEach(field => {
+      field.addEventListener("input", () => {
+        const card = field.closest(".official-photo-card");
+        const preview = card ? card.querySelector(".official-thumb-img") : null;
+        if (preview) preview.src = field.value.trim() || preview.getAttribute("data-default") || "";
+      });
+    });
+  };
+  initOfficialPhotoUploaders();
+
   const villageForm = document.getElementById("adminVillageSettingsForm");
   const btnSaveVillage = document.getElementById("btnSaveVillageInfo");
 
@@ -2558,6 +2632,8 @@ function initAdminView() {
       const state = document.getElementById("adminState")?.value.trim();
       const sarpanchName = document.getElementById("adminSarpanchName")?.value.trim();
       const sarpanchPhoto = document.getElementById("adminSarpanchPhoto")?.value.trim();
+      const deputySarpanchName = document.getElementById("adminDeputyName")?.value.trim();
+      const deputySarpanchPhoto = document.getElementById("adminDeputyPhoto")?.value.trim();
       const gramSevakName = document.getElementById("adminGramSevakName")?.value.trim();
       const gramSevakPhoto = document.getElementById("adminGramSevakPhoto")?.value.trim();
       const secretaryName = document.getElementById("adminSecretaryName")?.value.trim();
@@ -2579,6 +2655,10 @@ function initAdminView() {
         taluka, district, state,
         sarpanch_name: sarpanchName,
         sarpanch_photo: sarpanchPhoto,
+        deputy_sarpanch_name: deputySarpanchName,
+        deputySarpanchName: deputySarpanchName,
+        deputy_sarpanch_photo: deputySarpanchPhoto,
+        deputySarpanchPhoto: deputySarpanchPhoto,
         gram_sevak_name: gramSevakName,
         gram_sevak_photo: gramSevakPhoto,
         secretary_name: secretaryName,
@@ -4079,9 +4159,21 @@ async function renderAdminView() {
   setVal("adminSecretaryName", vi.secretary_name || "Smt. Sunita Kulkarni");
   setVal("adminSecretaryPhoto", vi.secretary_photo || "");
   setVal("adminOfficePhone", vi.office_phone || vi.helpline || "02489-234567 / 1800-120-JAL");
-  setVal("adminOfficeEmail", vi.office_email || "grampanchayat.sundarpur@gov.in");
+  setVal("adminDeputyName", vi.deputy_sarpanch_name || vi.deputySarpanchName || "Shri. Ramesh Patil");
+  setVal("adminDeputyPhoto", vi.deputy_sarpanch_photo || vi.deputySarpanchPhoto || "");
+  setVal("adminOfficeEmail", vi.office_email || "grampanchayat.ugwa@gov.in");
   setVal("adminOfficeHours", vi.office_hours || "Mon – Sat: 10:00 AM – 05:30 PM");
-  setVal("adminOfficeAddress", vi.office_address || "Gram Panchayat Karyalaya, Main Chowk, Sundarpur");
+  setVal("adminOfficeAddress", vi.office_address || "Gram Panchayat Karyalaya, Main Chowk, Ugwa");
+
+  // Synchronize photo preview thumbnails
+  const setPreview = (id, val, def) => {
+    const el = document.getElementById(id);
+    if (el) el.src = val || def;
+  };
+  setPreview("sarpanchPhotoPreview", vi.sarpanch_photo || vi.sarpanchPhoto, "/sarpanch.jpg");
+  setPreview("deputyPhotoPreview", vi.deputy_sarpanch_photo || vi.deputySarpanchPhoto, "/deputy_sarpanch.jpg");
+  setPreview("gramSevakPhotoPreview", vi.gram_sevak_photo || vi.gramSevakPhoto, "/gram_sevak.jpg");
+  setPreview("secretaryPhotoPreview", vi.secretary_photo || vi.secretaryPhoto, "/secretary.jpg");
   setVal("adminIntroText", vi.intro_text || t("gp_intro_default"));
   setVal("adminIntroTextMr", vi.intro_text_mr || t("gp_intro_default"));
   setVal("adminDroughtStatus", vi.drought_status || vi.overallStatus || "Low");

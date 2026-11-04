@@ -140,7 +140,7 @@ export function renderPanchayatWelcomeHero(villageInfo = {}) {
     phoneDisplay.title = phoneDisplay.textContent;
   }
   if (emailDisplay) {
-    emailDisplay.textContent = villageInfo.office_email || "grampanchayat.sundarpur@gov.in";
+    emailDisplay.textContent = villageInfo.office_email || "grampanchayat.ugwa@gov.in";
     emailDisplay.title = emailDisplay.textContent;
   }
   if (hoursDisplay) {
@@ -148,8 +148,14 @@ export function renderPanchayatWelcomeHero(villageInfo = {}) {
     hoursDisplay.title = hoursDisplay.textContent;
   }
   if (addressDisplay) {
-    addressDisplay.textContent = villageInfo.office_address || "Gram Panchayat Karyalaya, Main Chowk, Sundarpur";
+    addressDisplay.textContent = villageInfo.office_address || "Gram Panchayat Karyalaya, Main Chowk, Ugwa";
     addressDisplay.title = addressDisplay.textContent;
+  }
+
+  // Synchronize admin sidebar brand text
+  const adminGpTitleEl = document.querySelector("#adminSidebar .gp-title");
+  if (adminGpTitleEl) {
+    adminGpTitleEl.textContent = isMr ? (villageInfo.village_name_mr || "उगवा ग्रामपंचायत") : (villageInfo.village_name || "Ugwa Gram Panchayat");
   }
 }
 
@@ -458,7 +464,7 @@ const LETTER_TEMPLATES = {
     titleMr: "ग्रामपंचायतीकडे सर्वसाधारण अर्ज",
     subjectEn: "Subject: Application regarding civic service and general grievance redressal",
     subjectMr: "विषय: ग्रामपंचायत नागरी सुविधा व तक्रार निवारण बाबत अर्ज",
-    bodyEn: `Respected Sarpanch / Gram Sevak,\n\nI, the undersigned resident of Sundarpur, respectfully submit this application to draw your kind attention towards the matter stated above.\n\n[Please describe the background facts, locality landmark, and issue details here]\n\nI kindly request the Gram Panchayat to inspect the location and initiate necessary official resolution at the earliest.\n\nThanking you,`,
+    bodyEn: `Respected Sarpanch / Gram Sevak,\n\nI, the undersigned resident of Ugwa, respectfully submit this application to draw your kind attention towards the matter stated above.\n\n[Please describe the background facts, locality landmark, and issue details here]\n\nI kindly request the Gram Panchayat to inspect the location and initiate necessary official resolution at the earliest.\n\nThanking you,`,
     bodyMr: `प्रति,\nमा. सरपंच / ग्रामसेवक महोदय,\nग्रामपंचायत सुंदरपूर, ता. कर्जत, जि. अहिल्यानगर.\n\nविषय: नागरी सुविधा व समस्या निवारण बाबत अर्ज.\n\nमहोदय,\n\nमी सुंदरपूर गावचा रहिवासी असून, या अर्जाद्वारे खालील विषयाकडे आपले लक्ष वेधत आहे.\n\n[येथे आपली समस्या, ठिकाण, तारीख व आवश्यक कार्यवाहीचा तपशील लिहावा]\n\nतरी ग्रामपंचायतीने त्वरित पाहणी करून योग्य ती कार्यवाही करावी ही नम्र विनंती.\n\nआपला नम्र,`
   },
   water_conn: {
@@ -466,7 +472,7 @@ const LETTER_TEMPLATES = {
     titleMr: "नवीन घरगुती नळ जोडणी मिळणेबाबत अर्ज",
     subjectEn: "Subject: Application for sanctioning new domestic tap water connection under Jal Jeevan Mission",
     subjectMr: "विषय: जल जीवन मिशन अंतर्गत नवीन घरगुती नळ कनेक्शन मिळणेबाबत अर्ज",
-    bodyEn: `Respected Gram Sevak / VWSC Committee,\n\nI am residing at Property / House No. [House Number] in Ward [Ward Name], Sundarpur. Currently, our household does not have an active tap connection.\n\nI request the Gram Panchayat to sanction a domestic piped connection. I agree to pay the prescribed road-cutting / connection deposit fees and follow all water conservation guidelines.\n\nNecessary property ownership and tax receipt documents are enclosed.`,
+    bodyEn: `Respected Gram Sevak / VWSC Committee,\n\nI am residing at Property / House No. [House Number] in Ward [Ward Name], Ugwa. Currently, our household does not have an active tap connection.\n\nI request the Gram Panchayat to sanction a domestic piped connection. I agree to pay the prescribed road-cutting / connection deposit fees and follow all water conservation guidelines.\n\nNecessary property ownership and tax receipt documents are enclosed.`,
     bodyMr: `प्रति,\nमा. सरपंच / ग्रामसेवक तथा पाणी पुरवठा समिती,\nग्रामपंचायत सुंदरपूर.\n\nविषय: नवीन घरगुती नळ जोडणी मिळणेबाबत.\n\nमहोदय,\n\nमी सुंदरपूर येथील वॉर्ड क्रमांक [वॉर्ड नाव] मधील घर नं. [घर क्रमांक] येथे वास्तव्यास आहे. माझ्या घरात अधिकृत नळ कनेक्शन उपलब्ध नाही.\n\nतरी मला नियमानुसार नवीन नळ जोडणी मंजूर करावी. याकरिता लागणारे शासकीय शुल्क व अनामत रक्कम भरण्यास मी तयार आहे.\n\nसोबत घरपट्टी पावती व मालकी पुरावा जोडला आहे.`
   },
   water_complaint: {
@@ -490,7 +496,7 @@ const LETTER_TEMPLATES = {
     titleMr: "ग्रामपंचायत रहिवासी दाखला मिळणेबाबत अर्ज",
     subjectEn: "Subject: Application for issuance of Gram Panchayat Village Residence Certificate",
     subjectMr: "विषय: ग्रामपंचायत रहिवासी दाखला मिळणेबाबत विनंती अर्ज",
-    bodyEn: `Respected Sarpanch / Gram Sevak,\n\nI am a permanent resident of Sundarpur residing at the above address for the past [years] years. My family's name is registered in the Village Family Register (कुटुंब नोंदवही).\n\nI require an official Gram Panchayat Residence Certificate for [Educational / Bank / Government Job] purposes.\n\nKindly verify the records and issue the certificate upon offline counter verification.`,
+    bodyEn: `Respected Sarpanch / Gram Sevak,\n\nI am a permanent resident of Ugwa residing at the above address for the past [years] years. My family's name is registered in the Village Family Register (कुटुंब नोंदवही).\n\nI require an official Gram Panchayat Residence Certificate for [Educational / Bank / Government Job] purposes.\n\nKindly verify the records and issue the certificate upon offline counter verification.`,
     bodyMr: `प्रति,\nमा. सरपंच / ग्रामसेवक महोदय,\nग्रामपंचायत सुंदरपूर, ता. कर्जत, जि. अहिल्यानगर.\n\nविषय: रहिवासी दाखला मिळणेबाबत.\n\nमहोदय,\n\nमी सुंदरपूर गावचा कायमचा रहिवासी असून गेल्या [काही] वर्षांपासून येथे वास्तव्यास आहे. माझे नाव ग्रामपंचायतीच्या कुटुंब नोंदवहीत नोंदवलेले आहे.\n\nमला [शासकीय कामासाठी / शैक्षणिक कामासाठी] रहिवासी दाखल्याची आवश्यकता आहे. तरी मला दाखला मिळवून द्यावा ही नम्र विनंती.`
   },
   streetlight: {
@@ -543,7 +549,7 @@ export function initLetterGenerator(showToast) {
           ${isMr ? "महाराष्ट्र शासन • ग्रामविकास विभाग" : "Government of Maharashtra • Rural Development Department"}
         </div>
         <div style="font-size:1.6rem; font-weight:900; color:#0f172a; margin:4px 0;">
-          ${isMr ? "ग्रामपंचायत सुंदरपूर" : "SUNDARPUR GRAM PANCHAYAT"}
+          ${isMr ? "ग्रामपंचायत सुंदरपूर" : "UGWA GRAM PANCHAYAT"}
         </div>
         <div style="font-size:0.88rem; color:#475569;">
           ${isMr ? "तालुका: कर्जत, जिल्हा: अहिल्यानगर, महाराष्ट्र" : "Taluka: Karjat, District: Ahmednagar, Maharashtra"}
@@ -559,7 +565,7 @@ export function initLetterGenerator(showToast) {
         </div>
         <div style="text-align:right;">
           <strong>${isMr ? "दिनांक:" : "Date:"}</strong> <span contenteditable="true" id="letterDate">${todayStr}</span><br>
-          <strong>${isMr ? "स्थान:" : "Place:"}</strong> <span contenteditable="true" id="letterPlace">Sundarpur</span>
+          <strong>${isMr ? "स्थान:" : "Place:"}</strong> <span contenteditable="true" id="letterPlace">Ugwa</span>
         </div>
       </div>
 

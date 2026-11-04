@@ -49,6 +49,11 @@ import {
   renderAdminReportsView
 } from "./adminSmartVillage.js";
 
+import {
+  initNoticeTicker,
+  renderNoticeTicker
+} from "./publicNoticeTicker.js";
+
 // ==========================================================
 // 1. DEFAULT VILLAGE SAMPLE DATA
 // (Used as seed data for empty database or local fallback)
@@ -559,6 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initAdminPanchayatModule(showToast);
   loadPublicNoticesView();
   renderHomeNotices();
+  initNoticeTicker();
   initAuth();
   initCitizenView();
   initAdminView();
@@ -567,6 +573,7 @@ document.addEventListener("DOMContentLoaded", () => {
   onLanguageChange(() => {
     renderAllViews();
     renderHomeNotices();
+    renderNoticeTicker();
   });
 
   // Load database
@@ -645,6 +652,7 @@ export function switchPage(pageId) {
   if (pageId === "home") {
     renderHomeView();
     renderHomeNotices();
+    renderNoticeTicker();
   }
   if (pageId === "storage") renderStorageView();
   if (pageId === "schedule") renderScheduleView();

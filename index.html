@@ -136,6 +136,41 @@
 
     <!-- ================= PAGE 1: HOME DASHBOARD ================= -->
     <section class="page-view active" id="page-home" aria-labelledby="homeHeading">
+      <!-- Full-Width Government Public Notice Ticker Bar -->
+      <div class="gov-notice-ticker" id="govNoticeTicker" role="region" aria-label="Public Notices Ticker">
+        <div class="ticker-inner">
+          <!-- Fixed Badge on Left -->
+          <div class="ticker-badge" id="tickerBadge">
+            <span class="ticker-badge-pulse" aria-hidden="true"></span>
+            <span class="ticker-icon" aria-hidden="true">📢</span>
+            <span class="ticker-badge-text" id="tickerBadgeText" data-i18n="ticker_public_notices">PUBLIC NOTICES</span>
+          </div>
+
+          <!-- Scrolling Track Container -->
+          <div class="ticker-viewport" id="tickerViewport" role="marquee" aria-live="polite">
+            <div class="ticker-track" id="tickerTrack">
+              <!-- Dynamically populated from /api/notices -->
+            </div>
+          </div>
+
+          <!-- Controls: Prev, Pause/Play, Next, View All -->
+          <div class="ticker-controls" id="tickerControls" aria-label="Notice Ticker Controls">
+            <button type="button" class="ticker-ctrl-btn" id="btnTickerPrev" title="Previous Notice" aria-label="Previous Notice">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button type="button" class="ticker-ctrl-btn" id="btnTickerToggle" title="Pause / Resume Ticker" aria-label="Pause Ticker">
+              <span id="tickerToggleIcon">⏸️</span>
+            </button>
+            <button type="button" class="ticker-ctrl-btn" id="btnTickerNext" title="Next Notice" aria-label="Next Notice">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+            <button type="button" class="ticker-all-btn" id="btnTickerViewAll" data-nav="report" data-app-tab="notices" title="View All Public Notices">
+              <span data-i18n="ticker_view_all">View All</span> &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="container">
         <!-- Official Gram Panchayat Welcome Hero -->
         <div class="gp-welcome-hero" id="gpWelcomeHero">
@@ -4986,6 +5021,41 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="btnCancelTaskViewModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Public Notice Full Detail View -->
+  <div class="modal-backdrop" id="publicNoticeDetailModal" role="dialog" aria-modal="true" aria-labelledby="modalNoticeTitle" hidden>
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.25rem;">📢</span>
+          <div>
+            <span class="status-tag" id="modalNoticeCategory" style="background: rgba(255, 255, 255, 0.2); color: #ffffff; font-size: 0.72rem; text-transform: uppercase;">Public Notice</span>
+            <span class="status-tag" id="modalNoticePinned" style="background: #eab308; color: #78350f; font-size: 0.72rem; display:none;">📌 Pinned</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseNoticeDetailModal" style="color: #ffffff;" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <h2 id="modalNoticeTitle" style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); line-height: 1.4; margin: 0 0 14px 0;">Notice Title</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; padding: 12px 14px; background: #f8fafc; border: 1px solid var(--border-light); border-radius: var(--radius-sm); font-size: 0.85rem;">
+          <div><strong>📅 Publish Date:</strong> <span id="modalNoticeDate">-</span></div>
+          <div><strong>🏛️ Issued By:</strong> <span id="modalNoticeIssuedBy">Gram Panchayat</span></div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-weight: 700; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 6px;">Official Notice Content / सूचना मजकूर</label>
+          <div id="modalNoticeContent" style="padding: 16px; background: #fdfdfd; border: 1px solid var(--border-light); border-left: 4px solid var(--primary); border-radius: 6px; line-height: 1.6; font-size: 0.95rem; white-space: pre-wrap; color: var(--text-main);"></div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn btn-outline-primary btn-sm" id="btnNoticeModalViewAll" data-nav="report" data-app-tab="notices">
+          <span data-i18n="ticker_view_all">View All Notices on Board</span> &rarr;
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnCancelNoticeDetailModal">Close</button>
       </div>
     </div>
   </div>

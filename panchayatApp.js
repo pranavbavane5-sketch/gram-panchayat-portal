@@ -1028,6 +1028,9 @@ export async function initAdminPanchayatModule(showToast) {
         formNotice.reset();
         closeNoticeModal();
         loadAdminNotices();
+        if (typeof window !== "undefined" && typeof window.renderNoticeTicker === "function") {
+          window.renderNoticeTicker();
+        }
       } catch (err) {
         showToast("Failed to publish notice: " + err.message, "error");
       }
@@ -1542,6 +1545,9 @@ window.deleteAdminNotice = async function(id) {
     await api.deleteAdminNotice(id);
     loadAdminNotices();
     loadAdminExecutiveKPIs();
+    if (typeof window !== "undefined" && typeof window.renderNoticeTicker === "function") {
+      window.renderNoticeTicker();
+    }
   } catch (err) {
     alert("Failed to delete notice: " + err.message);
   }

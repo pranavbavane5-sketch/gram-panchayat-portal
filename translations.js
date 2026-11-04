@@ -256,6 +256,14 @@ export const translations = {
     login_locked_btn: "Login Locked",
     login_lock_expired: "Lockout expired. You may now attempt to sign in.",
 
+    // Government Public Notice Ticker
+    ticker_public_notices: "PUBLIC NOTICES",
+    ticker_view_all: "View All",
+    ticker_no_notices: "No active public notices at this time.",
+    ticker_pinned: "Pinned",
+    ticker_pause: "Pause Ticker",
+    ticker_resume: "Resume Ticker",
+
     // Resident Self-Registration Modal
     reg_modal_title: "Resident Self-Registration",
     reg_full_name_label: "Full Name",
@@ -973,6 +981,14 @@ export const translations = {
     login_locked_banner: "खात्याच्या सुरक्षेसाठी लॉगिन तात्पुरते १५ मिनिटांसाठी बंद केले आहे. कृपया प्रतीक्षा करा:",
     login_locked_btn: "लॉगिन तात्पुरते बंद",
     login_lock_expired: "प्रतीक्षा कालावधी संपला आहे. आपण आता पुन्हा लॉगिन करू शकता.",
+
+    // Government Public Notice Ticker
+    ticker_public_notices: "सार्वजनिक सूचना",
+    ticker_view_all: "सर्व पहा",
+    ticker_no_notices: "सध्या कोणतीही नवीन अधिकृत सूचना उपलब्ध नाही.",
+    ticker_pinned: "महत्त्वाची",
+    ticker_pause: "थांबवा",
+    ticker_resume: "सुरू करा",
 
     // Resident Self-Registration Modal
     reg_modal_title: "नागरिक स्वयं-नोंदणी",

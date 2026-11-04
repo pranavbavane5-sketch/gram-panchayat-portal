@@ -5615,6 +5615,272 @@ body {
   color: #334155;
 }
 
+/* ==========================================================
+   GOVERNMENT-STYLE SCROLLING PUBLIC NOTICE TICKER
+   ========================================================== */
+.gov-notice-ticker {
+  width: 100%;
+  background: #0f1f38;
+  background: linear-gradient(90deg, #09182d 0%, #0f2444 50%, #0a1b32 100%);
+  border-bottom: 2px solid #f59e0b; /* Official Saffron Accent */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  position: relative;
+  overflow: hidden;
+  z-index: 30;
+}
+
+.ticker-inner {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Fixed Badge on Left */
+.ticker-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #ffffff;
+  padding: 0 16px;
+  height: 100%;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.28);
+  position: relative;
+  z-index: 10;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ticker-badge-pulse {
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 50%;
+  animation: tickerPulse 1.6s infinite;
+}
+
+@keyframes tickerPulse {
+  0% { transform: scale(0.85); opacity: 0.8; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+  70% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+  100% { transform: scale(0.85); opacity: 0.8; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+.ticker-icon {
+  font-size: 0.95rem;
+}
+
+.ticker-badge-text {
+  white-space: nowrap;
+}
+
+/* Viewport & Scrolling Track */
+.ticker-viewport {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+}
+
+.ticker-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: tickerMarquee 45s linear infinite;
+  will-change: transform;
+  padding-left: 16px;
+}
+
+/* Pause on hover, focus, or when user clicks pause */
+.gov-notice-ticker:hover .ticker-track,
+.ticker-viewport:focus .ticker-track,
+.ticker-track.is-paused {
+  animation-play-state: paused !important;
+}
+
+@keyframes tickerMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Individual Notice Ticker Item */
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  color: #f8fafc;
+  font-size: 0.86rem;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  user-select: none;
+}
+
+.ticker-item:hover {
+  color: #fbbf24;
+}
+
+.ticker-item:hover .ticker-item-title {
+  text-decoration: underline;
+}
+
+.ticker-item-tag {
+  background: rgba(255, 255, 255, 0.12);
+  color: #38bdf8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  text-transform: uppercase;
+}
+
+.ticker-item-tag.pinned {
+  background: rgba(234, 179, 8, 0.25);
+  color: #facc15;
+  border-color: rgba(234, 179, 8, 0.5);
+}
+
+.ticker-item-title {
+  font-weight: 600;
+  color: inherit;
+}
+
+.ticker-item-date {
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-family: monospace;
+}
+
+.ticker-separator {
+  color: #f59e0b;
+  opacity: 0.7;
+  font-size: 0.72rem;
+  margin: 0 4px;
+}
+
+/* Controls on Right */
+.ticker-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #09182d;
+  height: 100%;
+  padding: 0 10px;
+  flex-shrink: 0;
+  z-index: 10;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ticker-ctrl-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.78rem;
+  padding: 0;
+}
+
+.ticker-ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: #f59e0b;
+}
+
+.ticker-all-btn {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.2), rgba(15, 118, 110, 0.2));
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  margin-left: 4px;
+}
+
+.ticker-all-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none !important;
+    overflow-x: auto;
+    white-space: normal;
+  }
+  .ticker-badge-pulse {
+    animation: none !important;
+  }
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 768px) {
+  .ticker-inner {
+    height: 40px;
+  }
+  .ticker-badge {
+    padding: 0 10px;
+    font-size: 0.74rem;
+  }
+  .ticker-item {
+    font-size: 0.8rem;
+    padding: 2px 10px;
+  }
+  .ticker-item-date {
+    display: none;
+  }
+  .ticker-ctrl-btn {
+    width: 24px;
+    height: 24px;
+  }
+  .ticker-all-btn {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .ticker-badge-text {
+    display: none;
+  }
+  .ticker-badge {
+    padding: 0 8px;
+  }
+}
+
 /* --- Print Stylesheet for Receipts, Bills & Official Reports --- */
 @media print {
   body {

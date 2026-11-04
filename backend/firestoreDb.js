@@ -267,7 +267,8 @@ export const COLLECTIONS = {
   PUBLIC_NOTICES: "public_notices",
   VILLAGE_SETTINGS: "village_settings",
   GP_SERVICES: "gp_services",
-  ADMIN_AUDIT_LOGS: "admin_audit_logs"
+  ADMIN_AUDIT_LOGS: "admin_audit_logs",
+  LOGIN_RATE_LIMITS: "login_rate_limits"
 };
 
 export default {

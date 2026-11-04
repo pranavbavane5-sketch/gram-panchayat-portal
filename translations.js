@@ -250,6 +250,7 @@ export const translations = {
     login_chip_cit1: "Citizen 1 - Tukaram Shinde (CIT-101)",
     login_chip_cit2: "Citizen 2 - Savita Devi (CIT-102)",
     login_reg_link: "Not registered yet? Resident Self-Registration",
+    login_rate_limited: "Too many failed login attempts. Please try again after 15 minutes.",
 
     // Resident Self-Registration Modal
     reg_modal_title: "Resident Self-Registration",
@@ -963,6 +964,7 @@ export const translations = {
     login_chip_cit1: "नागरिक १ - तुकाराम शिंदे (CIT-101)",
     login_chip_cit2: "नागरिक २ - सविता देवी (CIT-102)",
     login_reg_link: "अद्याप खाते नाही? येथे नागरिक स्वयं-नोंदणी करा",
+    login_rate_limited: "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया १५ मिनिटांनंतर पुन्हा प्रयत्न करा.",
 
     // Resident Self-Registration Modal
     reg_modal_title: "नागरिक स्वयं-नोंदणी",

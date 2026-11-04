@@ -24,6 +24,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust reverse proxy (Vercel edge, cloud load balancers) so req.ip and rate limiters resolve client IP safely
+app.set("trust proxy", 1);
+
 // Security & Standard Middlewares
 app.disable("x-powered-by");
 app.use((req, res, next) => {

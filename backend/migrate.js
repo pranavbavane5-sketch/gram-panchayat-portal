@@ -472,6 +472,21 @@ export async function runMigrations() {
       ) ENGINE=InnoDB;
     `);
 
+    // 15. Table: login_rate_limits (Brute-Force & Credential Stuffing Protection)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS login_rate_limits (
+        rate_key VARCHAR(190) PRIMARY KEY,
+        key_type VARCHAR(20) NOT NULL,
+        failed_attempts INT NOT NULL DEFAULT 0,
+        first_failed_at BIGINT NOT NULL DEFAULT 0,
+        last_failed_at BIGINT NOT NULL DEFAULT 0,
+        blocked_until BIGINT NOT NULL DEFAULT 0,
+        attempted_accounts TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_blocked (blocked_until)
+      ) ENGINE=InnoDB;
+    `);
+
     try {
       await pool.query("ALTER TABLE applications MODIFY rti_fee_status VARCHAR(100) DEFAULT 'Not Applicable'");
     } catch (colErr) {

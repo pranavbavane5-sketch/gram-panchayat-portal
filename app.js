@@ -1422,7 +1422,13 @@ function initAuth() {
         }
       } catch (err) {
         console.error("Login failure:", err);
-        showToast("Login failed: " + err.message, "error");
+        if (err.status === 429) {
+          const isMarathi = (typeof currentLang !== "undefined" && currentLang === "mr") || (document.documentElement.lang === "mr");
+          const msg = (isMarathi && err.data?.message_mr) ? err.data.message_mr : (err.data?.message || err.message);
+          showToast(msg, "error");
+        } else {
+          showToast("Login failed: " + err.message, "error");
+        }
       } finally {
         if (btnSubmit) {
           btnSubmit.disabled = false;

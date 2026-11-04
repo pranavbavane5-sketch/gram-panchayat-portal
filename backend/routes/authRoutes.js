@@ -10,6 +10,7 @@ import { userRepo } from "../repositories/userRepo.js";
 import { citizenRepo } from "../repositories/citizenRepo.js";
 import { propertyRepo } from "../repositories/propertyRepo.js";
 import { billingRepo } from "../repositories/billingRepo.js";
+import { checkLoginRateLimit, recordFailedLogin, recordSuccessfulLogin } from "../security/loginRateLimiter.js";
 
 const router = Router();
 
@@ -26,9 +27,23 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // 1. Check rate limit before performing any lookup or authentication
+    const rateCheck = await checkLoginRateLimit(req, identifier);
+    if (rateCheck.blocked) {
+      res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds || 900));
+      return res.status(429).json({
+        error: "Too Many Requests",
+        message: rateCheck.message || "Too many failed login attempts. Please try again after 15 minutes.",
+        message_mr: rateCheck.message_mr || "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया १५ मिनिटांनंतर पुन्हा प्रयत्न करा.",
+        retryAfter: rateCheck.retryAfterSeconds,
+        retryAfterMinutes: rateCheck.retryMinutes || Math.ceil((rateCheck.retryAfterSeconds || 900) / 60)
+      });
+    }
+
     // Lookup user by login_id, citizen_id, phone, email, or id (case-insensitive & trimmed)
     const user = await userRepo.findByLoginOrPhone(identifier);
     if (!user) {
+      await recordFailedLogin(req, identifier);
       return res.status(401).json({
         error: "Authentication failed",
         message: "Invalid login credentials."
@@ -46,6 +61,7 @@ router.post("/login", async (req, res) => {
 
     // Verify password hash with bcrypt
     if (!user.password_hash) {
+      await recordFailedLogin(req, identifier);
       return res.status(401).json({
         error: "Authentication failed",
         message: "Invalid login credentials."
@@ -54,11 +70,15 @@ router.post("/login", async (req, res) => {
 
     const match = await bcrypt.compare(String(password), String(user.password_hash));
     if (!match) {
+      await recordFailedLogin(req, identifier);
       return res.status(401).json({
         error: "Authentication failed",
         message: "Invalid login credentials."
       });
     }
+
+    // Successful authentication: reset failed-attempt tracking
+    await recordSuccessfulLogin(req, identifier);
 
     // If citizen, load citizen profile details
     let citizenData = null;

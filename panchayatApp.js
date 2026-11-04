@@ -59,141 +59,98 @@ export function renderPanchayatWelcomeHero(villageInfo = {}) {
     sarpanchSubDisplay.textContent = vName;
   }
 
-  // Sarpanch
-  const sarpanchName = document.getElementById("sarpanchNameDisplay");
-  const sarpanchPhoto = document.getElementById("sarpanchPhotoImg");
-  const sarpanchFallback = document.getElementById("sarpanchPhotoFallback");
-  const sName = villageInfo.sarpanch_name || "Shri. Vitthalrao Deshmukh";
-  if (sarpanchName) sarpanchName.textContent = sName;
-  if (sarpanchPhoto) {
-    if (villageInfo.sarpanch_photo) {
-      sarpanchPhoto.src = villageInfo.sarpanch_photo;
-      sarpanchPhoto.style.display = "block";
-      if (sarpanchFallback) sarpanchFallback.style.display = "none";
-    } else {
-      sarpanchPhoto.style.display = "none";
-      if (sarpanchFallback) {
-        sarpanchFallback.textContent = sName.charAt(0) || "स";
-        sarpanchFallback.style.display = "block";
-      }
-    }
-  }
-
-  // Gram Sevak
-  const gramSevakName = document.getElementById("gramSevakNameDisplay");
-  const gramSevakPhoto = document.getElementById("gramSevakPhotoImg");
-  const gramSevakFallback = document.getElementById("gramSevakPhotoFallback");
-  const gsName = villageInfo.gram_sevak_name || "Shri. Ramesh Patil";
-  if (gramSevakName) gramSevakName.textContent = gsName;
-  if (gramSevakPhoto) {
-    if (villageInfo.gram_sevak_photo) {
-      gramSevakPhoto.src = villageInfo.gram_sevak_photo;
-      gramSevakPhoto.style.display = "block";
-      if (gramSevakFallback) gramSevakFallback.style.display = "none";
-    } else {
-      gramSevakPhoto.style.display = "none";
-      if (gramSevakFallback) {
-        gramSevakFallback.textContent = gsName.charAt(0) || "ग";
-        gramSevakFallback.style.display = "block";
-      }
-    }
-  }
-
-  // Panchayat Secretary
-  const secretaryName = document.getElementById("secretaryNameDisplay");
-  const secretaryPhoto = document.getElementById("secretaryPhotoImg");
-  const secretaryFallback = document.getElementById("secretaryPhotoFallback");
-  const secName = villageInfo.secretary_name || "Smt. Sunita Kulkarni";
-  if (secretaryName) secretaryName.textContent = secName;
-  if (secretaryPhoto) {
-    if (villageInfo.secretary_photo) {
-      secretaryPhoto.src = villageInfo.secretary_photo;
-      secretaryPhoto.style.display = "block";
-      if (secretaryFallback) secretaryFallback.style.display = "none";
-    } else {
-      secretaryPhoto.style.display = "none";
-      if (secretaryFallback) {
-        secretaryFallback.textContent = secName.charAt(0) || "प";
-        secretaryFallback.style.display = "block";
-      }
-    }
-  }
-
-  // --- Header Officials Strip Synchronization (Maharashtra Government Portal Style) ---
+  // --- Header Officials Synchronization (Professional Government-Style Header) ---
   // 1. Sarpanch
-  const stripSarpanchName = document.getElementById("stripSarpanchName");
-  const stripSarpanchPhoto = document.getElementById("stripSarpanchPhoto");
-  const stripSarpanchFallback = document.getElementById("stripSarpanchFallback");
-  const stripSarpanchSub = document.getElementById("stripSarpanchSub");
-  const stripSarpanchTitle = document.getElementById("stripSarpanchTitle");
+  const hSarpanchName = document.getElementById("headerSarpanchName");
+  const hSarpanchPhoto = document.getElementById("headerSarpanchPhoto");
+  const hSarpanchFallback = document.getElementById("headerSarpanchFallback");
+  const hSarpanchTitle = document.getElementById("headerSarpanchTitle");
+  const sName = villageInfo.sarpanch_name || (isMr ? "श्री. विठ्ठलराव देशमुख" : "Shri. Vitthalrao Deshmukh");
 
-  if (stripSarpanchName) stripSarpanchName.textContent = sName;
-  if (stripSarpanchSub) stripSarpanchSub.textContent = vName;
-  if (stripSarpanchTitle) stripSarpanchTitle.textContent = isMr ? "सरपंच (Sarpanch)" : "Sarpanch";
-  if (stripSarpanchPhoto) {
+  if (hSarpanchName) hSarpanchName.textContent = sName;
+  if (hSarpanchTitle) hSarpanchTitle.textContent = isMr ? "सरपंच" : "Sarpanch";
+  if (hSarpanchPhoto) {
     if (villageInfo.sarpanch_photo) {
-      stripSarpanchPhoto.src = villageInfo.sarpanch_photo;
-      stripSarpanchPhoto.style.display = "block";
-      if (stripSarpanchFallback) stripSarpanchFallback.style.display = "none";
+      hSarpanchPhoto.src = villageInfo.sarpanch_photo;
+      hSarpanchPhoto.style.display = "block";
+      if (hSarpanchFallback) hSarpanchFallback.style.display = "none";
     } else {
-      stripSarpanchPhoto.style.display = "none";
-      if (stripSarpanchFallback) {
-        stripSarpanchFallback.style.display = "flex";
-        const initialEl = stripSarpanchFallback.querySelector(".official-badge-initial");
-        if (initialEl) initialEl.textContent = isMr ? "स" : (sName.charAt(0) || "S");
-      }
+      hSarpanchPhoto.src = "/sarpanch.jpg";
+      hSarpanchPhoto.style.display = "block";
+      if (hSarpanchFallback) hSarpanchFallback.style.display = "none";
     }
   }
 
-  // 2. Gram Sevak / Village Development Officer
-  const stripGramSevakName = document.getElementById("stripGramSevakName");
-  const stripGramSevakPhoto = document.getElementById("stripGramSevakPhoto");
-  const stripGramSevakFallback = document.getElementById("stripGramSevakFallback");
-  const stripGramSevakSub = document.getElementById("stripGramSevakSub");
-  const stripGramSevakTitle = document.getElementById("stripGramSevakTitle");
+  // 2. Deputy Sarpanch
+  const hDeputyName = document.getElementById("headerDeputyName");
+  const hDeputyPhoto = document.getElementById("headerDeputyPhoto");
+  const hDeputyFallback = document.getElementById("headerDeputyFallback");
+  const hDeputyTitle = document.getElementById("headerDeputyTitle");
+  const depName = villageInfo.deputy_sarpanch_name || (isMr ? "श्री. रमेश पाटील" : "Shri. Ramesh Patil");
 
-  if (stripGramSevakName) stripGramSevakName.textContent = gsName;
-  if (stripGramSevakSub) stripGramSevakSub.textContent = isMr ? "ग्राम विकास अधिकारी" : "Village Development Officer";
-  if (stripGramSevakTitle) stripGramSevakTitle.textContent = isMr ? "ग्रामसेवक तथा ग्रा.वि.अ." : "Gram Sevak / VDO";
-  if (stripGramSevakPhoto) {
+  if (hDeputyName) hDeputyName.textContent = depName;
+  if (hDeputyTitle) hDeputyTitle.textContent = isMr ? "उपसरपंच" : "Deputy Sarpanch";
+  if (hDeputyPhoto) {
+    if (villageInfo.deputy_sarpanch_photo) {
+      hDeputyPhoto.src = villageInfo.deputy_sarpanch_photo;
+      hDeputyPhoto.style.display = "block";
+      if (hDeputyFallback) hDeputyFallback.style.display = "none";
+    } else {
+      hDeputyPhoto.src = "/deputy_sarpanch.jpg";
+      hDeputyPhoto.style.display = "block";
+      if (hDeputyFallback) hDeputyFallback.style.display = "none";
+    }
+  }
+
+  // 3. Gram Sevak / Secretary
+  const hGramSevakName = document.getElementById("headerGramSevakName");
+  const hGramSevakPhoto = document.getElementById("headerGramSevakPhoto");
+  const hGramSevakFallback = document.getElementById("headerGramSevakFallback");
+  const hGramSevakTitle = document.getElementById("headerGramSevakTitle");
+  const gsName = villageInfo.gram_sevak_name || (isMr ? "सौ. सुनिता पवार" : "Smt. Sunita Pawar");
+
+  if (hGramSevakName) hGramSevakName.textContent = gsName;
+  if (hGramSevakTitle) hGramSevakTitle.textContent = isMr ? "ग्रामसेवक" : "Gram Sevak";
+  if (hGramSevakPhoto) {
     if (villageInfo.gram_sevak_photo) {
-      stripGramSevakPhoto.src = villageInfo.gram_sevak_photo;
-      stripGramSevakPhoto.style.display = "block";
-      if (stripGramSevakFallback) stripGramSevakFallback.style.display = "none";
+      hGramSevakPhoto.src = villageInfo.gram_sevak_photo;
+      hGramSevakPhoto.style.display = "block";
+      if (hGramSevakFallback) hGramSevakFallback.style.display = "none";
     } else {
-      stripGramSevakPhoto.style.display = "none";
-      if (stripGramSevakFallback) {
-        stripGramSevakFallback.style.display = "flex";
-        const initialEl = stripGramSevakFallback.querySelector(".official-badge-initial");
-        if (initialEl) initialEl.textContent = isMr ? "ग" : (gsName.charAt(0) || "G");
-      }
+      hGramSevakPhoto.src = "/gram_sevak.jpg";
+      hGramSevakPhoto.style.display = "block";
+      if (hGramSevakFallback) hGramSevakFallback.style.display = "none";
     }
   }
 
-  // 3. Panchayat Secretary
-  const stripSecretaryName = document.getElementById("stripSecretaryName");
-  const stripSecretaryPhoto = document.getElementById("stripSecretaryPhoto");
-  const stripSecretaryFallback = document.getElementById("stripSecretaryFallback");
-  const stripSecretarySub = document.getElementById("stripSecretarySub");
-  const stripSecretaryTitle = document.getElementById("stripSecretaryTitle");
+  // 4. IT & Information Officer
+  const hOfficerName = document.getElementById("headerOfficerName");
+  const hOfficerPhoto = document.getElementById("headerOfficerPhoto");
+  const hOfficerFallback = document.getElementById("headerOfficerFallback");
+  const hOfficerTitle = document.getElementById("headerOfficerTitle");
+  const offName = villageInfo.it_officer_name || (isMr ? "ॲड. आशिष शेलार" : "Adv. Ashish Shelar");
 
-  if (stripSecretaryName) stripSecretaryName.textContent = secName;
-  if (stripSecretarySub) stripSecretarySub.textContent = isMr ? "प्रशासकीय सचिव" : "Administrative Secretary";
-  if (stripSecretaryTitle) stripSecretaryTitle.textContent = isMr ? "पंचायत सचिव (Panchayat Secretary)" : "Panchayat Secretary";
-  if (stripSecretaryPhoto) {
+  if (hOfficerName) hOfficerName.textContent = offName;
+  if (hOfficerTitle) hOfficerTitle.textContent = isMr ? "माहिती तंत्रज्ञान अधिकारी" : "IT & Info Officer";
+  if (hOfficerPhoto) {
     if (villageInfo.secretary_photo) {
-      stripSecretaryPhoto.src = villageInfo.secretary_photo;
-      stripSecretaryPhoto.style.display = "block";
-      if (stripSecretaryFallback) stripSecretaryFallback.style.display = "none";
+      hOfficerPhoto.src = villageInfo.secretary_photo;
+      hOfficerPhoto.style.display = "block";
+      if (hOfficerFallback) hOfficerFallback.style.display = "none";
     } else {
-      stripSecretaryPhoto.style.display = "none";
-      if (stripSecretaryFallback) {
-        stripSecretaryFallback.style.display = "flex";
-        const initialEl = stripSecretaryFallback.querySelector(".official-badge-initial");
-        if (initialEl) initialEl.textContent = isMr ? "प" : (secName.charAt(0) || "P");
-      }
+      hOfficerPhoto.src = "/secretary.jpg";
+      hOfficerPhoto.style.display = "block";
+      if (hOfficerFallback) hOfficerFallback.style.display = "none";
     }
   }
+
+  // Compatibility bindings for any legacy elements
+  const sarpanchName = document.getElementById("sarpanchNameDisplay");
+  if (sarpanchName) sarpanchName.textContent = sName;
+  const gramSevakName = document.getElementById("gramSevakNameDisplay");
+  if (gramSevakName) gramSevakName.textContent = gsName;
+  const secretaryName = document.getElementById("secretaryNameDisplay");
+  if (secretaryName) secretaryName.textContent = offName;
 
   // Contact Info Strip
   const phoneDisplay = document.getElementById("gpOfficePhoneDisplay");

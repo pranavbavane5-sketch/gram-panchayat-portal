@@ -456,15 +456,15 @@ export function applyDynamicGramPanchayatBranding() {
   if (headerBrandTitle) {
     headerBrandTitle.textContent = displayName;
   }
+  const headerBrandEnSub = document.getElementById("headerBrandEnSub");
+  if (headerBrandEnSub) {
+    headerBrandEnSub.textContent = isMr ? "Gram Panchayat Ugwa" : "उगवा ग्रामपंचायत";
+  }
   const headerVillageName = document.getElementById("headerVillageName");
   if (headerVillageName) {
-    headerVillageName.textContent = fullSubtitle;
-  }
-  const headerGovDeptTag = document.getElementById("headerGovDeptTag");
-  if (headerGovDeptTag) {
-    headerGovDeptTag.textContent = isMr
-      ? "महाराष्ट्र शासन • ग्राम विकास व पंचायत राज विभाग"
-      : "Government of Maharashtra • Rural Development & Panchayat Raj Department";
+    headerVillageName.textContent = isMr
+      ? `गाव / पंचायत: ${displayName} • तालुका: Akola • जिल्हा: Akola • महाराष्ट्र`
+      : `Gram Panchayat ${displayName} • Taluka: Akola • District: Akola • Maharashtra`;
   }
 
   // 3. Home Page Hero Label
@@ -676,6 +676,16 @@ function initNavigation() {
       e.preventDefault();
       const pageId = btn.getAttribute("data-page");
       switchPage(pageId);
+    });
+  });
+
+  document.querySelectorAll("[data-scroll-to]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const targetId = btn.getAttribute("data-scroll-to");
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: "smooth" });
+      }
     });
   });
 

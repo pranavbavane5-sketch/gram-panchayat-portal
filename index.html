@@ -32,65 +32,186 @@
     </div>
   </aside>
 
-  <!-- Main Navigation Header: Maharashtra Government-Style Multi-tier Header -->
-  <header class="main-header gov-header" id="mainHeader">
-    <!-- Tier 1: Clean White Government Logo & Identity Section -->
-    <div class="gov-brand-section">
-      <div class="container gov-brand-container">
-        <!-- Left: Official Emblem & Bilingual Gram Panchayat Title -->
-        <div class="logo-group gov-logo-group" id="headerLogoGroup" role="banner">
-          <div class="logo-icon-wrap gov-emblem-wrap" aria-hidden="true">
-            <!-- Water drop leaf SVG logo with exact aspect ratio preserved -->
-            <svg class="logo-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="18" fill="url(#waterGrad)" />
-              <path d="M20 9C20 9 12 19.5 12 24.5C12 28.9183 15.5817 32.5 20 32.5C24.4183 32.5 28 28.9183 28 24.5C28 19.5 20 9 20 9Z" fill="#FFFFFF"/>
-              <path d="M20 14C20 14 15 21.5 15 25C15 27.7614 17.2386 30 20 30C22.7614 30 25 27.7614 25 25C25 21.5 20 14 20 14Z" fill="#38bdf8" fill-opacity="0.6"/>
-              <path d="M19 18C19 23 15 26 15 26" stroke="#0284c7" stroke-width="2" stroke-linecap="round"/>
+  <!-- Main Professional Gram Panchayat Header (Clean White Full-Width) -->
+  <header class="main-header gp-official-header" id="mainHeader">
+    <!-- Clean White Full-Width Header -->
+    <div class="gp-top-white-header">
+      <div class="container gp-header-flex-wrap">
+        
+        <!-- Left Section: Original Gram Panchayat Logo + Titles -->
+        <div class="gp-identity-left" id="headerLogoGroup" role="banner">
+          <div class="gp-logo-badge" aria-hidden="true">
+            <!-- Authentic Village Civic Emblem SVG -->
+            <svg class="gp-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="22" cy="22" r="20" fill="url(#gpGoldGrad)" stroke="#d97706" stroke-width="1.5" />
+              <path d="M22 8C22 8 13 19 13 25C13 30 17 34 22 34C27 34 31 30 31 25C31 19 22 8 22 8Z" fill="#ffffff" />
+              <path d="M22 14C22 14 16 22 16 26C16 29.3 18.7 32 22 32C25.3 32 28 29.3 28 26C28 22 22 14 22 14Z" fill="#0284c7" />
+              <path d="M19 26C19 28 20.5 29.5 22 29.5" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
               <defs>
-                <linearGradient id="waterGrad" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0284c7"/>
-                  <stop offset="1" stop-color="#0f766e"/>
+                <linearGradient id="gpGoldGrad" x1="4" y1="4" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#fef3c7"/>
+                  <stop offset="0.5" stop-color="#fde68a"/>
+                  <stop offset="1" stop-color="#f59e0b"/>
                 </linearGradient>
               </defs>
             </svg>
           </div>
-          <div class="logo-text gov-brand-text">
-            <div class="gov-dept-tag" id="headerGovDeptTag" data-i18n="gov_dept_tag">महाराष्ट्र शासन • ग्राम विकास व पंचायत राज विभाग | Govt. of Maharashtra</div>
-            <h1 class="brand-title gov-brand-title" id="headerBrandTitle">Ugwa Gram Panchayat</h1>
-            <div class="village-tag gov-village-tag" id="headerVillageName" data-i18n="official_gp_subtitle">Official Gram Panchayat Citizen Services Portal</div>
+
+          <div class="gp-identity-v-divider" aria-hidden="true"></div>
+
+          <div class="gp-identity-text">
+            <h1 class="gp-title-main" id="headerBrandTitle">उगवा ग्रामपंचायत</h1>
+            <div class="gp-title-sub-row">
+              <span class="gp-title-en" id="headerBrandEnSub">Gram Panchayat Ugwa</span>
+            </div>
+            <div class="gp-location-line" id="headerVillageName">
+              गाव / पंचायत: उगवा ग्रामपंचायत • तालुका: Akola • जिल्हा: Akola • महाराष्ट्र
+            </div>
           </div>
         </div>
 
-        <!-- Right: Actions (Helpline, DB Status, Language Switcher, Login/User) -->
-        <div class="header-actions gov-header-actions">
-          <!-- Toll-Free Helpline Badge -->
-          <div class="gov-helpline-chip" title="24x7 Gram Panchayat Citizen Helpline">
-            <svg class="gov-chip-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            <div class="gov-chip-text">
-              <span class="gov-chip-label" data-i18n="gov_header_helpline_label">Helpline:</span>
-              <strong class="gov-chip-num">1800-120-JAL</strong>
+        <!-- Right Section: Officials Profiles (Horizontal Row) -->
+        <div class="gp-header-officials-row" id="headerOfficialsRow" aria-label="Gram Panchayat Officials">
+          <!-- 1. Sarpanch -->
+          <div class="gp-official-card" id="headerOfficialSarpanch">
+            <div class="official-avatar-frame">
+              <img class="official-photo-img" id="headerSarpanchPhoto" src="/sarpanch.jpg" alt="श्री. विठ्ठलराव देशमुख" />
+              <div class="official-avatar-placeholder" id="headerSarpanchFallback" style="display:none;">
+                <span>स</span>
+              </div>
+            </div>
+            <div class="official-meta">
+              <span class="official-name" id="headerSarpanchName">श्री. विठ्ठलराव देशमुख</span>
+              <span class="official-role" id="headerSarpanchTitle" data-i18n="gp_sarpanch">सरपंच</span>
             </div>
           </div>
 
-          <div class="db-status-pill status-ready" id="dbStatusPill" style="display:none;" title="Gram Panchayat Portal Service Status: Active">
-            <span class="status-dot"></span>
-            <span class="status-label" id="dbStatusLabel" data-i18n="portal_active">Active</span>
+          <div class="official-separator-line" aria-hidden="true"></div>
+
+          <!-- 2. Deputy Sarpanch -->
+          <div class="gp-official-card" id="headerOfficialDeputy">
+            <div class="official-avatar-frame">
+              <img class="official-photo-img" id="headerDeputyPhoto" src="/deputy_sarpanch.jpg" alt="श्री. रमेश पाटील" />
+              <div class="official-avatar-placeholder" id="headerDeputyFallback" style="display:none;">
+                <span>उ</span>
+              </div>
+            </div>
+            <div class="official-meta">
+              <span class="official-name" id="headerDeputyName">श्री. रमेश पाटील</span>
+              <span class="official-role" id="headerDeputyTitle" data-i18n="gp_deputy_sarpanch">उपसरपंच</span>
+            </div>
           </div>
 
-          <!-- Language Selector: 🇬🇧 English / 🇮🇳 मराठी -->
+          <div class="official-separator-line" aria-hidden="true"></div>
+
+          <!-- 3. Gram Sevak -->
+          <div class="gp-official-card" id="headerOfficialGramSevak">
+            <div class="official-avatar-frame">
+              <img class="official-photo-img" id="headerGramSevakPhoto" src="/gram_sevak.jpg" alt="सौ. सुनिता पवार" />
+              <div class="official-avatar-placeholder" id="headerGramSevakFallback" style="display:none;">
+                <span>ग</span>
+              </div>
+            </div>
+            <div class="official-meta">
+              <span class="official-name" id="headerGramSevakName">सौ. सुनिता पवार</span>
+              <span class="official-role" id="headerGramSevakTitle" data-i18n="gp_gram_sevak">ग्रामसेवक</span>
+            </div>
+          </div>
+
+          <div class="official-separator-line" aria-hidden="true"></div>
+
+          <!-- 4. IT & Legal Officer -->
+          <div class="gp-official-card" id="headerOfficialOfficer">
+            <div class="official-avatar-frame">
+              <img class="official-photo-img" id="headerOfficerPhoto" src="/secretary.jpg" alt="ॲड. आशिष शेलार" />
+              <div class="official-avatar-placeholder" id="headerOfficerFallback" style="display:none;">
+                <span>आ</span>
+              </div>
+            </div>
+            <div class="official-meta">
+              <span class="official-name" id="headerOfficerName">ॲड. आशिष शेलार</span>
+              <span class="official-role" id="headerOfficerTitle" data-i18n="gp_it_officer">माहिती तंत्रज्ञान अधिकारी</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Tier 2: Dark Navy-Blue Navigation Bar -->
+    <div class="gp-nav-bar" id="gpNavBar">
+      <div class="container gp-nav-container">
+        <!-- Main Navigation Links -->
+        <nav class="gp-desktop-nav" aria-label="Main Navigation">
+          <!-- मुख्यपृष्ठ -->
+          <button class="nav-btn active" data-page="home" id="navHome" title="मुख्यपृष्ठ / Home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span data-i18n="nav_home">मुख्यपृष्ठ</span>
+          </button>
+
+          <span class="nav-sep-pipe" aria-hidden="true">|</span>
+
+          <!-- ग्रामपंचायत माहिती -->
+          <button class="nav-btn" data-page="home" data-scroll-to="gpWelcomeHero" id="navGpInfo" title="ग्रामपंचायत माहिती">
+            <span data-i18n="nav_gp_info">ग्रामपंचायत माहिती</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+
+          <span class="nav-sep-pipe" aria-hidden="true">|</span>
+
+          <!-- नागरिक सेवा -->
+          <button class="nav-btn" data-page="citizen" id="navCitizen" title="नागरिक सेवा">
+            <span data-i18n="nav_citizen_services">नागरिक सेवा</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+
+          <span class="nav-sep-pipe" aria-hidden="true">|</span>
+
+          <!-- योजना व उपक्रम -->
+          <button class="nav-btn" data-page="storage" id="navStorage" title="योजना व उपक्रम">
+            <span data-i18n="nav_schemes">योजना व उपक्रम</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+
+          <span class="nav-sep-pipe" aria-hidden="true">|</span>
+
+          <!-- अहवाल -->
+          <button class="nav-btn" data-page="report" id="navReport" title="अहवाल">
+            <span data-i18n="nav_reports">अहवाल</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+
+          <span class="nav-sep-pipe" aria-hidden="true">|</span>
+
+          <!-- संपर्क -->
+          <button class="nav-btn" data-scroll-to="gpContactStrip" id="navContact" title="संपर्क">
+            <span data-i18n="nav_contact">संपर्क</span>
+          </button>
+
+          <!-- Hidden compat buttons for existing scripts -->
+          <button class="nav-btn" data-page="schedule" id="navSchedule" style="display:none;"></button>
+          <button class="nav-btn" data-page="admin" id="navAdmin" title="Open Admin Control Panel" style="display:none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span data-i18n="nav_admin">Admin Portal</span>
+          </button>
+        </nav>
+
+        <!-- Right Side: Language Switcher & Login -->
+        <div class="gp-nav-right">
+          <!-- Language Selector -->
           <div class="lang-switcher-wrap" id="langSwitcherWrap">
-            <button type="button" class="lang-switcher-btn" id="langSwitcherBtn" aria-haspopup="true" aria-expanded="false" title="Change Language / भाषा निवडा">
-              <span class="lang-flag" id="langCurrentFlag">🇬🇧</span>
-              <span class="lang-label" id="langCurrentLabel">English</span>
+            <button type="button" class="lang-switcher-btn nav-lang-toggle" id="langSwitcherBtn" aria-haspopup="true" aria-expanded="false" title="Change Language / भाषा निवडा">
+              <span class="lang-globe-icon" aria-hidden="true">🌐</span>
+              <span class="lang-label" id="langCurrentLabel">मराठी</span>
               <svg class="lang-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div class="lang-dropdown-menu" id="langDropdownMenu" hidden>
-              <button type="button" class="lang-option active" data-lang="en" id="optLangEn">
+              <button type="button" class="lang-option" data-lang="en" id="optLangEn">
                 <span class="lang-flag">🇬🇧</span>
                 <span class="lang-text">English</span>
                 <span class="lang-check" aria-hidden="true">✓</span>
               </button>
-              <button type="button" class="lang-option" data-lang="mr" id="optLangMr">
+              <button type="button" class="lang-option active" data-lang="mr" id="optLangMr">
                 <span class="lang-flag">🇮🇳</span>
                 <span class="lang-text">मराठी</span>
                 <span class="lang-check" aria-hidden="true">✓</span>
@@ -98,10 +219,12 @@
             </div>
           </div>
 
-          <button class="btn btn-outline-primary btn-sm auth-nav-btn" data-page="login" id="navLoginBtn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-            <span data-i18n="nav_login">Login</span>
+          <!-- Auth Button / User Profile Badge -->
+          <button class="btn btn-outline-light btn-sm auth-nav-btn nav-login-btn" data-page="login" id="navLoginBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <span data-i18n="nav_login">लॉगिन</span>
           </button>
+
           <div class="user-nav-badge" id="navUserBadge" style="display:none;">
             <div class="user-badge-avatar" id="navUserAvatar">A</div>
             <div class="user-badge-info">
@@ -113,109 +236,7 @@
             </button>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Tier 2: Maharashtra Government-Style Horizontal Officials Strip -->
-    <div class="gov-officials-strip" id="govOfficialsStrip" role="region" aria-label="Gram Panchayat Key Officials">
-      <div class="container officials-strip-container">
-        <div class="officials-strip-header">
-          <span class="officials-emblem-badge" aria-hidden="true">🇮🇳</span>
-          <span class="officials-strip-title" data-i18n="gp_officials_heading">Office Bearers & Key Officials</span>
-        </div>
-
-        <div class="officials-cards-row" id="officialsCardsRow">
-          <!-- Sarpanch -->
-          <div class="official-card-item" id="stripSarpanchCard">
-            <div class="official-photo-wrap">
-              <img id="stripSarpanchPhoto" class="official-photo-img" src="" alt="Sarpanch Official Photo" style="display:none;" />
-              <div class="official-photo-placeholder" id="stripSarpanchFallback" aria-label="Sarpanch Avatar">
-                <svg class="official-avatar-svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                </svg>
-                <span class="official-badge-initial">स</span>
-              </div>
-            </div>
-            <div class="official-text-meta">
-              <span class="official-name" id="stripSarpanchName">Shri. Vitthalrao Deshmukh</span>
-              <span class="official-role" id="stripSarpanchTitle" data-i18n="gp_sarpanch">Sarpanch</span>
-              <span class="official-sub" id="stripSarpanchSub">Ugwa Gram Panchayat</span>
-            </div>
-          </div>
-
-          <div class="official-card-divider" aria-hidden="true"></div>
-
-          <!-- Gram Sevak / Village Development Officer -->
-          <div class="official-card-item" id="stripGramSevakCard">
-            <div class="official-photo-wrap">
-              <img id="stripGramSevakPhoto" class="official-photo-img" src="" alt="Gram Sevak Official Photo" style="display:none;" />
-              <div class="official-photo-placeholder" id="stripGramSevakFallback" aria-label="Gram Sevak Avatar">
-                <svg class="official-avatar-svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                </svg>
-                <span class="official-badge-initial">ग</span>
-              </div>
-            </div>
-            <div class="official-text-meta">
-              <span class="official-name" id="stripGramSevakName">Shri. Ramesh Patil</span>
-              <span class="official-role" id="stripGramSevakTitle" data-i18n="gp_gram_sevak">Gram Sevak / VDO</span>
-              <span class="official-sub" id="stripGramSevakSub" data-i18n="gp_vdo_sub">Village Development Officer</span>
-            </div>
-          </div>
-
-          <div class="official-card-divider" aria-hidden="true"></div>
-
-          <!-- Panchayat Secretary -->
-          <div class="official-card-item" id="stripSecretaryCard">
-            <div class="official-photo-wrap">
-              <img id="stripSecretaryPhoto" class="official-photo-img" src="" alt="Secretary Official Photo" style="display:none;" />
-              <div class="official-photo-placeholder" id="stripSecretaryFallback" aria-label="Secretary Avatar">
-                <svg class="official-avatar-svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                </svg>
-                <span class="official-badge-initial">प</span>
-              </div>
-            </div>
-            <div class="official-text-meta">
-              <span class="official-name" id="stripSecretaryName">Smt. Sunita Kulkarni</span>
-              <span class="official-role" id="stripSecretaryTitle" data-i18n="gp_secretary">Panchayat Secretary</span>
-              <span class="official-sub" id="stripSecretarySub" data-i18n="gp_sec_sub">Administrative Secretary</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tier 3: Main Navigation Bar -->
-    <div class="gov-nav-section">
-      <div class="container gov-nav-container">
-        <!-- Desktop Nav -->
-        <nav class="desktop-nav gov-desktop-nav" aria-label="Main Navigation">
-          <button class="nav-btn active" data-page="home" id="navHome">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            <span data-i18n="nav_home">Home</span>
-          </button>
-          <button class="nav-btn" data-page="storage" id="navStorage">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
-            <span data-i18n="nav_storage">Water Storage</span>
-          </button>
-          <button class="nav-btn" data-page="schedule" id="navSchedule">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span data-i18n="nav_schedule">Schedule</span>
-          </button>
-          <button class="nav-btn" data-page="report" id="navReport">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            <span data-i18n="nav_report">Report Problem</span>
-          </button>
-          <button class="nav-btn" data-page="citizen" id="navCitizen">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span data-i18n="nav_citizen">Citizen Portal</span>
-          </button>
-          <button class="nav-btn" data-page="admin" id="navAdmin" title="Open Admin Control Panel" style="display:none;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            <span data-i18n="nav_admin">Admin Portal</span>
-          </button>
-        </nav>
       </div>
     </div>
   </header>
@@ -228,11 +249,11 @@
       <!-- Full-Width Government Public Notice Ticker Bar -->
       <div class="gov-notice-ticker" id="govNoticeTicker" role="region" aria-label="Public Notices Ticker">
         <div class="ticker-inner">
-          <!-- Fixed Badge on Left -->
+          <!-- Fixed Saffron/Amber Badge on Left -->
           <div class="ticker-badge" id="tickerBadge">
             <span class="ticker-badge-pulse" aria-hidden="true"></span>
             <span class="ticker-icon" aria-hidden="true">📢</span>
-            <span class="ticker-badge-text" id="tickerBadgeText" data-i18n="ticker_public_notices">PUBLIC NOTICES</span>
+            <span class="ticker-badge-text" id="tickerBadgeText" data-i18n="ticker_public_notices">सार्वजनिक सूचना</span>
           </div>
 
           <!-- Scrolling Track Container -->
@@ -254,112 +275,104 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
             <button type="button" class="ticker-all-btn" id="btnTickerViewAll" data-nav="report" data-app-tab="notices" title="View All Public Notices">
-              <span data-i18n="ticker_view_all">View All</span> &rarr;
+              <span data-i18n="ticker_view_all">सर्व पहा</span> &rarr;
             </button>
           </div>
         </div>
       </div>
 
-      <div class="container">
-        <!-- Official Gram Panchayat Welcome Hero -->
-        <div class="gp-welcome-hero" id="gpWelcomeHero">
-          <div class="gp-badge-state">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <span data-i18n="gp_state_tag">Government of Maharashtra • Rural Development & Water Conservation</span>
-          </div>
-          <h1 class="gp-main-title" id="gpMainTitle" data-i18n="gp_name_default">Gram Panchayat</h1>
-          <div class="gp-jurisdiction-line" id="gpJurisdictionLine">
-            <span data-i18n="gp_jurisdiction_default">Official Gram Panchayat Citizen Services Portal</span>
-          </div>
-          <p class="gp-intro-para" id="gpIntroPara" data-i18n="gp_intro_default">
-            Welcome to the official Gram Panchayat digital administration portal. Our Panchayat is committed to transparent e-governance, prompt redressal of citizen grievances, uninterrupted civic services, and fair distribution of water resources throughout the year.
-          </p>
-
-          <!-- Office Bearers Grid (Sarpanch, Gram Sevak, Secretary) -->
-          <div class="gp-leaders-grid">
-            <!-- Sarpanch -->
-            <div class="leader-card" id="leaderSarpanchCard">
-              <div class="leader-avatar-wrap">
-                <img id="sarpanchPhotoImg" class="leader-photo-img" src="" alt="Sarpanch Official Photo" style="display:none;" />
-                <span class="leader-avatar-fallback" id="sarpanchPhotoFallback">स</span>
+      <!-- Professional Indian Government-Style Homepage Hero Section -->
+      <div class="gp-hero-section-v2" id="gpWelcomeHero">
+        <div class="container hero-inner-container">
+          <!-- Main Hero Card: Left Text + Right Authentic Panchayat Building Photo -->
+          <div class="hero-card-v2">
+            <div class="hero-left-content">
+              <h1 class="hero-title-devanagari" id="gpMainTitle">उगवा ग्रामपंचायत</h1>
+              <div class="hero-location-tag" id="gpJurisdictionLine">
+                गाव / पंचायत: उगवा ग्रामपंचायत • तालुका: Akola • जिल्हा: Akola • महाराष्ट्र
               </div>
-              <div class="leader-info">
-                <span class="leader-post-badge" data-i18n="gp_sarpanch">Sarpanch</span>
-                <span class="leader-name-text" id="sarpanchNameDisplay">Shri. Vitthalrao Deshmukh</span>
-                <span class="leader-sub-text" id="sarpanchSubDisplay">Sundarpur Gram Panchayat</span>
+              <div class="hero-subtitle-bar" id="heroSubtitleTag" data-i18n="official_gp_subtitle">
+                अधिकृत ग्रामपंचायत नागरिक सेवा पोर्टल
+              </div>
+              <p class="hero-desc-para" id="gpIntroPara" data-i18n="gp_intro_default">
+                ग्रामपंचायतीच्या अधिकृत ई-प्रशासन पोर्टलवर आपले सहर्ष स्वागत आहे. ग्रामस्थांना पारदर्शक प्रशासन, सर्व नागरी सेवा, वेळेवर तक्रार निवारण आणि वर्षभर सुरळीत पाणीपुरवठा उपलब्ध करून देण्यासाठी हे पोर्टल कटिबद्ध आहे.
+              </p>
+
+              <!-- Hero Quick Action Buttons -->
+              <div class="hero-action-buttons">
+                <button type="button" class="btn btn-hero-primary" data-page="citizen" id="btnHeroServices">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  <span data-i18n="hero_btn_services">नागरिक सेवा</span>
+                </button>
+                <button type="button" class="btn btn-hero-secondary" data-page="report" id="btnHeroComplaint">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  <span data-i18n="hero_btn_complaint">तक्रार नोंदवा</span>
+                </button>
+                <button type="button" class="btn btn-hero-outline" data-page="citizen" data-cit-tab="tracking" id="btnHeroTrack">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                  <span data-i18n="hero_btn_track">अर्जाची स्थिती पहा</span>
+                </button>
               </div>
             </div>
 
-            <!-- Gram Sevak -->
-            <div class="leader-card" id="leaderGramSevakCard">
-              <div class="leader-avatar-wrap">
-                <img id="gramSevakPhotoImg" class="leader-photo-img" src="" alt="Gram Sevak Official Photo" style="display:none;" />
-                <span class="leader-avatar-fallback" id="gramSevakPhotoFallback">ग</span>
-              </div>
-              <div class="leader-info">
-                <span class="leader-post-badge" data-i18n="gp_gram_sevak">Gram Sevak / VDO</span>
-                <span class="leader-name-text" id="gramSevakNameDisplay">Shri. Ramesh Patil</span>
-                <span class="leader-sub-text" id="gramSevakSubDisplay">Village Development Officer</span>
-              </div>
-            </div>
-
-            <!-- Panchayat Secretary -->
-            <div class="leader-card" id="leaderSecretaryCard">
-              <div class="leader-avatar-wrap">
-                <img id="secretaryPhotoImg" class="leader-photo-img" src="" alt="Secretary Official Photo" style="display:none;" />
-                <span class="leader-avatar-fallback" id="secretaryPhotoFallback">प</span>
-              </div>
-              <div class="leader-info">
-                <span class="leader-post-badge" data-i18n="gp_secretary">Panchayat Secretary</span>
-                <span class="leader-name-text" id="secretaryNameDisplay">Smt. Sunita Kulkarni</span>
-                <span class="leader-sub-text" id="secretarySubDisplay">Administrative Secretary</span>
+            <div class="hero-right-visual">
+              <div class="hero-building-frame">
+                <img src="/gp_building.jpg" alt="उगवा ग्रामपंचायत कार्यालय इमारत" class="hero-building-img" />
+                <div class="hero-building-label">
+                  <span>उगवा ग्रामपंचायत कार्यालय</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Office Contact & Hours Strip -->
-          <div class="gp-office-info-strip">
-            <div class="office-info-item">
-              <div class="office-info-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          <!-- Contact Information Strip: 4 Rounded Frosted Cards (Requirement 6) -->
+          <div class="gp-contact-strip-v2" id="gpContactStrip" aria-label="Gram Panchayat Contact Details">
+            <!-- 1. कार्यालय दूरध्वनी -->
+            <div class="contact-card-v2">
+              <div class="contact-icon-v2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
               </div>
-              <div>
-                <span class="office-info-label" data-i18n="gp_office_phone">Office Phone</span>
-                <span class="office-info-val" id="gpOfficePhoneDisplay">02489-234567 / 1800-120-JAL</span>
-              </div>
-            </div>
-
-            <div class="office-info-item">
-              <div class="office-info-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              </div>
-              <div>
-                <span class="office-info-label" data-i18n="gp_office_email">Official Email</span>
-                <span class="office-info-val" id="gpOfficeEmailDisplay">grampanchayat.sundarpur@gov.in</span>
+              <div class="contact-details-v2">
+                <span class="contact-label-v2" data-i18n="gp_office_phone">कार्यालय दूरध्वनी</span>
+                <span class="contact-value-v2" id="gpOfficePhoneDisplay">02489-234567 / 1800-120-JAL</span>
               </div>
             </div>
 
-            <div class="office-info-item">
-              <div class="office-info-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <!-- 2. अधिकृत ईमेल -->
+            <div class="contact-card-v2">
+              <div class="contact-icon-v2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               </div>
-              <div>
-                <span class="office-info-label" data-i18n="gp_office_hours">Office Timings</span>
-                <span class="office-info-val" id="gpOfficeHoursDisplay">Mon – Sat: 10:00 AM – 05:30 PM</span>
+              <div class="contact-details-v2">
+                <span class="contact-label-v2" data-i18n="gp_office_email">अधिकृत ईमेल</span>
+                <span class="contact-value-v2" id="gpOfficeEmailDisplay">grampanchayat.sundarpur@gov.in</span>
               </div>
             </div>
 
-            <div class="office-info-item">
-              <div class="office-info-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <!-- 3. कार्यालयीन वेळ -->
+            <div class="contact-card-v2">
+              <div class="contact-icon-v2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </div>
-              <div>
-                <span class="office-info-label" data-i18n="gp_office_address">Office Address</span>
-                <span class="office-info-val" id="gpOfficeAddressDisplay">Gram Panchayat Karyalaya, Main Chowk, Sundarpur</span>
+              <div class="contact-details-v2">
+                <span class="contact-label-v2" data-i18n="gp_office_hours">कार्यालयीन वेळ</span>
+                <span class="contact-value-v2" id="gpOfficeHoursDisplay">Mon – Sat: 10:00 AM – 05:30 PM</span>
+              </div>
+            </div>
+
+            <!-- 4. कार्यालयाचा पत्ता -->
+            <div class="contact-card-v2">
+              <div class="contact-icon-v2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              </div>
+              <div class="contact-details-v2">
+                <span class="contact-label-v2" data-i18n="gp_office_address">कार्यालयाचा पत्ता</span>
+                <span class="contact-value-v2" id="gpOfficeAddressDisplay">Gram Panchayat Karyalaya, Main Chowk, Sundarpur</span>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
         <!-- 14 Year-Round Gram Panchayat Services Section -->
         <section class="gp-services-section" id="gpServicesSection">

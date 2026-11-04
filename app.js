@@ -1719,8 +1719,9 @@ function initAuth() {
         return;
       }
 
-      if (password.length < 6) {
-        showToast("Password must be at least 6 characters.", "error");
+      if (password.length < 8) {
+        const isMr = getLanguage() === "mr";
+        showToast(isMr ? "पासवर्ड किमान ८ अक्षरांचा असणे आवश्यक आहे." : "Password must be at least 8 characters.", "error");
         return;
       }
 
@@ -1910,6 +1911,12 @@ function initCitizenView() {
 
       if (newPassword !== confirmPassword) {
         showToast("New passwords do not match.", "error");
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        const isMr = getLanguage() === "mr";
+        showToast(isMr ? "नवीन पासवर्ड किमान ८ अक्षरांचा असणे आवश्यक आहे." : "New password must be at least 8 characters.", "error");
         return;
       }
 

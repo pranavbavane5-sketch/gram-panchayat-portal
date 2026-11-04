@@ -251,10 +251,10 @@ router.put("/change-password", authenticateToken, async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
 
-    if (!oldPassword || !newPassword || newPassword.length < 6) {
+    if (!oldPassword || !newPassword || newPassword.length < 8) {
       return res.status(400).json({
         error: "Validation error",
-        message: "New password must be at least 6 characters long."
+        message: "New password must be at least 8 characters long."
       });
     }
 
@@ -304,8 +304,8 @@ router.post("/register-citizen", async (req, res) => {
       return res.status(400).json({ error: "Validation error", message: "A valid 10-digit mobile number is required." });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: "Validation error", message: "Password must be at least 6 characters." });
+    if (password.length < 8) {
+      return res.status(400).json({ error: "Validation error", message: "Password must be at least 8 characters." });
     }
 
     // Check if phone already registered in users table

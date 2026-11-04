@@ -1598,6 +1598,9 @@ export function translateErrorMessage(err) {
   if (rawMsg.includes("Passwords do not match")) {
     return "पासवर्ड जुळत नाहीत. कृपया पुन्हा तपासा.";
   }
+  if (rawMsg.includes("Password must be at least") || rawMsg.includes("New password must be at least")) {
+    return "पासवर्ड किमान ८ अक्षरांचा असणे आवश्यक आहे.";
+  }
   if (rawMsg.includes("Cannot connect to Express server") || rawMsg.includes("Cannot connect to Gram Panchayat API")) {
     return "बॅकएंड सर्व्हरशी संपर्क होऊ शकत नाही. सर्व्हर सुरू असल्याची खात्री करा.";
   }

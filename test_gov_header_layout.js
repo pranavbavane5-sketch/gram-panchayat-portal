@@ -47,9 +47,9 @@ assert(html.includes('id="headerOfficialGramSevak"'), "Gram Sevak card (#headerO
 assert(html.includes('id="headerGramSevakPhoto"') && html.includes('src="/gram_sevak.jpg"'), "Gram Sevak photo points to /gram_sevak.jpg");
 assert(html.includes('data-i18n="gp_gram_sevak"'), "Gram Sevak designation has i18n binding");
 
-assert(html.includes('id="headerOfficialOfficer"'), "IT/Info Officer card (#headerOfficialOfficer) exists");
-assert(html.includes('id="headerOfficerPhoto"') && html.includes('src="/secretary.jpg"'), "Officer photo points to /secretary.jpg");
-assert(html.includes('data-i18n="gp_it_officer"'), "Officer designation has i18n binding");
+// Verify 4th card (ॲड. आशिष शेलार) has been removed as requested by user
+assert(!headerSlice.includes('id="headerOfficialOfficer"'), "4th card (#headerOfficialOfficer) is removed");
+assert(!headerSlice.includes('आशिष शेलार') && !headerSlice.includes('Ashish Shelar'), "Name 'आशिष शेलार' is NOT present in the header");
 
 assert(html.includes('class="official-separator-line"'), "Subtle vertical separators exist between officials");
 

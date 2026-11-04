@@ -123,34 +123,11 @@ export function renderPanchayatWelcomeHero(villageInfo = {}) {
     }
   }
 
-  // 4. IT & Information Officer
-  const hOfficerName = document.getElementById("headerOfficerName");
-  const hOfficerPhoto = document.getElementById("headerOfficerPhoto");
-  const hOfficerFallback = document.getElementById("headerOfficerFallback");
-  const hOfficerTitle = document.getElementById("headerOfficerTitle");
-  const offName = villageInfo.it_officer_name || (isMr ? "ॲड. आशिष शेलार" : "Adv. Ashish Shelar");
-
-  if (hOfficerName) hOfficerName.textContent = offName;
-  if (hOfficerTitle) hOfficerTitle.textContent = isMr ? "माहिती तंत्रज्ञान अधिकारी" : "IT & Info Officer";
-  if (hOfficerPhoto) {
-    if (villageInfo.secretary_photo) {
-      hOfficerPhoto.src = villageInfo.secretary_photo;
-      hOfficerPhoto.style.display = "block";
-      if (hOfficerFallback) hOfficerFallback.style.display = "none";
-    } else {
-      hOfficerPhoto.src = "/secretary.jpg";
-      hOfficerPhoto.style.display = "block";
-      if (hOfficerFallback) hOfficerFallback.style.display = "none";
-    }
-  }
-
   // Compatibility bindings for any legacy elements
   const sarpanchName = document.getElementById("sarpanchNameDisplay");
   if (sarpanchName) sarpanchName.textContent = sName;
   const gramSevakName = document.getElementById("gramSevakNameDisplay");
   if (gramSevakName) gramSevakName.textContent = gsName;
-  const secretaryName = document.getElementById("secretaryNameDisplay");
-  if (secretaryName) secretaryName.textContent = offName;
 
   // Contact Info Strip
   const phoneDisplay = document.getElementById("gpOfficePhoneDisplay");

@@ -221,7 +221,9 @@ export function switchAppSectionTab(tabName) {
   const panes = document.querySelectorAll("#page-report .app-pane");
   panes.forEach(pane => {
     const paneName = pane.id.replace("appPane", "").toLowerCase();
-    pane.classList.toggle("active", paneName === tabName.toLowerCase());
+    const isActive = paneName === tabName.toLowerCase();
+    pane.classList.toggle("active", isActive);
+    pane.style.display = isActive ? "block" : "none";
   });
 
   if (tabName === "notices") {

@@ -30,13 +30,13 @@ router.post("/login", async (req, res) => {
     // 1. Check rate limit before performing any lookup or authentication
     const rateCheck = await checkLoginRateLimit(req, identifier);
     if (rateCheck.blocked) {
-      res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds || 900));
+      res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds || 300));
       return res.status(429).json({
         error: "Too Many Requests",
-        message: rateCheck.message || "Too many failed login attempts. Please try again after 15 minutes.",
-        message_mr: rateCheck.message_mr || "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया १५ मिनिटांनंतर पुन्हा प्रयत्न करा.",
+        message: rateCheck.message || "Too many failed login attempts. Please try again after 5 minutes.",
+        message_mr: rateCheck.message_mr || "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया ५ मिनिटांनंतर पुन्हा प्रयत्न करा.",
         retryAfter: rateCheck.retryAfterSeconds,
-        retryAfterMinutes: rateCheck.retryMinutes || Math.ceil((rateCheck.retryAfterSeconds || 900) / 60)
+        retryAfterMinutes: rateCheck.retryMinutes || Math.ceil((rateCheck.retryAfterSeconds || 300) / 60)
       });
     }
 

@@ -260,9 +260,9 @@ export const translations = {
     login_chip_cit1: "Citizen 1 - Tukaram Shinde (CIT-101)",
     login_chip_cit2: "Citizen 2 - Savita Devi (CIT-102)",
     login_reg_link: "Not registered yet? Resident Self-Registration",
-    login_rate_limited: "Too many failed login attempts. Please try again after 15 minutes.",
+    login_rate_limited: "Too many failed login attempts. Please try again after 5 minutes.",
     login_locked_title: "Too Many Failed Attempts",
-    login_locked_banner: "Login is temporarily locked for 15 minutes to protect your account. Please wait:",
+    login_locked_banner: "Login is temporarily locked for 5 minutes to protect your account. Please wait:",
     login_locked_btn: "Login Locked",
     login_lock_expired: "Lockout expired. You may now attempt to sign in.",
 
@@ -1001,9 +1001,9 @@ export const translations = {
     login_chip_cit1: "नागरिक १ - तुकाराम शिंदे (CIT-101)",
     login_chip_cit2: "नागरिक २ - सविता देवी (CIT-102)",
     login_reg_link: "अद्याप खाते नाही? येथे नागरिक स्वयं-नोंदणी करा",
-    login_rate_limited: "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया १५ मिनिटांनंतर पुन्हा प्रयत्न करा.",
+    login_rate_limited: "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया ५ मिनिटांनंतर पुन्हा प्रयत्न करा.",
     login_locked_title: "अनेक अयशस्वी लॉगिन प्रयत्न",
-    login_locked_banner: "खात्याच्या सुरक्षेसाठी लॉगिन तात्पुरते १५ मिनिटांसाठी बंद केले आहे. कृपया प्रतीक्षा करा:",
+    login_locked_banner: "खात्याच्या सुरक्षेसाठी लॉगिन तात्पुरते ५ मिनिटांसाठी बंद केले आहे. कृपया प्रतीक्षा करा:",
     login_locked_btn: "लॉगिन तात्पुरते बंद",
     login_lock_expired: "प्रतीक्षा कालावधी संपला आहे. आपण आता पुन्हा लॉगिन करू शकता.",
 

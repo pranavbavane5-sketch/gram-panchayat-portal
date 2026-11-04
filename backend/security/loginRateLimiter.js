@@ -17,8 +17,8 @@ import { isFirestore, getDb, mysqlQuery, COLLECTIONS } from "../repositories/bas
 
 export const RATE_LIMIT_CONFIG = {
   MAX_FAILED_ATTEMPTS: 5,
-  WINDOW_MS: 15 * 60 * 1000,        // 15 minutes
-  BLOCK_DURATION_MS: 15 * 60 * 1000  // 15 minutes
+  WINDOW_MS: 5 * 60 * 1000,        // 5 minutes
+  BLOCK_DURATION_MS: 5 * 60 * 1000  // 5 minutes
 };
 
 // Fallback in-memory store if database is unreachable or for isolated unit tests
@@ -289,8 +289,8 @@ export async function checkLoginRateLimit(req, identifier) {
       reason: "ip",
       retryAfterSeconds,
       retryMinutes,
-      message: "Too many failed login attempts. Please try again after 15 minutes.",
-      message_mr: "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया १५ मिनिटांनंतर पुन्हा प्रयत्न करा."
+      message: "Too many failed login attempts. Please try again after 5 minutes.",
+      message_mr: "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया ५ मिनिटांनंतर पुन्हा प्रयत्न करा."
     };
   }
 
@@ -306,8 +306,8 @@ export async function checkLoginRateLimit(req, identifier) {
         reason: "account",
         retryAfterSeconds,
         retryMinutes,
-        message: "Too many failed login attempts. Please try again after 15 minutes.",
-        message_mr: "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया १५ मिनिटांनंतर पुन्हा प्रयत्न करा."
+        message: "Too many failed login attempts. Please try again after 5 minutes.",
+        message_mr: "अनेक अयशस्वी लॉगिन प्रयत्न झाले आहेत. कृपया ५ मिनिटांनंतर पुन्हा प्रयत्न करा."
       };
     }
   }

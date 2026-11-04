@@ -654,34 +654,31 @@ body {
 }
 
 .hero-right-visual {
-  flex: 1 1 44%;
+  flex: 0 0 46%;
   min-width: 0;
-  max-width: 100%;
   position: relative;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 20px 16px 0;
+  align-items: stretch;
+  padding: 0;
 }
 
 .hero-building-frame {
   width: 100%;
   height: 100%;
-  min-height: 240px;
-  max-height: 280px;
+  min-height: 280px;
   position: relative;
-  border-radius: 10px;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.40);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: none;
+  border: none;
 }
 
 .hero-building-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 70% center;
+  object-position: 60% center;
   display: block;
 }
 
@@ -845,9 +842,8 @@ body {
   }
   .hero-right-visual {
     flex: 0 0 100% !important;
-    max-width: 100% !important;
     width: 100%;
-    height: 220px;
+    height: 240px;
     padding: 0;
   }
   .hero-left-content {

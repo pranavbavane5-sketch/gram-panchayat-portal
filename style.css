@@ -219,7 +219,6 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  position: relative;
 }
 
 /* Left Section: Original Gram Panchayat Logo + Titles */
@@ -305,11 +304,9 @@ body {
 .gp-header-officials-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .gp-official-card {
@@ -814,8 +811,6 @@ body {
     gap: 12px;
   }
   .gp-header-officials-row {
-    position: static;
-    transform: none;
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
